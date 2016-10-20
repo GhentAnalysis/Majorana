@@ -1,5 +1,5 @@
 # Init Majorana repository
-
+test
 ```
 cmsrel CMSSW_8_0_20
 cd CMSSW_8_0_20
