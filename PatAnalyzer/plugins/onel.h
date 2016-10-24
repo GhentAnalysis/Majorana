@@ -1,0 +1,548 @@
+#ifndef onel_H
+#define onel_H
+
+#include "FWCore/Framework/interface/EDAnalyzer.h"
+#include "FWCore/PluginManager/interface/ModuleDef.h"
+#include "FWCore/Framework/interface/MakerMacros.h"
+
+#include "FWCore/ServiceRegistry/interface/Service.h"
+#include "CommonTools/UtilAlgos/interface/TFileService.h"
+
+#include "HLTrigger/HLTcore/interface/HLTConfigProvider.h"
+
+#include "DataFormats/Common/interface/Handle.h"
+#include "DataFormats/Common/interface/View.h"
+#include "DataFormats/Common/interface/TriggerResults.h"
+#include "DataFormats/DetId/interface/DetId.h"
+#include "DataFormats/EgammaCandidates/interface/Photon.h"
+#include "DataFormats/EgammaCandidates/interface/PhotonFwd.h"
+#include "DataFormats/HepMCCandidate/interface/GenParticleFwd.h"
+#include "DataFormats/HepMCCandidate/interface/GenParticle.h"
+#include "DataFormats/METReco/interface/PFMET.h"
+#include "DataFormats/METReco/interface/PFMETCollection.h"
+#include "DataFormats/MuonReco/interface/MuonFwd.h"
+#include "DataFormats/MuonReco/interface/Muon.h"
+#include "DataFormats/PatCandidates/interface/Muon.h"
+#include "DataFormats/PatCandidates/interface/Electron.h"
+#include "DataFormats/PatCandidates/interface/Conversion.h"
+#include "DataFormats/PatCandidates/interface/Jet.h"
+#include "DataFormats/PatCandidates/interface/MET.h"
+#include "DataFormats/BeamSpot/interface/BeamSpot.h"
+#include "DataFormats/RecoCandidate/interface/RecoCandidate.h"
+#include "DataFormats/RecoCandidate/interface/IsoDepositFwd.h"
+#include "DataFormats/RecoCandidate/interface/IsoDeposit.h"
+#include "DataFormats/TrackReco/interface/TrackFwd.h"
+#include "DataFormats/TrackReco/interface/Track.h"
+#include "DataFormats/VertexReco/interface/Vertex.h"
+
+#include "FWCore/Framework/interface/Frameworkfwd.h"
+#include "FWCore/Framework/interface/EDAnalyzer.h"
+#include "FWCore/Framework/interface/Event.h"
+#include "FWCore/Framework/interface/MakerMacros.h"
+#include "FWCore/Framework/interface/EventSetup.h"
+#include "FWCore/Framework/interface/ESHandle.h"
+#include "FWCore/Common/interface/TriggerNames.h"
+#include "FWCore/MessageLogger/interface/MessageLogger.h"
+#include "FWCore/ParameterSet/interface/ParameterSet.h"
+#include "FWCore/PluginManager/interface/ModuleDef.h"
+#include "FWCore/Framework/interface/LuminosityBlock.h"
+
+#include "SUSYAnalyzer/PatAnalyzer/interface/GenParticleManager.h"
+#include "SUSYAnalyzer/PatAnalyzer/interface/Statistics.h"
+#include "SUSYAnalyzer/PatAnalyzer/interface/Tools.h"
+#include "SUSYAnalyzer/PatAnalyzer/interface/OnTheFlyCorrections.hh"
+#include "SUSYAnalyzer/PatAnalyzer/interface/BTagCalibrationStandalone.h"
+
+
+#include "EgammaAnalysis/ElectronTools/interface/EGammaMvaEleEstimatorCSA14.h"
+#include "RecoEgamma/EgammaTools/interface/ConversionTools.h"
+#include "DataFormats/Math/interface/deltaR.h"
+
+#include "RecoTauTag/RecoTau/interface/RecoTauVertexAssociator.h"
+#include "DataFormats/PatCandidates/interface/Tau.h"
+
+
+//Root Classes
+
+#include "TH1F.h"
+#include "TH2F.h"
+#include "TH1I.h"
+#include "TFile.h"
+#include "TDirectory.h"
+#include "TTree.h"
+#include "TStyle.h"
+#include "TCanvas.h"
+#include "TString.h"
+#include "TMath.h"
+#include "TLorentzVector.h"
+#include "TLegend.h"
+#include "TClonesArray.h"
+
+//Standard C++ classes
+#include <iostream>
+#include <string>
+#include <map>
+#include <vector>
+#include <utility>
+#include <ostream>
+#include <fstream>
+#include <algorithm>
+#include <cmath>
+#include <memory>
+#include <iomanip>
+
+using namespace std;
+
+const int nLeptonsMax = 6;
+
+const char* _triggers3lNames4[4] =
+{"HLT_TripleMu_12_10_5", "HLT_DiMu9_Ele9_CaloIdL_TrackIdL", "HLT_Mu8_DiEle12_CaloIdL_TrackIdL", "HLT_Ele16_Ele12_Ele8_CaloIdL_TrackIdL"
+};
+
+const char* _triggers2lNames4[2][6] =
+{ {"HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_v", "HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL_DZ_v",
+   "HLT_Mu8_TrkIsoVVL_Ele17_CaloIdL_TrackIdL_IsoVL_v", "HLT_Mu17_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_v",
+   "HLT_Ele17_Ele12_CaloIdL_TrackIdL_IsoVL_v", "HLT_Ele17_Ele12_CaloIdL_TrackIdL_IsoVL_DZ_v"},
+
+  {"HLT_DoubleMu8_Mass8_PFHT300","empty",
+   "HLT_Mu8_Ele8_CaloIdM_TrackIdM_Mass8_PFHT300","empty",
+   "HLT_DoubleEle8_CaloIdM_TrackIdM_Mass8_PFHT300","empty"}
+};
+
+const char* _triggers2lNames4Bkp[2][6] =
+{ {"HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_v", "HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL_v",
+   "HLT_Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_v", "HLT_Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_v",
+   "HLT_Ele23_Ele12_CaloIdL_TrackIdL_IsoVL_v", "HLT_Ele23_Ele12_CaloIdL_TrackIdL_IsoVL_DZ_v"},
+
+  {"HLT_DoubleMu8_Mass8_PFHT250","empty",
+   "HLT_Mu8_Ele8_CaloIdM_TrackIdM_Mass8_PFHT250","empty",
+   "HLT_DoubleEle8_CaloIdM_TrackIdM_Mass8_PFHT250","empty"}
+};
+
+const char* _triggersCSNames4[5][5] =
+{
+  {"HLT_Mu8_TrkIsoVVL_v","HLT_Mu17_TrkIsoVVL_v","HLT_Mu24_TrkIsoVVL_v","HLT_Mu34_TrkIsoVVL_v","empty"},
+  {"HLT_Ele12_CaloIdL_TrackIdL_IsoVL_PFJet30_v","HLT_Ele18_CaloIdL_TrackIdL_IsoVL_PFJet30_v","HLT_Ele23_CaloIdL_TrackIdL_IsoVL_PFJet30_v","HLT_Ele33_CaloIdL_TrackIdL_IsoVL_PFJet30_v","empty"},
+  {"HLT_Mu8_v","HLT_Mu17_v","HLT_Mu24_v","HLT_Mu34_v","empty"},
+  {"HLT_Ele8_CaloIdM_TrackIdM_PFJet30_v","HLT_Ele12_CaloIdM_TrackIdM_PFJet30_v","HLT_Ele18_CaloIdM_TrackIdM_PFJet30_v","HLT_Ele23_CaloIdM_TrackIdM_PFJet30_v",                 "HLT_Ele33_CaloIdM_TrackIdM_PFJet30_v"},
+  {"HLT_Ele17_CaloIdL_TrackIdL_IsoVL_v","HLT_Ele23_CaloIdL_TrackIdL_IsoVL_v","empty","empty","empty"}
+};
+
+const char* _triggersCSbNames4[2] = {"HLT_Mu10_CentralPFJet30_BTagCSV0p5PF_v","HLT_Ele10_CaloIdM_TrackIdM_CentralPFJet30_BTagCSV0p5PF_v"};
+
+const char* _triggers1lNames4[5] =
+{"HLT_IsoMu20_v","HLT_IsoTkMu20_v","HLT_IsoMu18_v","HLT_Ele23_WPLoose_Gsf_v","HLT_Ele27_WP85_Gsf_v"};
+
+/*
+HLT_Mu8_v1
+HLT_Mu17_v1
+HLT_Mu24_v1
+HLT_Mu34_v1
+HLT_Ele8_CaloIdM_TrackIdM_PFJet30_v1
+HLT_Ele12_CaloIdM_TrackIdM_PFJet30_v1
+HLT_Ele18_CaloIdM_TrackIdM_PFJet30_v1
+HLT_Ele23_CaloIdM_TrackIdM_PFJet30_v1
+HLT_Ele33_CaloIdM_TrackIdM_PFJet30_v1
+         
+HLT_Mu8_TrkIsoVVL_v1
+HLT_Mu17_TrkIsoVVL_v1
+HLT_Mu24_TrkIsoVVL_v1
+HLT_Mu34_TrkIsoVVL_v1
+HLT_Ele12_CaloIdL_TrackIdL_IsoVL_PFJet30_v1
+HLT_Ele18_CaloIdL_TrackIdL_IsoVL_PFJet30_v1
+HLT_Ele23_CaloIdL_TrackIdL_IsoVL_PFJet30_v1
+HLT_Ele33_CaloIdL_TrackIdL_IsoVL_PFJet30_v1
+                 
+HLT_Mu17_Mu8_DZ_v1
+HLT_Mu17_TkMu8_DZ_v1
+HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_v1
+HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL_DZ_v1
+HLT_Mu8_TrkIsoVVL_Ele17_CaloIdL_TrackIdL_IsoVL_v1
+HLT_Mu17_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_v1
+                       
+HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_v1
+HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL_v1
+HLT_Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_v1
+HLT_Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_v1
+HLT_Ele23_Ele12_CaloIdL_TrackIdL_IsoVL_v1
+                            
+HLT_DoubleMu8_Mass8_PFHT300_v1
+HLT_Mu8_Ele8_CaloIdM_TrackIdM_Mass8_PFHT300_v1
+HLT_DoubleEle8_CaloIdM_TrackIdM_Mass8_PFHT300_v1
+                              
+HLT_Mu10_CentralPFJet30_BTagCSV0p5PF_v1
+HLT_Ele10_CaloIdM_TrackIdM_CentralPFJet30_BTagCSV0p5PF_v1
+*/
+
+class onel : public edm::EDAnalyzer {
+public:
+    
+    explicit onel(const edm::ParameterSet & iConfig);
+    ~onel(){};
+    
+private:
+    
+    //virtual void analyze(edm::Event & iEvent, const edm::EventSetup & iSetup);
+    virtual void beginRun(const edm::Run& iRun, edm::EventSetup const& iSetup) override;
+    virtual void analyze(const edm::Event&, const edm::EventSetup&);
+    virtual void beginJob();
+    virtual void endJob(void);
+    
+    void fillRegVars(const pat::Jet *jet, double genpt, const pat::Muon* mu);
+    void fillRegVars(const pat::Jet *jet, double genpt, const pat::Electron* el);
+
+    void fillMCVars(const GenParticle* mc, const int leptonCounter);
+    void fillCloseJetVars(const int leptonCounter);
+    void matchCloseJet(const int leptonCounter);
+    void fillIsoMCVars(const int leptonCounter);
+
+    std::vector<const pat::Jet* > SelectedJetsAll;
+    edm::Handle<GenParticleCollection> TheGenParticles;
+    
+    
+    std::string Sample;
+    std::string SampleName;
+    edm::InputTag IT_muon;
+    edm::InputTag IT_electron;
+    edm::InputTag IT_tau;
+    edm::InputTag IT_tauDiscriminator;
+    edm::InputTag IT_jet;
+    edm::InputTag IT_pfmet;
+    edm::InputTag IT_beamspot;
+    edm::InputTag IT_hltresults;
+    edm::InputTag IT_METFilters;
+    
+    // MVA values and categories (optional)
+    edm::EDGetTokenT<edm::ValueMap<bool> > eleVetoIdMapToken_;
+    edm::EDGetTokenT<edm::ValueMap<bool> > eleLooseIdMapToken_;
+    edm::EDGetTokenT<edm::ValueMap<bool> > eleMediumIdMapToken_;
+    edm::EDGetTokenT<edm::ValueMap<bool> > eleTightIdMapToken_;
+    edm::EDGetTokenT<edm::ValueMap<float> > mvaValuesMapToken_;
+
+
+    edm::Service<TFileService> fs;
+    FILE *outfile;
+    
+    TH1F *Nvtx;
+    
+    //desired output variables
+    TTree* outputTree;
+    
+    string _corrLevel;
+    
+
+    
+    double _relIsoCutE;
+    double _relIsoCutMu;
+    double _relIsoCutEloose;
+    double _relIsoCutMuloose;
+    
+    bool _chargeConsistency;
+    
+    double _minPt0;
+    double _minPt1;
+    double _tightD0Mu;
+    double _tightD0E;
+    double _looseD0Mu;
+    double _looseD0E;
+    
+    double _jetPtCut;
+    double _jetEtaCut;
+    
+    double _tauPt;
+    double _tauEta;
+    
+    bool _regression;
+    
+    bool firstEvent_;
+    
+    std::vector<std::string> myManualCatWeigths;
+    vector<string> myManualCatWeigthsTrig;
+    EGammaMvaEleEstimatorCSA14* myMVATrig;
+    double looseMVA[3][2]; //{{0.35, 0.20, -0.52}, {0.73, 0.57, 0.05}};//{0.8, 1.479, };
+    
+
+    
+    //genlevel particles
+    GenParticleManager GPM;
+    OnTheFlyCorrections* fMetCorrector;
+    
+    int _n_bJets;
+    int _n_Jets;
+    
+    double _jetEta[20];
+    double _jetPhi[20];
+    double _jetPt[20];
+    double _jetE[20];
+    int _jetFlavour[20];
+    bool _bTagged[20];
+    double _csv[20];
+    double _jetDeltaR[20][6];
+
+    double _weight;
+    
+    int _n_bJetsAll;
+    int _n_JetsAll;
+    
+    double _jetEtaAll[100];
+    double _jetPhiAll[100];
+    double _jetPtAll[100];
+    double _jetEAll[100];
+    bool _bTaggedAll[100];
+    double _csvAll[100];
+    int _closeIndex[nLeptonsMax];
+    
+    
+    TClonesArray* _leptonP4;
+    TClonesArray* _jetP4;
+    TClonesArray* _jetAllP4;
+    
+    int _nLeptons;
+    int _nEle;
+    int _nMu;
+    int _nTau;
+    
+    int _eventType; //ee,mm,em
+    int _index1 = -1;
+    int _index2 = -1;
+
+    
+    int _indeces[nLeptonsMax];
+    int _flavors[nLeptonsMax];
+    double _charges[nLeptonsMax];
+    double _isolation[nLeptonsMax];
+    double _isolationDB[nLeptonsMax];
+    double _isolationComponents[nLeptonsMax][4];
+    double _isolationMC[nLeptonsMax][4]; //all daughters; all visible daughters; all daughters in the cone; all visible daughters in the cone
+    double _miniisolation[nLeptonsMax][2];
+    bool _multiisolation[nLeptonsMax][5];
+    double multiConst[5][3];
+    double _ptrel[nLeptonsMax];
+    double _ptratio[nLeptonsMax];
+
+    double _closeJetEtaAll[nLeptonsMax];
+    double _closeJetPhiAll[nLeptonsMax];
+    double _closeJetEAll[nLeptonsMax];
+    double _closeJetMAll[nLeptonsMax];
+    double _closeJetNconstAll[nLeptonsMax];
+    double _closeJetCSVAll [nLeptonsMax];
+
+
+    double myRhoJets;
+    double myRhoJECJets;
+
+    int _hitsNumber[nLeptonsMax];
+    bool _vtxFitConversion[nLeptonsMax];
+
+    bool _trigEmulator[nLeptonsMax];
+    bool _isotrigEmulator[nLeptonsMax];
+
+    double _mvaValue[nLeptonsMax];
+
+    int _origin[nLeptonsMax];
+    int _originReduced[nLeptonsMax];
+    bool _isPromptFinalState[nLeptonsMax];
+    bool _fromHardProcessFinalState[nLeptonsMax];
+
+    double _PVchi2;
+    double _PVerr[3];
+    double _ipPV[nLeptonsMax];
+    double _ipPVsig[nLeptonsMax];
+    double _ipPVerr[nLeptonsMax];
+    double _ipPVmc[nLeptonsMax];
+    
+    double _ipZPV[nLeptonsMax];
+    double _ipZPVerr[nLeptonsMax];
+    
+    double _3dIP[nLeptonsMax];
+    double _3dIPerr[nLeptonsMax];
+    double _3dIPsig[nLeptonsMax];
+    
+    double _mt[nLeptonsMax];
+    
+    double _srID[3];
+    double _channel[3];
+    double _mll[3];
+    bool _ossf[3];
+    bool _sb;
+    bool _doubleF;
+
+    double _closeJetPt[nLeptonsMax];
+    double _closeJetPtAll[nLeptonsMax];
+    
+    double _closeJetAngAll[nLeptonsMax];
+    double _ptRel[nLeptonsMax];
+    double _ptRelAll[nLeptonsMax];
+    double _closeJetPtAllMC[nLeptonsMax];
+    double _closeJetPtAllstatus[nLeptonsMax];
+    int _partonIdMatched[nLeptonsMax];
+    bool _sameParton[nLeptonsMax];
+    
+    bool _isloose[nLeptonsMax];
+    bool _istight[nLeptonsMax];
+    bool _istightID[nLeptonsMax];
+    bool _isvetoIDCutBased[nLeptonsMax];
+    bool _islooseIDCutBased[nLeptonsMax];
+    bool _ismediumIDCutBased[nLeptonsMax];
+    bool _istightIDCutBased[nLeptonsMax];
+
+    bool _chargeConst[nLeptonsMax];
+
+
+    double _n_MCTruth_PV;
+    int _n_PV;
+    
+    int _n_electrons;
+    int _n_muons;
+    int _n_taus;
+    
+    unsigned long _eventNb;
+    unsigned long _runNb;
+    unsigned long _lumiBlock;
+    
+    
+    double _lPt[nLeptonsMax], _lEta[nLeptonsMax], _lPhi[nLeptonsMax], _lE[nLeptonsMax];
+    double _lPtmc[nLeptonsMax], _lEtamc[nLeptonsMax], _lPhimc[nLeptonsMax], _lEmc[nLeptonsMax], _lpdgmc[nLeptonsMax], _lchargemc[nLeptonsMax];
+    bool _flag_lepton[nLeptonsMax];
+    double _dR15[nLeptonsMax];
+    double _nuPtmc[nLeptonsMax], _nuEtamc[nLeptonsMax], _nuPhimc[nLeptonsMax], _nuEmc[nLeptonsMax];
+
+    double _mtmc[nLeptonsMax];
+    
+    double _mompt[nLeptonsMax];
+    double _momphi[nLeptonsMax];
+    double _mometa[nLeptonsMax];
+    int _mompdg[nLeptonsMax];
+    
+    
+    double _met;
+    double _met_phi;
+    double HT;
+    
+    double _genmet;
+    double _genmet_phi;
+    
+    double _genqpt;
+
+    long _nEventsTotal;
+    long _nEventsTotalCounted;
+    long _nEventsFiltered;
+    
+    Vertex::Point PVmc;
+    
+    TH1D* _hCounter;
+    
+    double _regVars[15];
+    double hJet_ptRaw;
+    double hJet_genPt;
+    double hJet_pt;
+    double hJet_phi;
+    double hJet_eta;
+    double hJet_e;
+    
+    double hJet_ptLeadTrack;
+    
+    double hJet_vtx3dL;
+    double hJet_vtx3deL;
+    double hJet_vtxMass;
+    double hJet_vtxPt;
+    
+    double hJet_cef;
+    double hJet_nconstituents;
+    double hJet_JECUnc;
+    
+    double hJet_SoftLeptptRel;
+    double hJet_SoftLeptPt;
+    double hJet_SoftLeptdR;
+    
+    double hJet_SoftLeptIdlooseMu;
+    double hJet_SoftLeptId95;
+
+    //Triggers
+    /*
+    bool _trigMu8;
+    bool _trigMu17;
+    bool _trigMu8iso;
+    bool _trigMu17iso;
+    bool _trigEle12;
+    bool _trigEle12iso;
+    bool _trigDiMuIso;
+    bool _trigDiMuTkIso;
+    bool _trigMu8Ele23Iso;
+    bool _trigMu23Ele12Iso;
+    bool _trigEle23Ele12Iso;
+    bool _trigDoubleMu8;
+    bool _trigMu8Ele8;
+    bool _trigDoubleEle8;
+    bool _trigTripleMu;
+    bool _trigTripleDiMu9Ele9;
+    bool _trigTripleMu8DiEle12;
+    bool _trigTripleEle16Ele12Ele8;
+    */
+
+    bool _triggers2l[2][6];
+    double _triggers2lpresc[2][6];
+
+    bool _triggers2lbkp[2][6];
+    double _triggers2lbkppresc[2][6];
+
+    bool _triggersCS[5][5];
+    double _triggersCSpresc[5][5];
+
+    bool _triggersCSb[2];
+    double _triggersCSbpresc[2];
+
+    bool _triggers1l[5];
+    double _triggers1lpresc[5];
+
+    bool Flag_eeBadScFilter;
+
+    //HLTConfigProvider hltConfig_;
+
+
+    // JEC
+    JetCorrectionUncertainty *jecUnc;
+
+    // is Real Data
+    bool realdata_;
+
+    // JEC
+    double _jecUnc[20];
+    double _jetPtUp[20];
+    double _jetPtDown[20];
+
+    // JER
+    double _matchedjetPt[20];
+    double _matchedjetEta[20];
+    double _matchedjetPhi[20];
+    double _matchedjetE[20];
+    double _matchedjetM[20];
+    bool _matchGjet[20];
+
+    // b-tag SF
+    double _btagSF[19][20];
+
+    BTagCalibration* calib_csvv2;
+    BTagCalibrationReader* reader;
+    BTagCalibrationReader* reader_JESUp;
+    BTagCalibrationReader* reader_JESDown;
+    BTagCalibrationReader* reader_LFUp;
+    BTagCalibrationReader* reader_LFDown;
+    BTagCalibrationReader* reader_HFUp;
+    BTagCalibrationReader* reader_HFDown;
+    BTagCalibrationReader* reader_HFStats1Up;
+    BTagCalibrationReader* reader_HFStats1Down;
+    BTagCalibrationReader* reader_HFStats2Up;
+    BTagCalibrationReader* reader_HFStats2Down;
+    BTagCalibrationReader* reader_LFStats1Up;
+    BTagCalibrationReader* reader_LFStats1Down;
+    BTagCalibrationReader* reader_LFStats2Up;
+    BTagCalibrationReader* reader_LFStats2Down;
+    BTagCalibrationReader* reader_CFErr1Up;
+    BTagCalibrationReader* reader_CFErr1Down;
+    BTagCalibrationReader* reader_CFErr2Up;
+    BTagCalibrationReader* reader_CFErr2Down;
+
+};
+
+#endif

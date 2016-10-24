@@ -1,0 +1,695 @@
+ #include "SUSYAnalyzer/PatAnalyzer/interface/Tools.h"
+ 
+ 
+  float tools::mass(float pt1 , float pt2, float eta1 , float eta2, float phi1, float phi2)
+  {
+    TLorentzVector v1,v2;
+    v1.SetPtEtaPhiM(pt1, eta1, phi1, 0.);
+    v2.SetPtEtaPhiM(pt2,eta2, phi2, 0.);
+    v1 = v1 + v2;  
+    return v1.Mag();
+  }
+
+   void tools::ERR( edm::InputTag& IT )
+  {
+    cerr << "[ERROR] : " << IT << " is not a valid input label for this event.  SKIPPING EVENT " << endl;
+  }
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+  //Muon Selector 
+std::vector<const pat::Muon* > tools::MuonSelector(const std::vector<pat::Muon>  & thePatMuons, 
+double v_muon_pt,	 
+double v_muon_eta,  
+reco::Vertex::Point PV,
+double v_muon_d0,	 
+double v_muon_reliso,
+bool usePFiso)
+{  
+
+
+double  v_muon_dz = 0.1;
+int v_muon_numberOfMatchedStations =2; 
+int v_muon_nPixelValidHits =1.;
+int v_muon_numberOfValidMuonHits = 1;
+double v_muon_chi2Norm= 10;
+int v_muon_nValidHits= 6; 
+double v_muon_hadVetoEt= 6.;
+double v_muon_emVetoEt=4.; 
+
+   std::vector<const pat::Muon* > vMuons;
+      for( std::vector<pat::Muon>::const_iterator mu = thePatMuons.begin() ; mu != thePatMuons.end() ; mu++ ) 
+	{
+	  if ( mu->pt()  < v_muon_pt ) continue;
+	  if ( TMath::Abs( mu->eta() ) > v_muon_eta ) continue;
+//	  if ( !mu->isTrackerMuon() ) continue; 
+	  if ( !mu->isGlobalMuon()  ) continue;
+	  if ( !mu->isPFMuon() ) continue; 
+	  if ( mu->numberOfMatchedStations() < v_muon_numberOfMatchedStations ) continue;   //we should add this to skim
+
+	  const reco::TrackRef innerTrack = mu->innerTrack();
+	  if( innerTrack.isNull() ) continue;
+	  if( innerTrack->hitPattern().trackerLayersWithMeasurement() < v_muon_nValidHits ) continue; 
+	  if( innerTrack->hitPattern().numberOfValidPixelHits() < v_muon_nPixelValidHits  ) continue;
+	  
+	  const reco::TrackRef globalTrack = mu->globalTrack() ;
+	  if( globalTrack.isNull() ) continue;
+	  if( globalTrack->normalizedChi2() > v_muon_chi2Norm ) continue;
+	  if( globalTrack->hitPattern().numberOfValidMuonHits() < v_muon_numberOfValidMuonHits ) continue;
+
+          if(TMath::Abs(innerTrack->dxy(PV)) > v_muon_d0  ) continue;   
+  	  if(TMath::Abs(innerTrack->dz(PV))   > v_muon_dz  ) continue;   
+
+	  if( mu->isolationR03().emVetoEt > v_muon_emVetoEt ) continue;
+	  if( mu->isolationR03().hadVetoEt> v_muon_hadVetoEt ) continue;
+
+          float pfRelIso  = (mu->pfIsolationR03().sumChargedHadronPt + mu->pfIsolationR03().sumNeutralHadronEt + mu->pfIsolationR03().sumPhotonEt) /mu->pt() ;
+	  float detRelIso = (mu->isolationR03().emEt + mu->isolationR03().hadEt + mu->isolationR03().sumPt) / mu->pt() ;
+          float RelIso = detRelIso; 
+	  if(usePFiso) RelIso = pfRelIso;  
+	  if( RelIso > v_muon_reliso ) continue;
+
+	  vMuons.push_back(&*mu);
+       }
+       
+       return vMuons;      
+
+	  //float dxy = ( (mu->vy() - PV.y())*mu->px() - (mu->vx() - PV.x()) * mu->py()) / mu->pt();   /// impact Para w.r.t PV
+	  //if(TMath::Abs(dxy )   > v_muon_d0  ) continue;
+	  //TVector3 momPerp(0,0,0);
+  	  //momPerp.SetPtEtaPhi(mu->pt(),mu->eta(),mu->phi());
+  	  //TVector3 posPerp(mu->vx()-PV.x(), mu->vy() - PV.y(), 0);
+ 	  //float dzcorr = mu->vz() - PV.z() - posPerp.Dot(momPerp)/mu->pt() * (mu->pz()/mu->pt());
+	  //if(TMath::Abs(dzcorr )   > v_muon_dz  ) continue;
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  //Electron Selector 
+
+std::vector<const pat::Electron* > tools::ElectronSelector(const std::vector<pat::Electron>  & thePatElectrons, 
+double v_electron_pt, 
+double v_electron_eta, 
+reco::Vertex::Point PV,
+double v_electron_d0, 
+double v_electron_reliso,
+bool usePFiso, 
+bool bool_electron_chargeConsistency,
+edm::Handle< std::vector<reco::Conversion> > &theConversions,
+reco::BeamSpot::Point BS)
+{
+
+
+v_electron_d0= 0.02;
+double v_electron_dz = 0.1;
+bool bool_electron_ecalDriven= true;
+
+  std::vector<const pat::Electron* > vElectrons;  
+        for( std::vector<pat::Electron>::const_iterator el = thePatElectrons.begin() ; el != thePatElectrons.end() ; el++ ) 
+	{
+          const reco::GsfTrackRef gsfTrack = el->gsfTrack();
+         
+	  if( el->pt() < v_electron_pt ) continue;
+	  if( TMath::Abs(el->eta()) > v_electron_eta ) continue;
+	  // should we use SC eta ?  ele->superCluster()->eta();
+	  if( TMath::Abs( el->superCluster()->eta() ) < 1.566 &&  TMath::Abs( el->superCluster()->eta() ) > 1.4442 ) continue;
+	  if( bool_electron_ecalDriven && !el->ecalDrivenSeed() ) continue;
+	 
+	  if( TMath::Abs(el->gsfTrack()->dxy(PV)) > v_electron_d0  )  continue; 
+          if( TMath::Abs(el->gsfTrack()->dz(PV))  > v_electron_dz  ) continue;  
+
+	  if( bool_electron_chargeConsistency && !el->isGsfCtfScPixChargeConsistent() )  continue;
+	       
+	  // customized selection from RA5
+	  if( el->pt() < 20. )
+	    {
+	     if( ! ( el->fbrem() > 0.15 || ( TMath::Abs( el->superCluster()->eta() ) < 1.0 && el->eSuperClusterOverP() > 0.95 ) ) ) continue;
+	    }
+	  
+          
+          //if( TMath::Fabs(( 1./ el->trackMomentumAtVtx().p() ) - ( 1./ el->ecalEnergy() ) ) > 0.05 ) continue;
+          
+           if( TMath::Abs(1.0/el->ecalEnergy() - el->eSuperClusterOverP()/el->ecalEnergy()) > 0.05 ) continue;
+    
+            bool vtxFitConversion = ConversionTools::hasMatchedConversion(*el, theConversions, BS);
+           if( vtxFitConversion )  continue; 
+	    if( el->gsfTrack()->trackerExpectedHitsInner().numberOfHits() > 0 ) continue; 
+	  
+	  if( TMath::Abs( el->eta() ) < 1.4442 )
+	    {
+	      if( TMath::Abs(el->deltaPhiSuperClusterTrackAtVtx()) > 0.06 ) continue;
+	      if( TMath::Abs(el->deltaEtaSuperClusterTrackAtVtx()) > 0.004 ) continue;
+	      if( TMath::Abs(el->scSigmaIEtaIEta()) > 0.01 ) continue;
+	      if( TMath::Abs(el->hadronicOverEm()) > 0.1 ) continue;  //recommended is 0.12 but HLT applies 0.1
+	    }
+	  else if( TMath::Abs( el->eta() ) < 2.4 ) 
+	    {
+	      if( TMath::Abs(el->deltaPhiSuperClusterTrackAtVtx()) > 0.03 ) continue;
+	      if( TMath::Abs(el->deltaEtaSuperClusterTrackAtVtx()) > 0.007 ) continue;
+	      if( TMath::Abs(el->scSigmaIEtaIEta()) > 0.03 ) continue;
+	      if( TMath::Abs(el->hadronicOverEm()) > 0.075 ) continue;   /// at the HLT 0.075  recommended is 0.1
+	    }
+
+	  float ecalIso = TMath::Abs(el->eta()) > 1.47 ? el->dr03EcalRecHitSumEt() : TMath::Max(el->dr03EcalRecHitSumEt()-1.,0.); 
+	  float detRelIso = (el->dr03TkSumPt() + el->dr03HcalTowerSumEt() + ecalIso ) / el->pt() ;
+           //puChargedHadronIso(), particleIso()
+          //float pfRelIso  = (el->chargedHadronIso() + el->neutralHadronIso() + el->photonIso() ) /el->pt() ;
+          float RelIso = detRelIso; 
+	  //if(usePFiso) RelIso = pfRelIso;  
+	  if( RelIso  > v_electron_reliso ) continue;
+	  
+	  vElectrons.push_back(&*el );
+	}
+      return vElectrons;
+}
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+std::vector<const pat::Jet* > tools::JetSelector(const std::vector<pat::Jet>  & thePatJets, 
+double  v_jet_et,  
+double  v_jet_eta, 
+bool    bool_jet_id, 
+bool    jetLeptonCleaning, 
+double  v_jet_leptonVetoDR,
+std::vector<const pat::Electron*> vElectrons,
+std::vector<const pat::Muon*> vMuons)
+{
+
+
+     std::vector< const pat::Jet* > vJets;
+
+      for( std::vector<pat::Jet>::const_iterator jet = thePatJets.begin(); jet != thePatJets.end(); jet++ ) 
+	{
+	  if( jet->pt() < v_jet_et )continue;
+	  if( TMath::Abs( jet->eta() ) > v_jet_eta ) continue;
+	  if( bool_jet_id )
+	    {
+	      if( jet->neutralHadronEnergyFraction() >= 0.99 ) continue;
+	      if( jet->neutralEmEnergyFraction() >= 0.99 ) continue;
+	      if( ( jet->neutralHadronMultiplicity() + jet->chargedHadronMultiplicity() ) < 2 ) continue;
+	      if( TMath::Abs( jet->eta() ) < 2.4 ) 
+		{
+		  if( jet->chargedHadronEnergyFraction() == 0. ) continue;
+		  if( jet->chargedEmEnergyFraction() >= 0.99 ) continue;
+		  if( jet->chargedMultiplicity() == 0 ) continue;
+		}
+	    }
+
+	  bool vetoJet = false;
+          for(unsigned int i = 0 ; i < vMuons.size() ;i++ ) 
+            {
+             const pat::Muon *mu = vMuons[i]; 
+	      float dphi = TMath::ACos( TMath::Cos( mu->phi()-jet->phi() ));
+	      float deta = mu->eta()-jet->eta();
+	      float dr = TMath::Sqrt( dphi*dphi + deta*deta) ;
+      	    
+	      if(jetLeptonCleaning && dr < v_jet_leptonVetoDR)
+		{
+		  vetoJet = true;
+		  break;
+		}
+	    }
+	  if( vetoJet ) continue;
+
+          for(unsigned int i = 0 ; i < vElectrons.size() ;i++ ) 
+            {
+             const pat::Electron *el = vElectrons[i]; 
+	      float dphi = TMath::ACos( TMath::Cos( el->phi()-jet->phi() ) );
+	      float deta = el->eta() - jet->eta();
+	      float dr = TMath::Sqrt( dphi*dphi + deta*deta );
+	      
+	      if( jetLeptonCleaning && dr < v_jet_leptonVetoDR) 
+		{
+		  vetoJet = true;
+		  break;
+		}
+	    }
+	  if( vetoJet ) continue;	  
+	  vJets.push_back( &*jet );
+      }
+	  return vJets;
+}
+
+
+
+
+double tools::getZMassForDiEle(const std::vector<pat::Electron>  & thePatElectrons,                                                                                                                                 
+     edm::Handle< std::vector<reco::Conversion> > &theConversions,                                                                                                                                     
+     reco::BeamSpot::Point BS,                                                                                                                                                                       
+     reco::Vertex::Point PV,  
+     double  Rho,       
+     const pat::Electron* myEle) {
+    
+    
+    double Aeff[ 7 ] = { 0.10, 0.12, 0.085, 0.11, 0.12, 0.12, 0.13  };
+    double ZMass = 0;
+    
+    
+    bool bool_pfIsolation = true;
+
+    
+    double v_electron_pt = 10.;
+    double v_electron_eta = 2.4 ; 
+    double v_electron_d0 = 0.04; 
+    double v_electron_reliso = 0.2;
+    double v_electron_dz = 0.2;
+    bool bool_electron_ecalDriven = true;
+    bool usePFiso =false;
+    bool usePFisoCorr = false;
+    
+    for( std::vector<pat::Electron>::const_iterator el = thePatElectrons.begin() ; el != thePatElectrons.end() ; el++ ) {
+
+    const reco::GsfTrackRef gsfTrack = el->gsfTrack();
+    
+    if( el->pt() < v_electron_pt ) continue;
+    if( TMath::Abs(el->eta()) > v_electron_eta ) continue;
+  
+    if( TMath::Abs( el->superCluster()->eta() ) < 1.566 &&  TMath::Abs( el->superCluster()->eta() ) > 1.4442 ) continue;
+  
+    if( bool_electron_ecalDriven && !el->ecalDrivenSeed() ) continue;
+    
+    if(TMath::Abs(el->gsfTrack()->dxy(PV)) > v_electron_d0  )  continue;
+    
+    if(TMath::Abs(el->gsfTrack()->dz(PV)) > v_electron_dz  ) continue;
+    
+    
+
+    
+    if( TMath::Abs( el->eta() ) < 1.4442 )
+    {
+        if( TMath::Abs(el->deltaPhiSuperClusterTrackAtVtx()) > 0.8 ) continue;
+        if( TMath::Abs(el->deltaEtaSuperClusterTrackAtVtx()) > 0.007 ) continue;
+        if( TMath::Abs(el->scSigmaIEtaIEta()) > 0.01 ) continue;
+        if( TMath::Abs(el->hadronicOverEm()) > 0.15 ) continue;  //recommended is 0.12 but HLT applies 0.1
+    }
+    else if( TMath::Abs( el->eta() ) < 2.4 ) 
+    {
+        if( TMath::Abs(el->deltaPhiSuperClusterTrackAtVtx()) > 0.7 ) continue;
+        if( TMath::Abs(el->deltaEtaSuperClusterTrackAtVtx()) > 0.01 ) continue;
+        if( TMath::Abs(el->scSigmaIEtaIEta()) > 0.03 ) continue;
+    }
+    
+ 
+    
+    
+    double CorrectedTerm = 0.; 
+    if( TMath::Abs( el->eta() ) < 1.0                                             )     CorrectedTerm = Rho * Aeff[ 0 ];
+    else if( TMath::Abs( el->eta() ) > 1.0   && TMath::Abs( el->eta() ) < 1.479)     CorrectedTerm = Rho * Aeff[ 1 ];
+    else if( TMath::Abs( el->eta() ) > 1.479 && TMath::Abs( el->eta() ) < 2.0  )     CorrectedTerm = Rho * Aeff[ 2 ];
+    else if( TMath::Abs( el->eta() ) > 2.0   && TMath::Abs( el->eta() ) < 2.2  )     CorrectedTerm = Rho * Aeff[ 3 ];
+    else if( TMath::Abs( el->eta() ) > 2.2   && TMath::Abs( el->eta() ) < 2.3  )     CorrectedTerm = Rho * Aeff[ 4 ];
+    else if( TMath::Abs( el->eta() ) > 2.3   && TMath::Abs( el->eta() ) < 2.4  )     CorrectedTerm = Rho * Aeff[ 5 ];
+    
+    float pfRelIso = (el->chargedHadronIso() + TMath::Max(0.0, el->neutralHadronIso() + el->photonIso() - CorrectedTerm ) ) /el->pt() ;
+    
+    
+    
+    // Detector Isolation  
+    float ecalIso = TMath::Abs(el->eta()) > 1.47 ? el->dr03TkSumPt() : TMath::Max(el->dr03TkSumPt()-1.,0.); 
+    float detRelIso = (el->dr03EcalRecHitSumEt() + el->dr03HcalTowerSumEt() + ecalIso ) / el->pt() ;
+    
+    
+    if( bool_pfIsolation ){
+        if( pfRelIso > v_electron_reliso ) continue;
+    }
+    else{
+        
+        if( detRelIso > v_electron_reliso ) continue;
+    }
+    
+    
+    if( myEle->charge() == el->charge()  ) continue;
+    
+    TLorentzVector P1; P1.SetPtEtaPhiE( myEle->pt(), myEle->eta(), myEle->phi(), myEle->energy() );
+    TLorentzVector P2; P2.SetPtEtaPhiE( el->pt(), el->eta(), el->phi(), el->energy() );
+    
+    float Mass = ( P1 + P2 ).M();
+    
+    
+    if( Mass < 106. && Mass > 76. )   ZMass = Mass; 
+ 
+    
+    }
+
+return ZMass;
+}
+
+
+
+
+double tools::getZMassForDiMu(const std::vector<pat::Muon>  & thePatMuons,   
+                            reco::Vertex::Point PV,
+                            const pat::Muon *myMu ){
+    
+    
+    bool bool_pfIsolation = true;
+    float v_muon_pt  = 10.;
+    float v_muon_eta = 2.4;
+    float v_muon_dz  = 999.;
+    float v_muon_iso = 0.2;
+  //  bool ZMass = false; 
+    double ZMass = 0;
+
+    for( std::vector<pat::Muon>::const_iterator mu = thePatMuons.begin() ; mu != thePatMuons.end() ; mu++ ) {
+        
+        if ( mu->pt()  < v_muon_pt ) continue;
+        if ( TMath::Abs( mu->eta() ) > v_muon_eta ) continue;
+        if ( mu->isTrackerMuon() || mu->isGlobalMuon() ) {
+        if ( !mu->isPFMuon() ) continue; 
+        
+    //    TVector3 momPerp(0,0,0);
+    //    momPerp.SetPtEtaPhi(mu->pt(),mu->eta(),mu->phi());
+    //    TVector3 posPerp(mu->vx()-PV.x(), mu->vy() - PV.y(), 0);
+    //    float dzcorr = mu->vz() - PV.z() - posPerp.Dot(momPerp)/mu->pt() * (mu->pz()/mu->pt());
+     //   if(TMath::Abs(dzcorr ) > v_muon_dz  ) continue;
+        
+        // PF Isolation  
+        float chargedHadronIso = mu->pfIsolationR03().sumChargedHadronPt;
+        float neutralHadronIso = mu->pfIsolationR03().sumNeutralHadronEt;
+        float photonIso = mu->pfIsolationR03().sumPhotonEt;
+        float beta = mu->pfIsolationR03().sumPUPt;
+        float pfRelIso  = ( chargedHadronIso + TMath::Max ( 0.0 ,neutralHadronIso + photonIso - 0.5 * beta ) )/mu->pt() ;
+        
+        // Det Isolation 
+        float detRelIso = (mu->isolationR03().emEt + mu->isolationR03().hadEt + mu->isolationR03().sumPt) / mu->pt() ;
+        
+        if( bool_pfIsolation ){
+        
+	    if( pfRelIso > v_muon_iso ) continue;
+        }
+        else{
+            
+            if( detRelIso > v_muon_iso ) continue;
+        }
+        
+        
+        if( mu->charge() == myMu->charge() ) continue;  // We need opposite sign muons
+        
+        TLorentzVector P1; P1.SetPtEtaPhiE( mu->pt(), mu->eta(), mu->phi(), mu->energy() );
+        TLorentzVector P2; P2.SetPtEtaPhiE( myMu->pt(), myMu->eta(), myMu->phi(), myMu->energy() );
+        
+        float Mass = ( P1 + P2 ).M();
+        
+        if( Mass > 76. && Mass < 106. ) ZMass = Mass;
+        
+        
+        
+    }
+}
+    
+return ZMass;
+}
+
+
+
+
+
+float tools::getPtUncertainty(float pt, float eta) {
+	// returns the relative uncertainty on a jet pt, as a function of pt and eta
+	// DISCLAIMER this function is only valid for the Same-Sign 2012 HPA analysis!!
+	
+	
+	float result;
+	const int nBinsEta = 2 ;
+	const int nBinsPt = 10 ;
+	
+	float uncert[nBinsEta][nBinsPt] =
+	{
+		{ 12.0,  7.5,  6.3,  4.7,  3.7,  2.7,  2.6,  2.5,  2.4,  2.3 },
+		{ 20.0,  17.2, 14.5,  10.7,  7.9,  6.9,  6.0,  5.2,  4.7,  4.4 }
+	};
+	
+		
+	int ipt = int(pt/10.);
+	float rest = pt/10. - ipt;
+	int ieta = 0;
+	if (eta < -2.5 || eta > 2.5) {ieta = 1;}
+		
+	if (pt > 10. && pt < 100.) { 
+		result = uncert[ieta][ipt-1] + rest*(uncert[ieta][ipt] - uncert[ieta][ipt-1]);
+	} else if (pt >= 100.){
+		result = uncert[ieta][9];
+	} else {
+		result = uncert[ieta][0];
+	}
+	
+	
+	return result*0.01;
+}
+
+
+
+
+
+
+////////  For EWikino
+
+std::vector<const pat::Muon* > tools::MuonEWKinoSelector(const std::vector<pat::Muon>  & thePatMuons,
+						   double v_muon_pt,
+						   double v_muon_eta,
+						   reco::Vertex::Point PV)
+{
+
+  double v_muon_d0= 0.02;
+  double  v_muon_dz = 0.5;
+  int v_muon_numberOfMatchedStations =2;
+  int v_muon_nPixelValidHits =1.;
+  int v_muon_numberOfValidMuonHits = 1;
+  double v_muon_chi2Norm= 10;
+  int v_muon_nValidHits= 6;
+
+  std::vector<const pat::Muon* > vMuons;
+  for( std::vector<pat::Muon>::const_iterator mu = thePatMuons.begin() ; mu != thePatMuons.end() ; mu++ )
+    {
+       if ( mu->pt()  < v_muon_pt ) continue;
+
+       if ( TMath::Abs( mu->eta() ) > v_muon_eta ) continue;
+       if ( !mu->isGlobalMuon()  ) continue;
+       if ( !mu->isPFMuon() ) continue;
+      if ( mu->numberOfMatchedStations() < v_muon_numberOfMatchedStations ) continue;   //we should add this to skim                                                                                                                     
+      const reco::TrackRef innerTrack = mu->innerTrack();
+      if( innerTrack.isNull() ) continue;
+      if( innerTrack->hitPattern().trackerLayersWithMeasurement() < v_muon_nValidHits ) continue;
+      if( innerTrack->hitPattern().trackerLayersWithMeasurement() < v_muon_nValidHits ) continue;
+      if( innerTrack->hitPattern().numberOfValidPixelHits() < v_muon_nPixelValidHits  ) continue;
+
+      const reco::TrackRef globalTrack = mu->globalTrack() ;
+      if( globalTrack.isNull() ) continue;
+      if( globalTrack->normalizedChi2() > v_muon_chi2Norm ) continue;
+      if(globalTrack->hitPattern().numberOfValidMuonHits() < v_muon_numberOfValidMuonHits ) continue;
+      if(TMath::Abs(innerTrack->dxy(PV)) > v_muon_d0  ) continue;
+      if(TMath::Abs(innerTrack->dz(PV))   > v_muon_dz  ) continue;
+                                                                                                                                                          
+      vMuons.push_back(&*mu);
+
+    }
+
+  return vMuons;
+                                                                                                                      
+}
+
+
+
+
+
+
+
+
+
+
+
+std::vector<const pat::Electron* > tools::ElectronEWKinoSelector(const std::vector<pat::Electron>  & thePatElectrons,
+							   double v_electron_pt,
+							   double v_electron_eta,
+							   reco::Vertex::Point PV,
+							   edm::Handle< std::vector<reco::Conversion> > &theConversions,
+							   reco::BeamSpot::Point BS)
+{
+
+  double v_electron_d0= 0.02;
+  double v_electron_dz = 0.2;
+
+  std::vector<const pat::Electron* > vElectrons;
+  for( std::vector<pat::Electron>::const_iterator el = thePatElectrons.begin() ; el != thePatElectrons.end() ; el++ )
+    {
+      const reco::GsfTrackRef gsfTrack = el->gsfTrack();
+      if( el->pt() < v_electron_pt ) continue;
+      if( TMath::Abs(el->eta()) > v_electron_eta ) continue;                           
+
+      if( TMath::Abs( el->superCluster()->eta() ) < 1.566 &&  TMath::Abs( el->superCluster()->eta() ) > 1.4442 ) continue;
+      if( TMath::Abs(el->gsfTrack()->dxy(PV)) > v_electron_d0  )  continue;
+      if( TMath::Abs(el->gsfTrack()->dz(PV))  > v_electron_dz  ) continue;
+
+      if( TMath::Abs(1.0/el->ecalEnergy() - el->eSuperClusterOverP()/el->ecalEnergy()) > 0.05 ) continue;
+      bool vtxFitConversion = ConversionTools::hasMatchedConversion( reco::GsfElectron (*el) , theConversions, BS);
+      if( vtxFitConversion )  continue;
+      if( el->gsfTrack()->trackerExpectedHitsInner().numberOfHits() > 1 ) continue;
+
+      if( TMath::Abs( el->eta() ) < 1.5 )
+	{
+	  if( TMath::Abs(el->deltaPhiSuperClusterTrackAtVtx()) > 0.15 ) continue;
+	  if( TMath::Abs(el->deltaEtaSuperClusterTrackAtVtx()) > 0.007 ) continue;
+          if( TMath::Abs(el->scSigmaIEtaIEta()) > 0.01 ) continue;
+	  if( TMath::Abs(el->hadronicOverEm()) > 0.12 ) continue;  //recommended is 0.12 but HLT applies 0.1                                                                                                                             
+	}
+      else
+	{
+	  if( TMath::Abs(el->deltaPhiSuperClusterTrackAtVtx()) > 0.10 ) continue;
+	  if( TMath::Abs(el->deltaEtaSuperClusterTrackAtVtx()) > 0.009 ) continue;
+	  if( TMath::Abs(el->scSigmaIEtaIEta()) > 0.03 ) continue;
+	  if( TMath::Abs(el->hadronicOverEm()) > 0.1 ) continue;   /// at the HLT 0.075  recommended is 0.1                                                                                                                              
+	}
+
+
+      vElectrons.push_back(&*el );
+    }
+  return vElectrons;
+
+
+
+
+
+
+
+
+
+}
+
+
+ 
+
+
+
+std::vector<const reco::PFTau *> tools::TauSelector(edm::Handle<reco::PFTauCollection>  & PFTaus,
+							  double v_tau_pt,
+							  double v_tau_eta,
+							  edm::Handle<reco::PFTauDiscriminator> & electron,
+							  edm::Handle<reco::PFTauDiscriminator> & muon,
+                                                          edm::Handle<reco::PFTauDiscriminator> & iso,
+                                                          edm::Handle<reco::PFTauDiscriminator> & decay){
+  std::vector<const reco::PFTau *> vTaus;
+
+   for( unsigned  i=0; i<PFTaus->size(); i++ ) {
+  //   std::cout<<"Tau "<<(*PFTaus)[i].pt()<<" "<< (*PFTaus)[i].eta()<<" "<< (*PFTaus)[i].phi()<<std::endl;
+      //  std::cout<<"pt threshold"<<std::endl;
+	if((*PFTaus)[i].pt()<v_tau_pt) continue;
+//	std::cout<<"eta cut"<<std::endl;
+	if(TMath::Abs((*PFTaus)[i].eta())>v_tau_eta) continue;
+	reco::PFTauRef tauCandidate(PFTaus, i);
+//	std::cout<<"electron discr."<<std::endl;
+        if( (*electron)[tauCandidate] < 0.5 ) continue;
+//	std::cout<<"electron discr."<<std::endl;
+        if( (*muon)[tauCandidate] < 0.5 ) continue;
+//	std::cout<<"muon discr."<<std::endl;
+        if( (*iso)[tauCandidate] < 0.5 ) continue;
+//	std::cout<<"iso discr."<<std::endl;
+        if( (*decay)[tauCandidate] < 0.5 ) continue;
+//	std::cout<<"tau pass"<<std::endl;
+	vTaus.push_back(&((*PFTaus)[i]));
+   }
+  return vTaus;
+}
+
+bool tools::checkMuId(
+                      const pat::Muon *mu,
+                      reco::Vertex::Point PV){
+    
+    bool Passed = false;
+    
+    double v_muon_d0= 0.02;
+    double  v_muon_dz = 0.5;
+    int v_muon_numberOfMatchedStations =2;
+    int v_muon_nPixelValidHits =1.;
+    int v_muon_numberOfValidMuonHits = 1;
+    double v_muon_chi2Norm= 10;
+    int v_muon_nValidHits= 6;
+    
+
+        
+    if ( !mu->isGlobalMuon()  ) return Passed;
+    if ( !mu->isPFMuon() ) return Passed;
+    if ( mu->numberOfMatchedStations() < v_muon_numberOfMatchedStations ) return Passed;   //we should add this to skim                                                                                                                     
+        const reco::TrackRef innerTrack = mu->innerTrack();
+    if( innerTrack.isNull() ) return Passed;
+    if( innerTrack->hitPattern().trackerLayersWithMeasurement() < v_muon_nValidHits ) return Passed;
+    if( innerTrack->hitPattern().trackerLayersWithMeasurement() < v_muon_nValidHits ) return Passed;
+    if( innerTrack->hitPattern().numberOfValidPixelHits() < v_muon_nPixelValidHits  ) return Passed;
+        
+    const reco::TrackRef globalTrack = mu->globalTrack() ;
+    if( globalTrack.isNull() ) return Passed;
+    if( globalTrack->normalizedChi2() > v_muon_chi2Norm ) return Passed;
+    if(globalTrack->hitPattern().numberOfValidMuonHits() < v_muon_numberOfValidMuonHits ) return Passed;
+    if(TMath::Abs(innerTrack->dxy(PV)) > v_muon_d0  ) return Passed;
+    if(TMath::Abs(innerTrack->dz(PV))   > v_muon_dz  ) return Passed;
+        
+    double chargedHadronIso = mu->pfIsolationR03().sumChargedHadronPt;
+    double neutralHadronIso = mu->pfIsolationR03().sumNeutralHadronEt;
+    double photonIso        = mu->pfIsolationR03().sumPhotonEt;
+    double beta             = mu->pfIsolationR03().sumPUPt;
+    double pfRelIso         = ( chargedHadronIso + TMath::Max ( 0.0 ,neutralHadronIso + photonIso - 0.5 * beta ) )/mu->pt() ;
+    
+    if( pfRelIso > 0.15 ) return Passed;
+    
+    Passed = true;
+    return Passed;
+    
+    
+}
+
+
+
+bool tools::checkEleId(
+                reco::BeamSpot::Point BS,                                                                                                                                                                       
+                reco::Vertex::Point PV,  
+                double myRho,     
+                edm::Handle< std::vector<reco::Conversion> > &theConversions,  
+                const pat::Electron* el ){
+    
+    
+    bool Passed = false;
+    
+    double  Aeff[ 7 ] = { 0.10, 0.12, 0.085, 0.11, 0.12, 0.12, 0.13  };
+    
+    double v_electron_d0= 0.02;
+    double v_electron_dz = 0.2;
+
+    const reco::GsfTrackRef gsfTrack = el->gsfTrack();
+        
+    if( TMath::Abs( el->superCluster()->eta() ) < 1.566 &&  TMath::Abs( el->superCluster()->eta() ) > 1.4442 ) return Passed;
+    if( TMath::Abs(el->gsfTrack()->dxy(PV)) > v_electron_d0  )  return Passed;
+    if( TMath::Abs(el->gsfTrack()->dz(PV))  > v_electron_dz  ) return Passed;
+        
+    if( TMath::Abs(1.0/el->ecalEnergy() - el->eSuperClusterOverP()/el->ecalEnergy()) > 0.05 ) return Passed;
+    bool vtxFitConversion = ConversionTools::hasMatchedConversion( reco::GsfElectron (*el) , theConversions, BS);
+    if( vtxFitConversion )  return Passed;
+    if( el->gsfTrack()->trackerExpectedHitsInner().numberOfHits() > 1 ) return Passed;
+        
+    if( TMath::Abs( el->eta() ) < 1.5 ){
+        if( TMath::Abs(el->deltaPhiSuperClusterTrackAtVtx()) > 0.15 ) return Passed;
+        if( TMath::Abs(el->deltaEtaSuperClusterTrackAtVtx()) > 0.007 ) return Passed;
+        if( TMath::Abs(el->scSigmaIEtaIEta()) > 0.01 ) return Passed;
+        if( TMath::Abs(el->hadronicOverEm()) > 0.12 ) return Passed;  //recommended is 0.12 but HLT applies 0.1                                                                                                                             
+    }
+    else{
+        if( TMath::Abs(el->deltaPhiSuperClusterTrackAtVtx()) > 0.10 ) return Passed;
+        if( TMath::Abs(el->deltaEtaSuperClusterTrackAtVtx()) > 0.009 ) return Passed;
+        if( TMath::Abs(el->scSigmaIEtaIEta()) > 0.03 ) return Passed;
+        if( TMath::Abs(el->hadronicOverEm()) > 0.1 ) return Passed;   /// at the HLT 0.075  recommended is 0.1                                                                                                                              
+    }
+    
+    double CorrectedTerm;
+    if( TMath::Abs( el->superCluster()->eta() ) < 1.0 ) CorrectedTerm = myRho * Aeff[ 0 ];
+    else if( TMath::Abs( el->superCluster()->eta() ) > 1.0 && TMath::Abs( el->superCluster()->eta() ) < 1.479  )   CorrectedTerm = myRho * Aeff[ 1 ];
+    else if( TMath::Abs( el->superCluster()->eta() ) > 1.479 && TMath::Abs( el->superCluster()->eta() ) < 2.0  )   CorrectedTerm = myRho * Aeff[ 2 ];
+    else if( TMath::Abs( el->superCluster()->eta() ) > 2.0 && TMath::Abs( el->superCluster()->eta() ) < 2.2  )     CorrectedTerm = myRho * Aeff[ 3 ];
+    else if( TMath::Abs( el->superCluster()->eta() ) > 2.2 && TMath::Abs( el->superCluster()->eta() ) < 2.3  )     CorrectedTerm = myRho * Aeff[ 4 ];
+    else if( TMath::Abs( el->superCluster()->eta() ) > 2.3 && TMath::Abs( el->superCluster()->eta() ) < 2.4  )     CorrectedTerm = myRho * Aeff[ 5 ];
+    
+    double pfRelIso = (el->chargedHadronIso() + TMath::Max(0.0, el->neutralHadronIso() + el->photonIso() - CorrectedTerm ) ) /el->pt() ;
+    
+    if( pfRelIso > 0.15 ) return Passed;
+        
+    Passed = true;
+    return Passed;
+}
