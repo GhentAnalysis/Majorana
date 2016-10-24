@@ -49,11 +49,11 @@
 #include "FWCore/PluginManager/interface/ModuleDef.h"
 #include "FWCore/Framework/interface/LuminosityBlock.h"
 
-#include "SUSYAnalyzer/PatAnalyzer/interface/GenParticleManager.h"
-#include "SUSYAnalyzer/PatAnalyzer/interface/Statistics.h"
-#include "SUSYAnalyzer/PatAnalyzer/interface/Tools.h"
-#include "SUSYAnalyzer/PatAnalyzer/interface/OnTheFlyCorrections.hh"
-#include "SUSYAnalyzer/PatAnalyzer/interface/BTagCalibrationStandalone.h"
+#include "Majorana/PatAnalyzer/interface/GenParticleManager.h"
+#include "Majorana/PatAnalyzer/interface/Statistics.h"
+#include "Majorana/PatAnalyzer/interface/Tools.h"
+#include "Majorana/PatAnalyzer/interface/OnTheFlyCorrections.hh"
+#include "Majorana/PatAnalyzer/interface/BTagCalibrationStandalone.h"
 
 
 #include "EgammaAnalysis/ElectronTools/interface/EGammaMvaEleEstimatorCSA14.h"

@@ -95,7 +95,7 @@ if isMC:
 
 else:
    import PhysicsTools.PythonAnalysis.LumiList as LumiList
-#   process.source.lumisToProcess = LumiList.LumiList(filename = '/scratch/osg/lesya/CMSSW_5_3_11_patch6/src/SUSYAnalyzer/PatAnalyzer/test/fullJSON_SUSYFakes.json').getVLuminosityBlockRange()
+#   process.source.lumisToProcess = LumiList.LumiList(filename = '/scratch/osg/lesya/CMSSW_5_3_11_patch6/src/Majorana/PatAnalyzer/test/fullJSON_SUSYFakes.json').getVLuminosityBlockRange()
 
    process.source.fileNames = cms.untracked.vstring(
     '/scratch/lfs/lesya/FakeSync_jets_test_data_Electrons.root'
@@ -328,8 +328,8 @@ if isMC:
         )
 else:
    import PhysicsTools.PythonAnalysis.LumiList as LumiList
-#   process.source.lumisToProcess = LumiList.LumiList(filename = '/scratch/hpc/lesya/CMSSW_5_3_6_patch1/src/SUSYAnalyzer/PatAnalyzer/test/JSON/Merged_190456-208686_8TeV_Collision12.json').getVLuminosityBlockRange()
-   process.source.lumisToProcess = LumiList.LumiList(filename = '/scratch/osg/lesya/CMSSW_5_3_11_patch6/src/SUSYAnalyzer/PatAnalyzer/test/fullJSON_SUSYFakes.json').getVLuminosityBlockRange()
+#   process.source.lumisToProcess = LumiList.LumiList(filename = '/scratch/hpc/lesya/CMSSW_5_3_6_patch1/src/Majorana/PatAnalyzer/test/JSON/Merged_190456-208686_8TeV_Collision12.json').getVLuminosityBlockRange()
+   process.source.lumisToProcess = LumiList.LumiList(filename = '/scratch/osg/lesya/CMSSW_5_3_11_patch6/src/Majorana/PatAnalyzer/test/fullJSON_SUSYFakes.json').getVLuminosityBlockRange()
    process.p = cms.Path(
 	process.goodOfflinePrimaryVertices
        *process.FakeElectrons

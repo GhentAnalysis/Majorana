@@ -1,4 +1,4 @@
-#include "SUSYAnalyzer/PatAnalyzer/interface/Tools.h"
+#include "Majorana/PatAnalyzer/interface/Tools.h"
 
 double tools::getActivityAroundLepton(edm::Handle<pat::PackedCandidateCollection> pfcands,
                       const reco::Candidate* ptcl,

@@ -321,7 +321,7 @@ if isMC:
         )
 else:
     import FWCore.PythonUtilities.LumiList as LumiList
-    process.source.lumisToProcess = LumiList.LumiList(filename = '/user/ikhvastu/CMSSW_8_0_5/src/SUSYAnalyzer/PatAnalyzer/test/JSON/Cert_271036-276811_13TeV_PromptReco_Collisions16_JSON_NoL1T.json').getVLuminosityBlockRange()
+    process.source.lumisToProcess = LumiList.LumiList(filename = '/user/ikhvastu/CMSSW_8_0_5/src/Majorana/PatAnalyzer/test/JSON/Cert_271036-276811_13TeV_PromptReco_Collisions16_JSON_NoL1T.json').getVLuminosityBlockRange()
     process.p = cms.Path(
     process.goodOfflinePrimaryVertices
     #primaryVertexFilter

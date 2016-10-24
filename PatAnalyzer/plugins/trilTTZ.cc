@@ -39,7 +39,7 @@
 #include "FWCore/Framework/interface/EventSetup.h"
 
 //btagging
-#include "SUSYAnalyzer/PatAnalyzer/interface/BTagCalibrationStandalone.h"
+#include "Majorana/PatAnalyzer/interface/BTagCalibrationStandalone.h"
 
 using namespace std;
 using namespace edm;
@@ -389,7 +389,7 @@ void trilTTZ::beginJob()
     if (isData) _corrLevel = "L2L3Residual";
 
  
-    jecUnc = new JetCorrectionUncertainty("/user/mvit/CMSSW_8_0_5/src/SUSYAnalyzer/PatAnalyzer/jetfiles/Spring16_25nsV6_MC_Uncertainty_AK4PFchs.txt");
+    jecUnc = new JetCorrectionUncertainty("/user/mvit/CMSSW_8_0_5/src/Majorana/PatAnalyzer/jetfiles/Spring16_25nsV6_MC_Uncertainty_AK4PFchs.txt");
     
    
     //80 % eff

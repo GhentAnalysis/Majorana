@@ -84,7 +84,7 @@ for i in inputFile.split(","):
 
 #else:
    #import PhysicsTools.PythonAnalysis.LumiList as LumiList
-   #process.source.lumisToProcess = LumiList.LumiList(filename = '/localgrid/depoyraz/CMSSW_7_4_12/src/SUSYAnalyzer/PatAnalyzer/test/Cert_246908-258750_13TeV_PromptReco_Collisions15_25ns_JSON.txt').getVLuminosityBlockRange()
+   #process.source.lumisToProcess = LumiList.LumiList(filename = '/localgrid/depoyraz/CMSSW_7_4_12/src/Majorana/PatAnalyzer/test/Cert_246908-258750_13TeV_PromptReco_Collisions15_25ns_JSON.txt').getVLuminosityBlockRange()
 
 # input files
    #for j in inputFile.split(","):
@@ -179,7 +179,7 @@ if isMC:
         )
 else:
     import FWCore.PythonUtilities.LumiList as LumiList
-    process.source.lumisToProcess = LumiList.LumiList(filename = '/localgrid/ikhvastu/CMSSW_7_4_14/src/SUSYAnalyzer/PatAnalyzer/test/JSON/Cert_246908-260627_13TeV_PromptReco_Collisions15_25ns_JSON_v2.json').getVLuminosityBlockRange()
+    process.source.lumisToProcess = LumiList.LumiList(filename = '/localgrid/ikhvastu/CMSSW_7_4_14/src/Majorana/PatAnalyzer/test/JSON/Cert_246908-260627_13TeV_PromptReco_Collisions15_25ns_JSON_v2.json').getVLuminosityBlockRange()
     process.p = cms.Path(process.goodOfflinePrimaryVertices * process.egmGsfElectronIDSequence * process.FakeElectrons)
 
 print "SIX"

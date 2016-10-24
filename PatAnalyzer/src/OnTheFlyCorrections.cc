@@ -1,10 +1,10 @@
-#include "SUSYAnalyzer/PatAnalyzer/interface/OnTheFlyCorrections.hh"
+#include "Majorana/PatAnalyzer/interface/OnTheFlyCorrections.hh"
 #include <math.h>
 
 using namespace std;
 
 OnTheFlyCorrections::OnTheFlyCorrections(std::string gt, bool isdata){
-	std::string path="/user/mvit/CMSSW_8_0_5/src/SUSYAnalyzer/PatAnalyzer/jetfiles/";
+	std::string path="/user/mvit/CMSSW_8_0_5/src/Majorana/PatAnalyzer/jetfiles/";
 	JetCorrectorParameters *ResJetPar = new JetCorrectorParameters(path+gt+"_L2L3Residual_AK4PFchs.txt");
 	JetCorrectorParameters *L3JetPar  = new JetCorrectorParameters(path+gt+"_L3Absolute_AK4PFchs.txt");
 	JetCorrectorParameters *L2JetPar  = new JetCorrectorParameters(path+gt+"_L2Relative_AK4PFchs.txt");

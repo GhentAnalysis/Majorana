@@ -39,7 +39,7 @@
 #include "FWCore/Framework/interface/EventSetup.h"
 
 //btagging
-#include "SUSYAnalyzer/PatAnalyzer/interface/BTagCalibrationStandalone.h"
+#include "Majorana/PatAnalyzer/interface/BTagCalibrationStandalone.h"
 
 using namespace std;
 using namespace edm;
@@ -431,8 +431,8 @@ void trilHadr::beginJob()
     */
 
     //jecUnc = new JetCorrectionUncertainty(JetCorPar);
-    //jecUnc = new JetCorrectionUncertainty("/localgrid/ikhvastu/CMSSW_7_4_14/src/SUSYAnalyzer/PatAnalyzer/jetfiles/Summer15_25nsV6_MC_Uncertainty_AK4PFchs.txt");
-    jecUnc = new JetCorrectionUncertainty("/user/ikhvastu/CMSSW_8_0_5/src/SUSYAnalyzer/PatAnalyzer/jetfiles/Spring16_25nsV6_MC_Uncertainty_AK4PFchs.txt");
+    //jecUnc = new JetCorrectionUncertainty("/localgrid/ikhvastu/CMSSW_7_4_14/src/Majorana/PatAnalyzer/jetfiles/Summer15_25nsV6_MC_Uncertainty_AK4PFchs.txt");
+    jecUnc = new JetCorrectionUncertainty("/user/ikhvastu/CMSSW_8_0_5/src/Majorana/PatAnalyzer/jetfiles/Spring16_25nsV6_MC_Uncertainty_AK4PFchs.txt");
     
     /*
     myManualCatWeigths.push_back("EgammaAnalysis/ElectronTools/data/PHYS14/EIDmva_EB1_5_oldscenario2phys14_BDT.weights.xml");
@@ -496,7 +496,7 @@ void trilHadr::beginJob()
     firstEvent_ = true;
     
     /*
-    calib_csvv2 = new BTagCalibration("csvv2", "/localgrid/ikhvastu/CMSSW_7_4_14/src/SUSYAnalyzer/PatAnalyzer/test/ttH_BTV_CSVv2_13TeV_2015D_20151120.csv"); // 25s version of SFs
+    calib_csvv2 = new BTagCalibration("csvv2", "/localgrid/ikhvastu/CMSSW_7_4_14/src/Majorana/PatAnalyzer/test/ttH_BTV_CSVv2_13TeV_2015D_20151120.csv"); // 25s version of SFs
     reader = new BTagCalibrationReader(calib_csvv2, BTagEntry::OP_RESHAPING, "iterativefit", "central");
     // JESUp
     reader_JESUp = new  BTagCalibrationReader(calib_csvv2, BTagEntry::OP_RESHAPING,"iterativefit","up_jes");

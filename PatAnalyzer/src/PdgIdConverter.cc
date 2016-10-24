@@ -1,4 +1,4 @@
 #define PdgIdConverter_cxx
-#include "SUSYAnalyzer/PatAnalyzer/interface/PdgIdConverter.h"
+#include "Majorana/PatAnalyzer/interface/PdgIdConverter.h"
 
 

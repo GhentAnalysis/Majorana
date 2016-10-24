@@ -1,6 +1,6 @@
 [arg 1] :  trilTTZ_Interactive.py
 [arg 2] :  input=file:///user/mvit/file_from_tom/file/Majorana_trilepton_RunIISpring16MiniAODv2_100.root
-[arg 3] :  output=/user/mvit/CMSSW_8_0_5/src/SUSYAnalyzer/PatAnalyzer/test/results/test.root
+[arg 3] :  output=/user/mvit/CMSSW_8_0_5/src/Majorana/PatAnalyzer/test/results/test.root
 # Conditions read from  CMS_CONDITIONS  via FrontierProd 
 Adding:  file:///user/mvit/file_from_tom/file/Majorana_trilepton_RunIISpring16MiniAODv2_100.root
 11   momentum:  0.0514294

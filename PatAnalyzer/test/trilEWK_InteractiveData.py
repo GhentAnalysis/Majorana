@@ -95,7 +95,7 @@ if isMC:
 
 else:
    import PhysicsTools.PythonAnalysis.LumiList as LumiList
-#   process.source.lumisToProcess = LumiList.LumiList(filename = '/scratch/osg/lesya/CMSSW_5_3_11_patch6/src/SUSYAnalyzer/PatAnalyzer/test/fullJSON_SUSYFakes.json').getVLuminosityBlockRange()
+#   process.source.lumisToProcess = LumiList.LumiList(filename = '/scratch/osg/lesya/CMSSW_5_3_11_patch6/src/Majorana/PatAnalyzer/test/fullJSON_SUSYFakes.json').getVLuminosityBlockRange()
 
    process.source.fileNames = cms.untracked.vstring(
     '/scratch/lfs/lesya/FakeSync_jets_test_data_Electrons.root'
@@ -330,7 +330,7 @@ if isMC:
         )
 else:
     import FWCore.PythonUtilities.LumiList as LumiList
-    process.source.lumisToProcess = LumiList.LumiList(filename = '/user/ikhvastu/CMSSW_8_0_5/src/SUSYAnalyzer/PatAnalyzer/test/JSON/Cert_271036-275125_13TeV_PromptReco_Collisions16_JSON.json').getVLuminosityBlockRange()
+    process.source.lumisToProcess = LumiList.LumiList(filename = '/user/ikhvastu/CMSSW_8_0_5/src/Majorana/PatAnalyzer/test/JSON/Cert_271036-275125_13TeV_PromptReco_Collisions16_JSON.json').getVLuminosityBlockRange()
     process.p = cms.Path(
     process.goodOfflinePrimaryVertices
     #primaryVertexFilter

@@ -1,4 +1,4 @@
-#include "SUSYAnalyzer/PatAnalyzer/interface/BTagCalibrationStandalone.h"
+#include "Majorana/PatAnalyzer/interface/BTagCalibrationStandalone.h"
 #include <iostream>
 #include <exception>
 #include <algorithm>
