@@ -22,7 +22,7 @@ OnTheFlyCorrections::OnTheFlyCorrections(std::string path, std::string gt, bool 
 	delete L3JetPar; 
 	delete ResJetPar; 
 
-	fJetUncertainty = new JetCorrectionUncertainty(edm::FileInPath(path+gt+"_Uncertainty_AK4PFchs.txt"));
+	fJetUncertainty = new JetCorrectionUncertainty(edm::FileInPath(path+gt+"_Uncertainty_AK4PFchs.txt").fullPath());
 }
 
 float OnTheFlyCorrections::getJECUncertainty(float pt, float eta){
