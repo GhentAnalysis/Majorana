@@ -7,7 +7,7 @@
 
 class OnTheFlyCorrections {
 	public:
-		OnTheFlyCorrections (std::string globaltag, bool isdata);
+		OnTheFlyCorrections (std::string path, std::string gt, bool isdata);
 		~OnTheFlyCorrections(){};
 
 		bool fIsData;

@@ -1,14 +1,15 @@
 #include "Majorana/PatAnalyzer/interface/OnTheFlyCorrections.hh"
+#include "FWCore/ParameterSet/interface/FileInPath.h"
 #include <math.h>
+
 
 using namespace std;
 
-OnTheFlyCorrections::OnTheFlyCorrections(std::string gt, bool isdata){
-	std::string path="/user/mvit/CMSSW_8_0_5/src/Majorana/PatAnalyzer/jetfiles/";
-	JetCorrectorParameters *ResJetPar = new JetCorrectorParameters(path+gt+"_L2L3Residual_AK4PFchs.txt");
-	JetCorrectorParameters *L3JetPar  = new JetCorrectorParameters(path+gt+"_L3Absolute_AK4PFchs.txt");
-	JetCorrectorParameters *L2JetPar  = new JetCorrectorParameters(path+gt+"_L2Relative_AK4PFchs.txt");
-	JetCorrectorParameters *L1JetPar  = new JetCorrectorParameters(path+gt+"_L1FastJet_AK4PFchs.txt");
+OnTheFlyCorrections::OnTheFlyCorrections(std::string path, std::string gt, bool isdata){
+	JetCorrectorParameters *ResJetPar = new JetCorrectorParameters(edm::FileInPath(path+gt+"_L2L3Residual_AK4PFchs.txt").fullPath());
+	JetCorrectorParameters *L3JetPar  = new JetCorrectorParameters(edm::FileInPath(path+gt+"_L3Absolute_AK4PFchs.txt").fullPath());
+	JetCorrectorParameters *L2JetPar  = new JetCorrectorParameters(edm::FileInPath(path+gt+"_L2Relative_AK4PFchs.txt").fullPath());
+	JetCorrectorParameters *L1JetPar  = new JetCorrectorParameters(edm::FileInPath(path+gt+"_L1FastJet_AK4PFchs.txt").fullPath());
 	fJetCorPar.push_back(*L1JetPar);
 	fJetCorPar.push_back(*L2JetPar);
 	fJetCorPar.push_back(*L3JetPar);

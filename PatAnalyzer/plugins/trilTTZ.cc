@@ -37,9 +37,12 @@
 #include "JetMETCorrections/Objects/interface/JetCorrectionsRecord.h"
 #include "FWCore/Framework/interface/ESHandle.h"
 #include "FWCore/Framework/interface/EventSetup.h"
+#include "FWCore/ParameterSet/interface/FileInPath.h"
 
 //btagging
 #include "Majorana/PatAnalyzer/interface/BTagCalibrationStandalone.h"
+
+#include <iostream>
 
 using namespace std;
 using namespace edm;
@@ -90,8 +93,6 @@ _regression(false)
 {
     Sample              = iConfig.getUntrackedParameter<std::string>("SampleLabel") ;
     SampleName          = iConfig.getUntrackedParameter<std::string>("SampleName") ;
-  
-  
 }
 
 
@@ -108,7 +109,6 @@ void trilTTZ::beginJob()
     _hCounterSUSY_ZZ = fs->make<TH2D>("hCounterSUSY_ZZ", "Events counter", 80, 0., 2000., 60, 0., 1500.);
     
     outputTree = new TTree("FakeTree","FakeTree");
-    
     
     _leptonP4 = new TClonesArray("TLorentzVector", nLeptonsMax);
     for (int i=0; i!=nLeptonsMax; ++i) {
@@ -371,25 +371,18 @@ void trilTTZ::beginJob()
       outputTree->Branch("_gen_wPhi", &_gen_wPhi, "_gen_wPhi[_gen_nW]/D");
       outputTree->Branch("_gen_wmompdg", &_gen_wmompdg, "_gen_wmompdg[_gen_nW]/I");
 
-       }
-
-
-
-    
+   }
 
     
     GPM = GenParticleManager();
     
     bool isData = !(Sample=="ElectronsMC");
-    if (isData)
-        fMetCorrector = new OnTheFlyCorrections("Spring16_25nsV6_DATA", isData); //isData = true
-    else
-        fMetCorrector = new OnTheFlyCorrections("Spring16_25nsV6_MC", isData); //isData = true
-    _corrLevel = "L3Absolute";
+    if (isData) fMetCorrector = new OnTheFlyCorrections("Majorana/PatAnalyzer/jetfiles/", "Spring16_25nsV6_DATA", isData);
+    else        fMetCorrector = new OnTheFlyCorrections("Majorana/PatAnalyzer/jetfiles/", "Spring16_25nsV6_MC",   isData);
     if (isData) _corrLevel = "L2L3Residual";
+    else        _corrLevel = "L3Absolute";
 
- 
-    jecUnc = new JetCorrectionUncertainty("/user/mvit/CMSSW_8_0_5/src/Majorana/PatAnalyzer/jetfiles/Spring16_25nsV6_MC_Uncertainty_AK4PFchs.txt");
+    jecUnc = new JetCorrectionUncertainty(edm::FileInPath("Majorana/PatAnalyzer/jetfiles/Spring16_25nsV6_MC_Uncertainty_AK4PFchs.txt").fullPath());
     
    
     //80 % eff
@@ -649,9 +642,6 @@ void trilTTZ::analyze(const edm::Event& iEvent, const edm::EventSetup& iEventSet
 	    _gen_nNu = nNu;
 	    _gen_nMajo = nMajo;
 	    _gen_nW= nw;
-	    //**************************************************************************************
-	    // MC
-	    //**************************************************************************************
 	}
     }
 
