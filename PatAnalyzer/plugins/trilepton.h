@@ -1,5 +1,5 @@
-#ifndef trilTTZ_H
-#define trilTTZ_H
+#ifndef trilepton_H
+#define trilepton_H
 
 #include "FWCore/Framework/interface/EDAnalyzer.h"
 #include "FWCore/PluginManager/interface/ModuleDef.h"
@@ -190,11 +190,11 @@ HLT_Mu10_CentralPFJet30_BTagCSV0p5PF_v1
 HLT_Ele10_CaloIdM_TrackIdM_CentralPFJet30_BTagCSV0p5PF_v1
 */
 
-class trilTTZ : public edm::EDAnalyzer {
+class trilepton : public edm::EDAnalyzer {
 public:
     
-    explicit trilTTZ(const edm::ParameterSet & iConfig);
-    ~trilTTZ(){};
+    explicit trilepton(const edm::ParameterSet & iConfig);
+    ~trilepton(){};
     
 private:
     

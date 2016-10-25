@@ -1,4 +1,4 @@
-#include "trilTTZ.h"
+#include "trilepton.h"
 #include "DataFormats/Common/interface/Handle.h"
 #include "DataFormats/Common/interface/View.h"
 #include "FWCore/Framework/interface/MakerMacros.h"
@@ -51,7 +51,7 @@ using namespace tools;
 using namespace math;
 using namespace reco::tau;
 
-trilTTZ::trilTTZ(const edm::ParameterSet & iConfig) :
+trilepton::trilepton(const edm::ParameterSet & iConfig) :
 genparticleToken_(consumes<reco::GenParticleCollection> (iConfig.getParameter<edm::InputTag>("genPartsLabel"))),
 mvaValuesMapToken_(consumes<edm::ValueMap<float> >(iConfig.getParameter<edm::InputTag>("mvaValuesMap"))),
 pdfvariablesToken_(consumes<GenEventInfoProduct>(iConfig.getParameter<edm::InputTag>("pdfvariablesLabel"))),
@@ -96,7 +96,7 @@ _regression(false)
 }
 
 
-void trilTTZ::beginJob()
+void trilepton::beginJob()
 {
     Nvtx           = fs->make<TH1F>("N_{vtx}"        , "Number of vertices;N_{vtx};events / 1"  ,    40, 0., 40.);
     
@@ -436,7 +436,7 @@ void trilTTZ::beginJob()
  
 }
 
-void trilTTZ::endJob() {
+void trilepton::endJob() {
    
     std::cout<<_nEventsTotal<<std::endl;
     std::cout<<_nEventsFiltered<<std::endl;
@@ -446,14 +446,14 @@ void trilTTZ::endJob() {
     
 }
 
-void trilTTZ::beginRun(const edm::Run& iRun, edm::EventSetup const& iSetup)
+void trilepton::beginRun(const edm::Run& iRun, edm::EventSetup const& iSetup)
 {
     using namespace edm;
     
     return;
 }
 
-void trilTTZ::analyze(const edm::Event& iEvent, const edm::EventSetup& iEventSetup)
+void trilepton::analyze(const edm::Event& iEvent, const edm::EventSetup& iEventSetup)
 {
     //bool islepton;
 
@@ -1411,7 +1411,7 @@ void trilTTZ::analyze(const edm::Event& iEvent, const edm::EventSetup& iEventSet
     outputTree->Fill();
 }
 
-void trilTTZ::fillMCVars(const GenParticle* mc, const int leptonCounter) {
+void trilepton::fillMCVars(const GenParticle* mc, const int leptonCounter) {
     
     _lPtmc[leptonCounter] = mc->pt();
     _lEmc[leptonCounter] = mc->energy();
@@ -1518,7 +1518,7 @@ void trilTTZ::fillMCVars(const GenParticle* mc, const int leptonCounter) {
     
     //GPM.printInheritance(&(*mc));
 }
-void trilTTZ::fillCloseJetVars(const int leptonCounter, Vertex::Point PV) {
+void trilepton::fillCloseJetVars(const int leptonCounter, Vertex::Point PV) {
 
     _closeJetPtAll[leptonCounter] = 0;
     _closeJetAngAll[leptonCounter] = 10000;
@@ -1609,7 +1609,7 @@ void trilTTZ::fillCloseJetVars(const int leptonCounter, Vertex::Point PV) {
     */
 }
 
-void trilTTZ::matchCloseJet(const int leptonCounter) {
+void trilepton::matchCloseJet(const int leptonCounter) {
     double minDeltaR3 = 9999;
     double minDeltaR2 = 9999;
     TLorentzVector Gen1, Gen2;
@@ -1667,7 +1667,7 @@ void trilTTZ::matchCloseJet(const int leptonCounter) {
 }
 
 
-void trilTTZ::fillIsoMCVars(const int leptonCounter) {
+void trilepton::fillIsoMCVars(const int leptonCounter) {
     
     if( TheGenParticles.isValid() )
     {
@@ -1705,7 +1705,7 @@ void trilTTZ::fillIsoMCVars(const int leptonCounter) {
     }
 }
 
-void trilTTZ::fillRegVars(const pat::Jet *jet, double genpt, const pat::Muon* mu) {
+void trilepton::fillRegVars(const pat::Jet *jet, double genpt, const pat::Muon* mu) {
     
     hJet_ptRaw = (jet->correctedP4("Uncorrected")).Pt();
     hJet_genPt = genpt;
@@ -1762,7 +1762,7 @@ void trilTTZ::fillRegVars(const pat::Jet *jet, double genpt, const pat::Muon* mu
     hJet_SoftLeptId95 = 1;
 }
 
-void trilTTZ::fillRegVars(const pat::Jet *jet, double genpt, const pat::Electron* mu) {
+void trilepton::fillRegVars(const pat::Jet *jet, double genpt, const pat::Electron* mu) {
     
     hJet_ptRaw = (jet->correctedP4("Uncorrected")).Pt();
     hJet_genPt = genpt;
@@ -1820,4 +1820,4 @@ void trilTTZ::fillRegVars(const pat::Jet *jet, double genpt, const pat::Electron
 }
 
 
-DEFINE_FWK_MODULE(trilTTZ);
+DEFINE_FWK_MODULE(trilepton);
