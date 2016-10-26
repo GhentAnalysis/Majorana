@@ -111,85 +111,6 @@ const int nMajo_gen = 20;
 const int nNu_gen = 20;
 const int nJetsMax = 20;
 
-const char* _triggers3lNamesTTZ[4] =
-{"HLT_TripleMu_12_10_5", "HLT_DiMu9_Ele9_CaloIdL_TrackIdL", "HLT_Mu8_DiEle12_CaloIdL_TrackIdL", "HLT_Ele16_Ele12_Ele8_CaloIdL_TrackIdL"
-};
-
-const char* _triggers2lNamesTTZ[2][6] =
-{ {"HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_v", "HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL_DZ_v",
-   "HLT_Mu8_TrkIsoVVL_Ele17_CaloIdL_TrackIdL_IsoVL_v", "HLT_Mu17_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_v",
-   "HLT_Ele17_Ele12_CaloIdL_TrackIdL_IsoVL_v", "HLT_Ele17_Ele12_CaloIdL_TrackIdL_IsoVL_DZ_v"},
-
-  {"HLT_DoubleMu8_Mass8_PFHT300","empty",
-   "HLT_Mu8_Ele8_CaloIdM_TrackIdM_Mass8_PFHT300","empty",
-   "HLT_DoubleEle8_CaloIdM_TrackIdM_Mass8_PFHT300","empty"}
-};
-
-const char* _triggers2lNamesTTZBkp[2][6] =
-{ {"HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_v", "HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL_v",
-   "HLT_Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_v", "HLT_Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_v",
-   "HLT_Ele23_Ele12_CaloIdL_TrackIdL_IsoVL_v", "HLT_Ele23_Ele12_CaloIdL_TrackIdL_IsoVL_DZ_v"},
-
-  {"HLT_DoubleMu8_Mass8_PFHT250","empty",
-   "HLT_Mu8_Ele8_CaloIdM_TrackIdM_Mass8_PFHT250","empty",
-   "HLT_DoubleEle8_CaloIdM_TrackIdM_Mass8_PFHT250","empty"}
-};
-
-const char* _triggersCSNamesTTZ[5][5] =
-{
-  {"HLT_Mu8_TrkIsoVVL_v","HLT_Mu17_TrkIsoVVL_v","HLT_Mu24_TrkIsoVVL_v","HLT_Mu34_TrkIsoVVL_v","empty"},
-  {"HLT_Ele12_CaloIdL_TrackIdL_IsoVL_PFJet30_v","HLT_Ele18_CaloIdL_TrackIdL_IsoVL_PFJet30_v","HLT_Ele23_CaloIdL_TrackIdL_IsoVL_PFJet30_v","HLT_Ele33_CaloIdL_TrackIdL_IsoVL_PFJet30_v","empty"},
-  {"HLT_Mu8_v","HLT_Mu17_v","HLT_Mu24_v","HLT_Mu34_v","HLT_Ele17_CaloIdM_TrackIdM_PFJet30"},
-  {"HLT_Ele8_CaloIdM_TrackIdM_PFJet30_v","HLT_Ele12_CaloIdM_TrackIdM_PFJet30_v","HLT_Ele18_CaloIdM_TrackIdM_PFJet30_v","HLT_Ele23_CaloIdM_TrackIdM_PFJet30_v",                 "HLT_Ele33_CaloIdM_TrackIdM_PFJet30_v"},
-  {"HLT_Ele17_CaloIdL_TrackIdL_IsoVL_v","HLT_Ele23_CaloIdL_TrackIdL_IsoVL_v","empty","empty","empty"}
-};
-
-const char* _triggersCSbNamesTTZ[2] = {"HLT_Mu10_CentralPFJet30_BTagCSV0p5PF_v","HLT_Ele10_CaloIdM_TrackIdM_CentralPFJet30_BTagCSV0p5PF_v"};
-
-const char* _triggers1lNamesTTZ[5] =
-{"HLT_IsoMu22_v","HLT_IsoTkMu22_v","HLT_IsoMu18_v","HLT_Ele27_WPTight_Gsf_v","HLT_Ele27_eta2p1_WPLoose_Gsf_v"};
-
-/*
-HLT_Mu8_v1
-HLT_Mu17_v1
-HLT_Mu24_v1
-HLT_Mu34_v1
-HLT_Ele8_CaloIdM_TrackIdM_PFJet30_v1
-HLT_Ele12_CaloIdM_TrackIdM_PFJet30_v1
-HLT_Ele18_CaloIdM_TrackIdM_PFJet30_v1
-HLT_Ele23_CaloIdM_TrackIdM_PFJet30_v1
-HLT_Ele33_CaloIdM_TrackIdM_PFJet30_v1
-         
-HLT_Mu8_TrkIsoVVL_v1
-HLT_Mu17_TrkIsoVVL_v1
-HLT_Mu24_TrkIsoVVL_v1
-HLT_Mu34_TrkIsoVVL_v1
-HLT_Ele12_CaloIdL_TrackIdL_IsoVL_PFJet30_v1
-HLT_Ele18_CaloIdL_TrackIdL_IsoVL_PFJet30_v1
-HLT_Ele23_CaloIdL_TrackIdL_IsoVL_PFJet30_v1
-HLT_Ele33_CaloIdL_TrackIdL_IsoVL_PFJet30_v1
-                 
-HLT_Mu17_Mu8_DZ_v1
-HLT_Mu17_TkMu8_DZ_v1
-HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_v1
-HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL_DZ_v1
-HLT_Mu8_TrkIsoVVL_Ele17_CaloIdL_TrackIdL_IsoVL_v1
-HLT_Mu17_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_v1
-                       
-HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_v1
-HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL_v1
-HLT_Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_v1
-HLT_Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_v1
-HLT_Ele23_Ele12_CaloIdL_TrackIdL_IsoVL_v1
-                            
-HLT_DoubleMu8_Mass8_PFHT300_v1
-HLT_Mu8_Ele8_CaloIdM_TrackIdM_Mass8_PFHT300_v1
-HLT_DoubleEle8_CaloIdM_TrackIdM_Mass8_PFHT300_v1
-                              
-HLT_Mu10_CentralPFJet30_BTagCSV0p5PF_v1
-HLT_Ele10_CaloIdM_TrackIdM_CentralPFJet30_BTagCSV0p5PF_v1
-*/
-
 class trilepton : public edm::EDAnalyzer {
 public:
     
@@ -211,13 +132,14 @@ private:
     void fillCloseJetVars(const int leptonCounter, Vertex::Point PV);
     void matchCloseJet(const int leptonCounter);
     void fillIsoMCVars(const int leptonCounter);
+    void getTriggerResults(const edm::Event& iEvent, bool isHLT, edm::EDGetTokenT<edm::TriggerResults> token, std::vector<TString> toSave);
 
     std::vector<const pat::Jet* > SelectedJetsAll;
     //edm::Handle<GenParticleCollection> TheGenParticles;
     edm::Handle<std::vector<reco::GenParticle>> TheGenParticles;
     
     
-    std::string Sample;
+    bool isData;
     std::string SampleName;
     //edm::InputTag IT_muon;
     //edm::InputTag IT_electron;
@@ -230,30 +152,30 @@ private:
     edm::InputTag IT_METFilters;
     
     // MVA values and categories (optional)
-    edm::EDGetTokenT<edm::ValueMap<bool> > eleVetoIdMapToken_;
-    edm::EDGetTokenT<edm::ValueMap<bool> > eleLooseIdMapToken_;
-    edm::EDGetTokenT<edm::ValueMap<bool> > eleMediumIdMapToken_;
-    edm::EDGetTokenT<edm::ValueMap<bool> > eleTightIdMapToken_;
+    edm::EDGetTokenT<edm::ValueMap<bool>> eleVetoIdMapToken;
+    edm::EDGetTokenT<edm::ValueMap<bool>> eleLooseIdMapToken;
+    edm::EDGetTokenT<edm::ValueMap<bool>> eleMediumIdMapToken;
+    edm::EDGetTokenT<edm::ValueMap<bool>> eleTightIdMapToken;
 
-    edm::EDGetTokenT<reco::GenParticleCollection> genparticleToken_;
-    edm::EDGetTokenT<edm::ValueMap<float> > mvaValuesMapToken_;
-    edm::EDGetTokenT<GenEventInfoProduct> pdfvariablesToken_;
-    edm::EDGetTokenT<reco::BeamSpot> IT_beamspot;
-    edm::EDGetTokenT<vector< PileupSummaryInfo >> PileUpToken_; 
-    edm::EDGetTokenT<std::vector<Vertex>> goodOfflinePrimaryVerticesToken_;
-    edm::EDGetTokenT<pat::PackedCandidateCollection> packedPFCandidatesToken_;
-    edm::EDGetTokenT<std::vector<pat::Muon>> IT_muon;
-    edm::EDGetTokenT<edm::View<pat::Electron>> IT_electron;
-    edm::EDGetTokenT<std::vector<pat::Jet>> IT_jet;
-    edm::EDGetTokenT<std::vector<pat::MET>> IT_pfmet;
-    edm::EDGetTokenT<std::vector<reco::Conversion>> reducedEgammaToken_;
-    edm::EDGetTokenT<std::vector<pat::Tau>> IT_tau;
-    edm::EDGetTokenT<double> fixedGridRhoFastjetCentralNeutralToken_;
-    edm::EDGetTokenT<double> fixedGridRhoFastjetAllToken_;
-    edm::EDGetTokenT<edm::TriggerResults> IT_hltresults;
-    edm::EDGetTokenT<pat::PackedTriggerPrescales> triggerPrescales_;
-    edm::EDGetTokenT<edm::TriggerResults> triggerBits_;
-    edm::EDGetTokenT<LHEEventProduct> IT_externalLHEProducer;
+    edm::EDGetTokenT<reco::GenParticleCollection>    genparticleToken;
+    edm::EDGetTokenT<edm::ValueMap<float>>           mvaValuesMapToken;
+    edm::EDGetTokenT<GenEventInfoProduct>            pdfvariablesToken;
+    edm::EDGetTokenT<reco::BeamSpot>                 IT_beamspot;
+    edm::EDGetTokenT<vector<PileupSummaryInfo>>      PileUpToken; 
+    edm::EDGetTokenT<std::vector<Vertex>>            goodOfflinePrimaryVerticesToken;
+    edm::EDGetTokenT<pat::PackedCandidateCollection> packedPFCandidatesToken;
+    edm::EDGetTokenT<std::vector<pat::Muon>>         IT_muon;
+    edm::EDGetTokenT<edm::View<pat::Electron>>       IT_electron;
+    edm::EDGetTokenT<std::vector<pat::Jet>>          IT_jet;
+    edm::EDGetTokenT<std::vector<pat::MET>>          IT_pfmet;
+    edm::EDGetTokenT<std::vector<reco::Conversion>>  reducedEgammaToken;
+    edm::EDGetTokenT<std::vector<pat::Tau>>          IT_tau;
+    edm::EDGetTokenT<double>                         fixedGridRhoFastjetCentralNeutralToken;
+    edm::EDGetTokenT<double>                         fixedGridRhoFastjetAllToken;
+    edm::EDGetTokenT<edm::TriggerResults>            triggerResultsHLTToken;
+    edm::EDGetTokenT<edm::TriggerResults>            triggerResultsRECOToken;
+    edm::EDGetTokenT<pat::PackedTriggerPrescales>    triggerPrescalesToken;
+    edm::EDGetTokenT<LHEEventProduct>                IT_externalLHEProducer;
     
 
     edm::Service<TFileService> fs;
@@ -549,11 +471,7 @@ private:
     Vertex::Point PVmc;
     
     TH1D* _hCounter;
-    TH2D* _hCounterSUSY;
 
-    TH2D* _hCounterSUSY_WW;
-    TH2D* _hCounterSUSY_WZ;
-    TH2D* _hCounterSUSY_ZZ;
     
     double _regVars[15];
     double hJet_ptRaw;
@@ -581,45 +499,12 @@ private:
     double hJet_SoftLeptIdlooseMu;
     double hJet_SoftLeptId95;
 
-
    
-
-    //Triggers
-    /*
-    bool _trigMu8;
-    bool _trigMu17;
-    bool _trigMu8iso;
-    bool _trigMu17iso;
-    bool _trigEle12;
-    bool _trigEle12iso;
-    bool _trigDiMuIso;
-    bool _trigDiMuTkIso;
-    bool _trigMu8Ele23Iso;
-    bool _trigMu23Ele12Iso;
-    bool _trigEle23Ele12Iso;
-    bool _trigDoubleMu8;
-    bool _trigMu8Ele8;
-    bool _trigDoubleEle8;
-    bool _trigTripleMu;
-    bool _trigTripleDiMu9Ele9;
-    bool _trigTripleMu8DiEle12;
-    bool _trigTripleEle16Ele12Ele8;
-    */
-
-    bool _triggers2l[2][6];
-    double _triggers2lpresc[2][6];
-
-    bool _triggers2lbkp[2][6];
-    double _triggers2lbkppresc[2][6];
-
-    bool _triggersCS[5][5];
-    double _triggersCSpresc[5][5];
-
-    bool _triggersCSb[2];
-    double _triggersCSbpresc[2];
-
-    bool _triggers1l[5];
-    double _triggers1lpresc[5];
+    std::vector<TString>    filtersToSave;
+    std::vector<TString>    triggersToSave;
+    std::map<TString, bool> triggerFlags;
+    std::map<TString, int>  triggerPrescales;
+    std::map<TString, int>  triggerIndices;
 
     bool Flag_eeBadScFilter;
     bool Flag_HBHENoiseFilter;

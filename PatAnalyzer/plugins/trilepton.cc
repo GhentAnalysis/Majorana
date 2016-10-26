@@ -44,6 +44,7 @@
 
 #include <iostream>
 
+// In the long run, we should get rid of these using namespace statements, this is bad coding
 using namespace std;
 using namespace edm;
 using namespace reco;
@@ -52,69 +53,78 @@ using namespace math;
 using namespace reco::tau;
 
 trilepton::trilepton(const edm::ParameterSet & iConfig) :
-genparticleToken_(consumes<reco::GenParticleCollection> (iConfig.getParameter<edm::InputTag>("genPartsLabel"))),
-mvaValuesMapToken_(consumes<edm::ValueMap<float> >(iConfig.getParameter<edm::InputTag>("mvaValuesMap"))),
-pdfvariablesToken_(consumes<GenEventInfoProduct>(iConfig.getParameter<edm::InputTag>("pdfvariablesLabel"))),
-IT_beamspot(consumes<reco::BeamSpot>(iConfig.getParameter<edm::InputTag>("BeamSpotLabel"))),
-PileUpToken_(consumes<vector< PileupSummaryInfo >>(iConfig.getParameter<edm::InputTag>("slimmedAddPileupInfoLabel"))),
-goodOfflinePrimaryVerticesToken_(consumes<std::vector<Vertex>>(iConfig.getParameter<edm::InputTag>("goodOfflinePrimaryVerticesLabel"))),
-packedPFCandidatesToken_(consumes<pat::PackedCandidateCollection>(iConfig.getParameter<edm::InputTag>("packedPFCandidatesLabel"))),
-IT_muon(consumes<std::vector<pat::Muon>>(iConfig.getParameter<edm::InputTag>("MuonLabel"))),
-IT_electron(consumes<edm::View<pat::Electron>>(iConfig.getParameter<edm::InputTag>("ElectronLabel"))),
-IT_jet(consumes<std::vector<pat::Jet>>(iConfig.getParameter<edm::InputTag>("JetLabel"))),
-IT_pfmet(consumes<std::vector<pat::MET>>(iConfig.getParameter<edm::InputTag>("METLabel"))),
-reducedEgammaToken_(consumes<std::vector<reco::Conversion>>(iConfig.getParameter<edm::InputTag>("reducedEgammaLabel"))),
-IT_tau(consumes<std::vector<pat::Tau>>(iConfig.getParameter<edm::InputTag>("TauLabel"))),
-fixedGridRhoFastjetCentralNeutralToken_(consumes<double>(iConfig.getParameter<edm::InputTag>("fixedGridRhoFastjetCentralNeutralLabel"))),
-fixedGridRhoFastjetAllToken_(consumes<double>(iConfig.getParameter<edm::InputTag>("fixedGridRhoFastjetAllLabel"))),
-IT_hltresults(consumes<edm::TriggerResults>(iConfig.getParameter<edm::InputTag>("HLTResultsLabel"))),
-triggerPrescales_(consumes<pat::PackedTriggerPrescales>(iConfig.getParameter<edm::InputTag>("prescales"))),
-triggerBits_(consumes<edm::TriggerResults>(iConfig.getParameter<edm::InputTag>("bits"))),
-IT_externalLHEProducer(consumes<LHEEventProduct>(iConfig.getParameter<edm::InputTag>("exernalLHEPLabel"))),
-_relIsoCutE(999.),//0.15
-_relIsoCutMu(999.),//0.15
-_relIsoCutEloose(999.), //0.5
-_relIsoCutMuloose(999.), //0.5
-_chargeConsistency(true),
-_minPt0(5),
-_minPt1(5.),
-_tightD0Mu(0.05),
-_tightD0E(0.05),
-_looseD0Mu(0.05), // 0.05 for sync
-_looseD0E(0.05), // 0.05 for sync
-//_looseD0Mu(0.2),
-//_looseD0E(9999999.),
-//_jetPtCut(40.),
-_jetPtCut(20.),
-_jetEtaCut(2.4),
-_tauPt(20),
-_tauEta(2.3),
-_regression(false)
+  genparticleToken(                      consumes<reco::GenParticleCollection>(   iConfig.getParameter<edm::InputTag>("genPartsLabel"))),
+  mvaValuesMapToken(                     consumes<edm::ValueMap<float>>(          iConfig.getParameter<edm::InputTag>("mvaValuesMap"))),
+  pdfvariablesToken(                     consumes<GenEventInfoProduct>(           iConfig.getParameter<edm::InputTag>("pdfvariablesLabel"))),
+  IT_beamspot(                           consumes<reco::BeamSpot>(                iConfig.getParameter<edm::InputTag>("BeamSpotLabel"))),
+  PileUpToken(                           consumes<vector<PileupSummaryInfo>>(     iConfig.getParameter<edm::InputTag>("slimmedAddPileupInfoLabel"))),
+  goodOfflinePrimaryVerticesToken(       consumes<std::vector<Vertex>>(           iConfig.getParameter<edm::InputTag>("goodOfflinePrimaryVerticesLabel"))),
+  packedPFCandidatesToken(               consumes<pat::PackedCandidateCollection>(iConfig.getParameter<edm::InputTag>("packedPFCandidatesLabel"))),
+  IT_muon(                               consumes<std::vector<pat::Muon>>(        iConfig.getParameter<edm::InputTag>("MuonLabel"))),
+  IT_electron(                           consumes<edm::View<pat::Electron>>(      iConfig.getParameter<edm::InputTag>("ElectronLabel"))),
+  IT_jet(                                consumes<std::vector<pat::Jet>>(         iConfig.getParameter<edm::InputTag>("JetLabel"))),
+  IT_pfmet(                              consumes<std::vector<pat::MET>>(         iConfig.getParameter<edm::InputTag>("METLabel"))),
+  reducedEgammaToken(                    consumes<std::vector<reco::Conversion>>( iConfig.getParameter<edm::InputTag>("reducedEgammaLabel"))),
+  IT_tau(                                consumes<std::vector<pat::Tau>>(         iConfig.getParameter<edm::InputTag>("TauLabel"))),
+  fixedGridRhoFastjetCentralNeutralToken(consumes<double>(                        iConfig.getParameter<edm::InputTag>("fixedGridRhoFastjetCentralNeutralLabel"))),
+  fixedGridRhoFastjetAllToken(           consumes<double>(                        iConfig.getParameter<edm::InputTag>("fixedGridRhoFastjetAllLabel"))),
+  triggerResultsHLTToken(                consumes<edm::TriggerResults>(           iConfig.getParameter<edm::InputTag>("triggerResultsHLT"))),
+  triggerResultsRECOToken(               consumes<edm::TriggerResults>(           iConfig.getParameter<edm::InputTag>("triggerResultsRECO"))),
+  triggerPrescalesToken(                 consumes<pat::PackedTriggerPrescales>(   iConfig.getParameter<edm::InputTag>("prescales"))),
+  IT_externalLHEProducer(                consumes<LHEEventProduct>(               iConfig.getParameter<edm::InputTag>("exernalLHEPLabel"))),
+  _relIsoCutE(999.),//0.15
+  _relIsoCutMu(999.),//0.15
+  _relIsoCutEloose(999.), //0.5
+  _relIsoCutMuloose(999.), //0.5
+  _chargeConsistency(true),
+  _minPt0(5),
+  _minPt1(5.),
+  _tightD0Mu(0.05),
+  _tightD0E(0.05),
+  _looseD0Mu(0.05), // 0.05 for sync   // Not sure if this was some temporary change?
+  _looseD0E(0.05), // 0.05 for sync
+  //_looseD0Mu(0.2),
+  //_looseD0E(9999999.),
+  //_jetPtCut(40.),
+  _jetPtCut(20.),
+  _jetEtaCut(2.4),
+  _tauPt(20),
+  _tauEta(2.3),
+  _regression(false)
 {
-    Sample              = iConfig.getUntrackedParameter<std::string>("SampleLabel") ;
+    isData              = iConfig.getUntrackedParameter<bool>("isData") ;
     SampleName          = iConfig.getUntrackedParameter<std::string>("SampleName") ;
+
+    // eventually move this to config level
+    // just a bunch of lepton triggers, might need a closer look for cleanup or additions
+    triggersToSave = {"HLT_TripleMu_12_10_5", "HLT_DiMu9_Ele9_CaloIdL_TrackIdL", "HLT_Mu8_DiEle12_CaloIdL_TrackIdL", "HLT_Ele16_Ele12_Ele8_CaloIdL_TrackIdL",
+                      "HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ", "HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL_DZ", 
+                      "HLT_Mu8_TrkIsoVVL_Ele17_CaloIdL_TrackIdL_IsoVL", "HLT_Mu17_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL", 
+                      "HLT_Ele17_Ele12_CaloIdL_TrackIdL_IsoVL", "HLT_Ele17_Ele12_CaloIdL_TrackIdL_IsoVL_DZ",
+                      "HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL", "HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL",
+                      "HLT_Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL", "HLT_Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL",
+                      "HLT_Ele23_Ele12_CaloIdL_TrackIdL_IsoVL_v", "HLT_Ele23_Ele12_CaloIdL_TrackIdL_IsoVL_DZ",
+                      "HLT_Mu8_TrkIsoVVL","HLT_Mu17_TrkIsoVVL","HLT_Mu24_TrkIsoVVL","HLT_Mu34_TrkIsoVVL",
+                      "HLT_Mu8","HLT_Mu17","HLT_Mu24","HLT_Mu34",
+                      "HLT_Ele17_CaloIdL_TrackIdL_IsoVL","HLT_Ele23_CaloIdL_TrackIdL_IsoVL",
+                      "HLT_IsoMu22","HLT_IsoTkMu22","HLT_IsoMu18","HLT_Ele27_WPTight_Gsf","HLT_Ele27_eta2p1_WPLoose_Gsf"};
+    filtersToSave  = {"Flag_HBHENoiseFilter", "Flag_HBHENoiseIsoFilter", "Flag_EcalDeadCellTriggerPrimitiveFilter", "Flag_goodVertices", "Flag_eeBadScFilter", "Flag_globalTightHalo2016Filter"};
 }
 
 
 void trilepton::beginJob()
 {
-    Nvtx           = fs->make<TH1F>("N_{vtx}"        , "Number of vertices;N_{vtx};events / 1"  ,    40, 0., 40.);
+    outputTree = fs->make<TTree>("trileptonTree","trileptonTree");
+    Nvtx = fs->make<TH1F>("N_{vtx}", "Number of vertices;N_{vtx};events / 1"  ,    40, 0., 40.);
     
     _hCounter = fs->make<TH1D>("hCounter", "Events counter", 5,0,5);
 
-    _hCounterSUSY = fs->make<TH2D>("hCounterSUSY", "Events counter", 80, 0., 2000., 60, 0., 1500.);
-
-    _hCounterSUSY_WW = fs->make<TH2D>("hCounterSUSY_WW", "Events counter", 80, 0., 2000., 60, 0., 1500.);
-    _hCounterSUSY_WZ = fs->make<TH2D>("hCounterSUSY_WZ", "Events counter", 80, 0., 2000., 60, 0., 1500.);
-    _hCounterSUSY_ZZ = fs->make<TH2D>("hCounterSUSY_ZZ", "Events counter", 80, 0., 2000., 60, 0., 1500.);
-    
-    outputTree = new TTree("FakeTree","FakeTree");
-    
     _leptonP4 = new TClonesArray("TLorentzVector", nLeptonsMax);
     for (int i=0; i!=nLeptonsMax; ++i) {
         new ( (*_leptonP4)[i] ) TLorentzVector();
     }
     outputTree->Branch("_leptonP4", "TClonesArray", &_leptonP4, 32000, 0);
+
     // =============== GEN ================================
     _gen_leptonP4 = new TClonesArray("TLorentzVector", nLeptonsMax);
     for (int i=0; i!=nLeptonsMax; ++i) {
@@ -146,7 +156,6 @@ void trilepton::beginJob()
       new ( (*_gen_wP4)[i] ) TLorentzVector();
     }
     outputTree->Branch("_gen_wP4", "TClonesArray", &_gen_wP4, 32000, 0);
-
 
      // ===============================================
     _jetP4 = new TClonesArray("TLorentzVector", 100);
@@ -336,11 +345,20 @@ void trilepton::beginJob()
     outputTree->Branch("_passedMVA90", &_passedMVA90, "_passedMVA90/I");
     outputTree->Branch("_findMatched", &_findMatched, "_findMatched/I");
 
+    // trigger
+    for(TString triggerName : triggersToSave){
+      outputTree->Branch(triggerName, &triggerFlags[triggerName], triggerName + "/O");
+      outputTree->Branch(triggerName + "_prescale", &triggerPrescales[triggerName], triggerName + "_prescale/I");
+    }
 
+    // MET filters
+    for(TString filterName : filtersToSave){
+      outputTree->Branch(filterName, &triggerFlags[filterName], filterName + "/O");
+    }
 
 
     //Gen Level outputTrees////////////////////////////////////////////////////
-    if(Sample == "ElectronsMC"){
+    if(not isData){
       outputTree->Branch("_gen_nL", &_gen_nL, "_gen_nL/I");	    
       outputTree->Branch("_gen_lPt", &_gen_lPt, "_gen_lPt[_gen_nL]/D");
       outputTree->Branch("_gen_lE", &_gen_lE, "_gen_lE[_gen_nL]/D");
@@ -376,7 +394,6 @@ void trilepton::beginJob()
     
     GPM = GenParticleManager();
     
-    bool isData = !(Sample=="ElectronsMC");
     if (isData) fMetCorrector = new OnTheFlyCorrections("Majorana/PatAnalyzer/jetfiles/", "Spring16_25nsV6_DATA", isData);
     else        fMetCorrector = new OnTheFlyCorrections("Majorana/PatAnalyzer/jetfiles/", "Spring16_25nsV6_MC",   isData);
     if (isData) _corrLevel = "L2L3Residual";
@@ -433,7 +450,6 @@ void trilepton::beginJob()
     _nEventsTotalCounted = 0;
     
     firstEvent_ = true;
- 
 }
 
 void trilepton::endJob() {
@@ -453,18 +469,55 @@ void trilepton::beginRun(const edm::Run& iRun, edm::EventSetup const& iSetup)
     return;
 }
 
+
+void trilepton::getTriggerResults(const edm::Event& iEvent, bool isHLT, edm::EDGetTokenT<edm::TriggerResults> token, std::vector<TString> toSave){
+  edm::Handle<edm::TriggerResults> trigResults;       iEvent.getByToken(token,                 trigResults);
+  edm::Handle<pat::PackedTriggerPrescales> prescales; iEvent.getByToken(triggerPrescalesToken, prescales);
+
+  if(trigResults.failedToGet()){
+    std::cout << "WARNING: no trigger results for " << (isHLT? "HLT" : "RECO") << "!" << std::endl;
+    return;
+  }
+
+  const edm::TriggerNames& triggerNames = iEvent.triggerNames(*trigResults);
+
+  // Get full trigger list, and remember the indices of triggers we need to save
+  if(firstEvent_){
+    std::cout << "Available triggers:" << std::endl;
+    for (unsigned int i = 0; i < trigResults->size(); ++i){
+      std::cout << "  " << triggerNames.triggerName(i) << std::endl;
+      for(TString triggerName : toSave){
+	if(TString(triggerNames.triggerName(i)).Contains(triggerName)){
+	  triggerIndices[triggerName] = i;
+	}
+      }
+    }
+    std::cout << std::endl;
+  }
+
+  // Save our triggers/flags
+  for(TString triggerName : toSave){
+    triggerFlags[triggerName] = trigResults->accept(triggerIndices[triggerName]);
+    if(isHLT){
+      triggerPrescales[triggerName] = prescales->getPrescaleForIndex(triggerIndices[triggerName]);
+    }
+  }
+}
+
+
+
 void trilepton::analyze(const edm::Event& iEvent, const edm::EventSetup& iEventSetup)
 {
     //bool islepton;
 
     _nZboson = 0;
 
-    if (Sample=="ElectronsMC") {
+    if(not isData) {
         //******************************************************************************************************************
         // Gen level particles                  ****************************************************************************
         //******************************************************************************************************************
         //iEvent.getByLabel("packedGenParticles", TheGenParticles);
-        iEvent.getByToken(genparticleToken_, TheGenParticles);
+        iEvent.getByToken(genparticleToken, TheGenParticles);
         std::vector<const GenParticle*> vGenElectrons, vGenMuons, vGenNPElectrons, vGenNPMuons, vGenW, vGenMajorana;
         if( TheGenParticles.isValid() )
         {
@@ -645,153 +698,16 @@ void trilepton::analyze(const edm::Event& iEvent, const edm::EventSetup& iEventS
 	}
     }
 
- 
-     //============= trigger ==============
-    /*
-     _trigMu8 = false;
-     _trigMu17 = false;
-     _trigMu8iso = false;
-     _trigMu17iso = false;
-     _trigEle12 = false;
-     _trigEle12iso = false;
-
-     _trigDiMuIso = false;
-     _trigDiMuTkIso = false;
-     _trigMu8Ele23Iso = false;
-     _trigMu23Ele12Iso = false;
-     _trigEle23Ele12Iso = false;
-     _trigDoubleMu8 = false;
-     _trigMu8Ele8 = false;
-     _trigDoubleEle8 = false;
-
-     _trigTripleMu = false;
-     _trigTripleDiMu9Ele9 = false;
-     _trigTripleMu8DiEle12 = false;
-     _trigTripleEle16Ele12Ele8 = false;
-     */
-
-     edm::Handle<edm::TriggerResults> trigResults;
-     iEvent.getByToken(IT_hltresults, trigResults);
-
-     edm::Handle<pat::PackedTriggerPrescales> triggerPrescales;
-     iEvent.getByToken(triggerPrescales_, triggerPrescales);
-
-     edm::Handle<edm::TriggerResults> triggerBits;
-     iEvent.getByToken(triggerBits_, triggerBits);
-
-     for (int i=0; i!=5; ++i) {
-        for (int j=0; j!=5; ++j) { _triggersCS[j][i] = 0;}
-        _triggers1l[i] = 0;
-     }
-     for (int i=0; i!=6; ++i) {
-        for (int j=0; j!=2; ++j) _triggers2l[j][i] = 0;
-        for (int j=0; j!=2; ++j) _triggers2lbkp[j][i] = 0;
-     }
-
-     for (int i=0; i!=2; ++i) 
-         _triggersCSb[i] = 0;
-
-     Flag_eeBadScFilter = 0;
-     Flag_HBHENoiseFilter=0;
-     Flag_HBHENoiseIsoFilter=0;
-     Flag_EcalDeadCellTriggerPrimitiveFilter=0;
-     Flag_goodVertices=0;
-     Flag_globalTightHalo2016Filter=0;
-
-     if( trigResults.failedToGet() ) cout << "--- NO TRIGGER RESULTS !! ---" << endl;
-     
-     //==================================
-     
-     if( !trigResults.failedToGet() ) {
-        unsigned int n_Triggers = trigResults->size();
-        const edm::TriggerNames & triggerNames = iEvent.triggerNames(*trigResults);
-
-       
-        if ( firstEvent_ ) {
-            const edm::TriggerNames &names = iEvent.triggerNames(*triggerBits);
-            for (unsigned int i = 0, n = triggerBits->size(); i < n; ++i) {
-                std::cout << "Trigger " << names.triggerName(i) << 
-                ", prescale " << triggerPrescales->getPrescaleForIndex(i) <<
-                ": " << (triggerBits->accept(i) ? "PASS" : "fail (or not run)") 
-                << std::endl;
-            }
-            firstEvent_ = false;
-        }
-        for(unsigned int i_Trig = 0; i_Trig < n_Triggers; ++i_Trig ) {
-            if (trigResults.product()->accept(i_Trig)) {
-                TString TrigPath = triggerNames.triggerName(i_Trig); 
-                 double prescaleHLTL1 = 1.;
-                 if (Sample!="ElectronsMC") 
-                    prescaleHLTL1 = triggerPrescales->getPrescaleForIndex(i_Trig);
-
-                for (int i=0; i!=6; ++i) {
-                    for (int j=0; j!=2; ++j) {
-                        if (TrigPath.Contains(_triggers2lNamesTTZ[j][i])){
-                            _triggers2l[j][i] = 1;
-                            _triggers2lpresc[j][i] = prescaleHLTL1;
-                            //std::cout<< "Second info about prescale (trigger 2l): " << j << " " << i << " " << TrigPath<<" "<<"" <<" "<<prescaleHLTL1<<std::endl;
-                        }
-                    }
-                    for (int j=0; j!=2; ++j) {
-                        if (TrigPath.Contains(_triggers2lNamesTTZBkp[j][i])){
-                            _triggers2lbkp[j][i] = 1;
-                            _triggers2lbkppresc[j][i] = prescaleHLTL1;
-                            //std::cout<< "Second info about prescale (trigger 2l bkp): " << j << " " << i << " " << TrigPath<<" "<<"" <<" "<<prescaleHLTL1<<std::endl;
-                        }
-                    }
-                }
-                
-                for (int i=0; i!=5; ++i) {
-                    for (int j=0; j!=5; ++j) {
-                        if (TrigPath.Contains(_triggersCSNamesTTZ[j][i])){
-                            _triggersCS[j][i] = 1;
-                            _triggersCSpresc[j][i] = prescaleHLTL1;
-                            //std::cout<< "Second info about prescale (trigger CS): " << j << " " << i << " " << TrigPath<<" "<<"" <<" "<<prescaleHLTL1<<std::endl;
-                        }
-                    }
-                    if (TrigPath.Contains(_triggers1lNamesTTZ[i])){
-                        _triggers1l[i] = 1;
-                        _triggers1lpresc[i] = prescaleHLTL1;
-                        //std::cout<< "Second info about prescale (trigger 1l): " << i << " " << TrigPath<<" "<<"" <<" "<<prescaleHLTL1<<std::endl;
-                    }
-                }
-                for (int i=0; i!=2; ++i) {
-                    if (TrigPath.Contains(_triggersCSbNamesTTZ[i])){
-                        _triggersCSb[i] = 1;
-                        _triggersCSbpresc[i] = prescaleHLTL1;
-                        //std::cout<< "Second info about prescale (trigger csb): " << i << " " << TrigPath<<" "<<"" <<" "<<prescaleHLTL1<<std::endl;
-                    }
-                }
-                
-                if (Sample!="ElectronsMC") {
-
-                    if(TrigPath.Contains("Flag_eeBadScFilter"))
-                        Flag_eeBadScFilter=true;
-                    if(TrigPath.Contains("Flag_HBHENoiseFilter"))
-                        Flag_HBHENoiseFilter=true;
-                    if(TrigPath.Contains("Flag_HBHENoiseIsoFilter"))
-                        Flag_HBHENoiseIsoFilter=true;
-                    if(TrigPath.Contains("Flag_EcalDeadCellTriggerPrimitiveFilter"))
-                        Flag_EcalDeadCellTriggerPrimitiveFilter=true;
-                    if(TrigPath.Contains("Flag_goodVertices"))
-                        Flag_goodVertices=true;
-                    if(TrigPath.Contains("Flag_globalTightHalo2016Filter"))
-                        Flag_globalTightHalo2016Filter=true;
-
-                    if(Flag_eeBadScFilter || Flag_HBHENoiseFilter || Flag_HBHENoiseIsoFilter || Flag_EcalDeadCellTriggerPrimitiveFilter || Flag_goodVertices || Flag_globalTightHalo2016Filter) return;
-                }
-
-            }
-        }
-     }
-     
+     getTriggerResults(iEvent, true,  triggerResultsHLTToken,  triggersToSave);
+     getTriggerResults(iEvent, false, triggerResultsRECOToken, filtersToSave);
+     firstEvent_ = false;
 
     realdata_ = iEvent.isRealData();
 
     Double_t weight = 1.;
-    if (Sample=="ElectronsMC") {
+    if(not isData) {
         edm::Handle<GenEventInfoProduct> pdfvariables;
-        iEvent.getByToken(pdfvariablesToken_, pdfvariables);
+        iEvent.getByToken(pdfvariablesToken, pdfvariables);
         weight = pdfvariables->weight();
         _weight=weight;
     }
@@ -828,9 +744,9 @@ void trilepton::analyze(const edm::Event& iEvent, const edm::EventSetup& iEventS
     //iEvent.getByLabel("addPileupInfo", theMCTruthVertices) ;
     //if( ! theVertices.isValid() ) ERR(IT_MCTruthVtx ) ;
     //int nMCTruthvertex = theMCTruthVertices->size();
-    if (Sample=="ElectronsMC") {
+    if (not isData) {
         edm::Handle<vector< PileupSummaryInfo > >  PupInfo;
-        iEvent.getByToken(PileUpToken_, PupInfo);
+        iEvent.getByToken(PileUpToken, PupInfo);
         //std::cout << "Get Bunch Crossing: ";
         for(vector<PileupSummaryInfo>::const_iterator PVI = PupInfo->begin(); PVI != PupInfo->end(); ++PVI) {
             //std::cout << PVI->getBunchCrossing() << " ";
@@ -845,7 +761,7 @@ void trilepton::analyze(const edm::Event& iEvent, const edm::EventSetup& iEventS
     //============ Primary vertices ============
     //edm::InputTag IT_goodVtx = edm::InputTag("offlineSlimmedPrimaryVertices");
     edm::Handle<std::vector<Vertex> > theVertices;
-    iEvent.getByToken( goodOfflinePrimaryVerticesToken_, theVertices) ;
+    iEvent.getByToken( goodOfflinePrimaryVerticesToken, theVertices) ;
     //if( ! theVertices.isValid() ) ERR(IT_goodVtx ) ;
     int nvertex = theVertices->size();
     
@@ -871,7 +787,7 @@ void trilepton::analyze(const edm::Event& iEvent, const edm::EventSetup& iEventS
     
     //============ PF cand ============
     edm::Handle<pat::PackedCandidateCollection> pfcands;
-    iEvent.getByToken(packedPFCandidatesToken_, pfcands);
+    iEvent.getByToken(packedPFCandidatesToken, pfcands);
     //==================================
     
     //============ Pat Muons ============
@@ -890,13 +806,13 @@ void trilepton::analyze(const edm::Event& iEvent, const edm::EventSetup& iEventS
    
     // Get MVA values and categories (optional)
     edm::Handle<edm::ValueMap<float> > mvaValues;
-    iEvent.getByToken(mvaValuesMapToken_,mvaValues);
+    iEvent.getByToken(mvaValuesMapToken,mvaValues);
 
 
     //============ Conversions ============
     edm::Handle< std::vector<reco::Conversion> > theConversions;
     //iEvent.getByLabel("reducedEgamma","reducedConversions", theConversions);
-    iEvent.getByToken(reducedEgammaToken_, theConversions);
+    iEvent.getByToken(reducedEgammaToken, theConversions);
     //==================================
     
     //============ Pat Jets ============
@@ -905,11 +821,11 @@ void trilepton::analyze(const edm::Event& iEvent, const edm::EventSetup& iEventS
     //if( ! thePatJets.isValid() ) ERR(IT_jet);
     //==================================
     edm::Handle<double> rhoJets;
-    iEvent.getByToken(fixedGridRhoFastjetCentralNeutralToken_ , rhoJets);//kt6PFJets
+    iEvent.getByToken(fixedGridRhoFastjetCentralNeutralToken , rhoJets);//kt6PFJets
     myRhoJets = *rhoJets;
     //==================================
     edm::Handle<double> rhoJECJets;
-    iEvent.getByToken(fixedGridRhoFastjetAllToken_ , rhoJECJets);//kt6PFJets
+    iEvent.getByToken(fixedGridRhoFastjetAllToken , rhoJECJets);//kt6PFJets
     myRhoJECJets = *rhoJECJets;
 
 
@@ -1151,11 +1067,7 @@ void trilepton::analyze(const edm::Event& iEvent, const edm::EventSetup& iEventS
 
         fillCloseJetVars(leptonCounter, PV);
         
-        if (Sample=="ElectronsMC") {
-            //**************************************************************************************
-            // MC
-            //**************************************************************************************
-            
+        if (not isData) {
             const GenParticle* mc = GPM.matchedMC(iM);
             if ( mc!=0 ) {
                 fillMCVars(mc, leptonCounter);
@@ -1299,10 +1211,7 @@ void trilepton::analyze(const edm::Event& iEvent, const edm::EventSetup& iEventS
        
         fillCloseJetVars(leptonCounter, PV);
         
-        if (Sample=="ElectronsMC") {
-            //**************************************************************************************
-            // MC
-            //**************************************************************************************
+        if (not isData) {
 	  _findMatched[leptonCounter]=-1;
             const GenParticle* mc = GPM.matchedMC(&*iE);
             if ( mc!=0 ) {
@@ -1575,7 +1484,7 @@ void trilepton::fillCloseJetVars(const int leptonCounter, Vertex::Point PV) {
                 cout << "track pt: " << trk.pt() << endl;
                 */
            }
-           cout << "trackMullicity: " << trackSelectionMult << endl;
+           cout << "trackMultiplicity: " << trackSelectionMult << endl;
            //}
 
          _trackSelectionMultiplicity[leptonCounter] = trackSelectionMult;
