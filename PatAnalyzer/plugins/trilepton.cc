@@ -98,16 +98,17 @@ trilepton::trilepton(const edm::ParameterSet & iConfig) :
     // eventually move this to config level
     // just a bunch of lepton triggers, might need a closer look for cleanup or additions
     triggersToSave = {"HLT_TripleMu_12_10_5", "HLT_DiMu9_Ele9_CaloIdL_TrackIdL", "HLT_Mu8_DiEle12_CaloIdL_TrackIdL", "HLT_Ele16_Ele12_Ele8_CaloIdL_TrackIdL",
-                      "HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ", "HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL_DZ", 
-                      "HLT_Mu8_TrkIsoVVL_Ele17_CaloIdL_TrackIdL_IsoVL", "HLT_Mu17_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL", 
+                      "HLT_Mu1c7_TrkIsoVVL_Mu8_TrkIsoVVL_DZ", "HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL_DZ",
+                      "HLT_TrkMu17_TrkIsoVVL_TkMu8_TrkIsoVVL_DZ",
+                      "HLT_Mu8_TrkIsoVVL_Ele17_CaloIdL_TrackIdL_IsoVL", "HLT_Mu17_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL",
                       "HLT_Ele17_Ele12_CaloIdL_TrackIdL_IsoVL", "HLT_Ele17_Ele12_CaloIdL_TrackIdL_IsoVL_DZ",
                       "HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL", "HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL",
                       "HLT_Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL", "HLT_Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL",
-                      "HLT_Ele23_Ele12_CaloIdL_TrackIdL_IsoVL_v", "HLT_Ele23_Ele12_CaloIdL_TrackIdL_IsoVL_DZ",
+                      "HLT_Ele23_Ele12_CaloIdL_TrackIdL_IsoVL", "HLT_Ele23_Ele12_CaloIdL_TrackIdL_IsoVL_DZ",
                       "HLT_Mu8_TrkIsoVVL","HLT_Mu17_TrkIsoVVL","HLT_Mu24_TrkIsoVVL","HLT_Mu34_TrkIsoVVL",
                       "HLT_Mu8","HLT_Mu17","HLT_Mu24","HLT_Mu34",
                       "HLT_Ele17_CaloIdL_TrackIdL_IsoVL","HLT_Ele23_CaloIdL_TrackIdL_IsoVL",
-                      "HLT_IsoMu22","HLT_IsoTkMu22","HLT_IsoMu18","HLT_Ele27_WPTight_Gsf","HLT_Ele27_eta2p1_WPLoose_Gsf"};
+                      "HLT_IsoMu22", "HLT_IsoMu24", "HLT_IsoTkMu22","HLT_IsoMu18","HLT_Ele27_WPTight_Gsf","HLT_Ele27_eta2p1_WPLoose_Gsf"};
     filtersToSave  = {"Flag_HBHENoiseFilter", "Flag_HBHENoiseIsoFilter", "Flag_EcalDeadCellTriggerPrimitiveFilter", "Flag_goodVertices", "Flag_eeBadScFilter", "Flag_globalTightHalo2016Filter"};
 }
 
@@ -394,12 +395,12 @@ void trilepton::beginJob()
     
     GPM = GenParticleManager();
     
-    if (isData) fMetCorrector = new OnTheFlyCorrections("Majorana/PatAnalyzer/jetfiles/", "Spring16_25nsV6_DATA", isData);
-    else        fMetCorrector = new OnTheFlyCorrections("Majorana/PatAnalyzer/jetfiles/", "Spring16_25nsV6_MC",   isData);
+    if (isData) fMetCorrector = new OnTheFlyCorrections("Majorana/PatAnalyzer/data/", "Spring16_25nsV6_DATA", isData);
+    else        fMetCorrector = new OnTheFlyCorrections("Majorana/PatAnalyzer/data/", "Spring16_25nsV6_MC",   isData);
     if (isData) _corrLevel = "L2L3Residual";
     else        _corrLevel = "L3Absolute";
 
-    jecUnc = new JetCorrectionUncertainty(edm::FileInPath("Majorana/PatAnalyzer/jetfiles/Spring16_25nsV6_MC_Uncertainty_AK4PFchs.txt").fullPath());
+    jecUnc = new JetCorrectionUncertainty(edm::FileInPath("Majorana/PatAnalyzer/data/Spring16_25nsV6_MC_Uncertainty_AK4PFchs.txt").fullPath());
     
    
     //80 % eff
