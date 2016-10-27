@@ -2,11 +2,10 @@ import sys
 import FWCore.ParameterSet.Config as cms
 from RecoTauTag.RecoTau.PFRecoTauQualityCuts_cfi import PFTauQualityCuts
 
-skim       = "NOSkim"
 isData     = False
 inputFile  = "file:///user/mvit/public/Majorana/MajoranaNeutrino_trilepton_M-10_5f_NLO/Majorana_trilepton_RunIISpring16MiniAODv2_96.root"
-outputFile = "test.root"
-
+outputFile = "trilepton.root"
+nEvents    = -1
 
 
 def getVal(arg):
@@ -16,12 +15,11 @@ def getVal(arg):
 for i in range(1,len(sys.argv)):
     print "[arg "+str(i)+"] : ", sys.argv[i]
     if   "isData" in sys.argv[i]: isData     = (getVal(sys.argv[i]) == "True")
-    elif "skim"   in sys.argv[i]: skim       = getVal(sys.argv[i])
     elif "output" in sys.argv[i]: outputFile = getVal(sys.argv[i])
     elif "input"  in sys.argv[i]: inputFile  = getVal(sys.argv[i])
+    elif "events" in sys.argv[i]: nEvents    = int(getVal(sys.argv[i]))
 
 
-if skim=="" : print "WARNING: No Skim Conditions have been provided \n"
 
 process = cms.Process("trilepton")
 
@@ -29,7 +27,10 @@ process = cms.Process("trilepton")
 process.load("FWCore.MessageLogger.MessageLogger_cfi")
 process.MessageLogger.cerr.threshold = 'INFO' # Options: INFO, WARNING, ERROR
 process.MessageLogger.cerr.FwkReport.reportEvery = 10
-process.source = cms.Source("PoolSource", fileNames = cms.untracked.vstring(inputFile.split(",")))
+
+process.source    = cms.Source("PoolSource", fileNames = cms.untracked.vstring(inputFile.split(",")))
+process.options   = cms.untracked.PSet(wantSummary = cms.untracked.bool(True))
+process.maxEvents = cms.untracked.PSet(input = cms.untracked.int32(nEvents)) # for debugging
 
 process.load("Configuration.StandardSequences.FrontierConditions_GlobalTag_cff")
 
@@ -43,27 +44,19 @@ process.load('Configuration.StandardSequences.Reconstruction_cff')
 
 
 # Set up electron ID (VID framework)
-#
-
-from PhysicsTools.SelectorUtils.tools.vid_id_tools import *
 # turn on VID producer, indicate data format  to be
 # DataFormat.AOD or DataFormat.MiniAOD, as appropriate
-dataFormat = DataFormat.MiniAOD
-
-switchOnVIDElectronIdProducer(process, dataFormat)
-
-# define which IDs we want to produce
+from PhysicsTools.SelectorUtils.tools.vid_id_tools import *
+switchOnVIDElectronIdProducer(process, DataFormat.MiniAOD)
 my_id_modules = ['RecoEgamma.ElectronIdentification.Identification.mvaElectronID_Spring15_25ns_nonTrig_V1_cff',
                  'RecoEgamma.ElectronIdentification.Identification.cutBasedElectronID_Spring15_25ns_V1_cff']
-
-#add them to the VID producer
 for idmod in my_id_modules:
     setupAllVIDIdsInModule(process,idmod,setupVIDElectronSelection)
 
-process.options   = cms.untracked.PSet(wantSummary = cms.untracked.bool(True))
-process.maxEvents = cms.untracked.PSet(input = cms.untracked.int32(10000)) # for debugging
+
 
 process.TFileService = cms.Service("TFileService", fileName = cms.string(outputFile) )
+
 
 process.trileptonProducer = cms.EDAnalyzer("trilepton",
                                           #METFilter                              = cms.InputTag("TriggerResults::PAT"),
@@ -86,7 +79,7 @@ process.trileptonProducer = cms.EDAnalyzer("trilepton",
 					   fixedGridRhoFastjetCentralNeutralLabel = cms.InputTag("fixedGridRhoFastjetCentralNeutral"),
 					   fixedGridRhoFastjetAllLabel            = cms.InputTag("fixedGridRhoFastjetAll"),
 					   prescales                              = cms.InputTag("patTrigger"),
-                                           triggerResultsHLT                      = cms.InputTag("TriggerResults::HLT"),
+                                           triggerResultsHLT                      = cms.InputTag("TriggerResults::HLT" if isData else "TriggerResults::HLT2"), # reHLT samples have their triggers stored in HLT2
                                            triggerResultsRECO                     = cms.InputTag("TriggerResults::RECO"),
 					   exernalLHEPLabel                       = cms.InputTag("externalLHEProducer"),
 					   )
