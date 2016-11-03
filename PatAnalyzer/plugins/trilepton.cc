@@ -97,18 +97,25 @@ trilepton::trilepton(const edm::ParameterSet & iConfig) :
 
     // eventually move this to config level
     // just a bunch of lepton triggers, might need a closer look for cleanup or additions
-    triggersToSave = {"HLT_TripleMu_12_10_5", "HLT_DiMu9_Ele9_CaloIdL_TrackIdL", "HLT_Mu8_DiEle12_CaloIdL_TrackIdL", "HLT_Ele16_Ele12_Ele8_CaloIdL_TrackIdL",
-                      "HLT_Mu1c7_TrkIsoVVL_Mu8_TrkIsoVVL_DZ", "HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL_DZ",
-                      "HLT_TrkMu17_TrkIsoVVL_TkMu8_TrkIsoVVL_DZ",
-                      "HLT_Mu8_TrkIsoVVL_Ele17_CaloIdL_TrackIdL_IsoVL", "HLT_Mu17_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL",
-                      "HLT_Ele17_Ele12_CaloIdL_TrackIdL_IsoVL", "HLT_Ele17_Ele12_CaloIdL_TrackIdL_IsoVL_DZ",
-                      "HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL", "HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL",
-                      "HLT_Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL", "HLT_Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL",
-                      "HLT_Ele23_Ele12_CaloIdL_TrackIdL_IsoVL", "HLT_Ele23_Ele12_CaloIdL_TrackIdL_IsoVL_DZ",
-                      "HLT_Mu8_TrkIsoVVL","HLT_Mu17_TrkIsoVVL","HLT_Mu24_TrkIsoVVL","HLT_Mu34_TrkIsoVVL",
-                      "HLT_Mu8","HLT_Mu17","HLT_Mu24","HLT_Mu34",
-                      "HLT_Ele17_CaloIdL_TrackIdL_IsoVL","HLT_Ele23_CaloIdL_TrackIdL_IsoVL",
-                      "HLT_IsoMu22", "HLT_IsoMu24", "HLT_IsoTkMu22","HLT_IsoMu18","HLT_Ele27_WPTight_Gsf","HLT_Ele27_eta2p1_WPLoose_Gsf"};
+    triggersToSave = {"HLT_TripleMu_12_10_5", "HLT_DiMu9_Ele9_CaloIdL_TrackIdL", "HLT_Mu8_DiEle12_CaloIdL_TrackIdL", "HLT_Ele16_Ele12_Ele8_CaloIdL_TrackIdL",   // 3l
+                      "HLT_TripleMu_5_3_3_DZ_Mass3p8",														// 3l (with mass requirement)
+                      "HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ", "HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL_DZ", "HLT_TkMu17_TrkIsoVVL_TkMu8_TrkIsoVVL_DZ",		// mumu
+                      "HLT_Mu30_TkMu11", "HLT_Mu40_TkMu11",
+                      "HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL",    "HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL",    "HLT_TkMu17_TrkIsoVVL_TkMu8_TrkIsoVVL",			// mumu prescaled
+                      "HLT_Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_DZ", 											// mue
+                      "HLT_Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_DZ", "HLT_Mu23_TrkIsoVVL_Ele8_CaloIdL_TrackIdL_IsoVL_DZ",
+                      "HLT_Mu8_TrkIsoVVL_Ele17_CaloIdL_TrackIdL_IsoVL",												// mue partially off
+                      "HLT_DoubleEle37_Ele27_CaloIdL_GsfTrkIdVL", "HLT_Ele23_Ele12_CaloIdL_TrackIdL_IsoVL_DZ", "HLT_DoubleEle24_22_eta2p1_WPLoose_Gsf",		// ee
+                      "HLT_DoubleEle33_CaloIdL_GsfTrkIdVL",
+                      "HLT_Ele23_Ele12_CaloIdL_TrackIdL_IsoVL",	"HLT_Ele17_Ele12_CaloIdL_TrackIdL_IsoVL", "HLT_Ele17_Ele12_CaloIdL_TrackIdL_IsoVL_DZ",		// ee prescaled
+                      "HLT_DoubleEle33_CaloIdL_GsfTrkIdVL",
+                      "HLT_Mu50", "HLT_TkMu50", "HLT_IsoMu27", "HLT_IsoTkMu27", 										// mu
+                      "HLT_IsoMu24", "HLT_IsoTkMu24", "HLT_IsoMu24_eta2p1", "HLT_IsoTkMu24_eta2p1",
+                      "HLT_IsoMu22_eta2p1", "HLT_IsoTkMu22_eta2p1",
+                      "HLT_IsoTkMu22", "HLT_Mu45_eta2p1",													// mu partially off
+                      "HLT_Ele32_WPTight_Gsf", "HLT_Ele32_eta2p1_WPTight_Gsf", "HLT_Ele30_WPTight_Gsf", "HLT_Ele30_eta2p1_WPTight_Gsf", 			// e
+                      "HLT_Ele27_WPTight_Gsf", "HLT_Ele27_eta2p1_WPTight_Gsf", "HLT_Ele27_eta2p1_WPLoose_Gsf", "HLT_Ele25_eta2p1_WPTight_Gsf",
+                      "HLT_Ele25_WPTight_Gsf"};															// e partially off
     filtersToSave  = {"Flag_HBHENoiseFilter", "Flag_HBHENoiseIsoFilter", "Flag_EcalDeadCellTriggerPrimitiveFilter", "Flag_goodVertices", "Flag_eeBadScFilter", "Flag_globalTightHalo2016Filter"};
 }
 
@@ -211,7 +218,6 @@ void trilepton::beginJob()
 
     outputTree->Branch("_flavors", &_flavors, "_flavors[_nLeptons]/I");
     outputTree->Branch("_charges", &_charges, "_charges[_nLeptons]/D");
-    outputTree->Branch("_indeces", &_indeces, "_indeces[_nLeptons]/I");
     outputTree->Branch("_isolation", &_isolation, "_isolation[_nLeptons]/D");
     outputTree->Branch("_isolationDB", &_isolationDB, "_isolationDB[_nLeptons]/D");
     //outputTree->Branch("_isolationComponents", &_isolationComponents, "_isolationComponents[4][6]/D");
@@ -342,8 +348,8 @@ void trilepton::beginJob()
     outputTree->Branch("_mchi0", &_mchi0, "_mchi0/D");
     
     outputTree->Branch("_nMajorana", &_nMajorana, "_nMajorana/I");
-    outputTree->Branch("_passedMVA80", &_passedMVA80, "_passedMVA80/I");
-    outputTree->Branch("_passedMVA90", &_passedMVA90, "_passedMVA90/I");
+    outputTree->Branch("_passedMVA80", &_passedMVA80, "_passedMVA80[_nLeptons]/O");
+    outputTree->Branch("_passedMVA90", &_passedMVA90, "_passedMVA90[_nLeptons]/O");
     outputTree->Branch("_findMatched", &_findMatched, "_findMatched/I");
 
     // trigger
@@ -463,10 +469,7 @@ void trilepton::endJob() {
     
 }
 
-void trilepton::beginRun(const edm::Run& iRun, edm::EventSetup const& iSetup)
-{
-    using namespace edm;
-    
+void trilepton::beginRun(const edm::Run& iRun, edm::EventSetup const& iSetup){
     return;
 }
 
@@ -482,7 +485,9 @@ void trilepton::getTriggerResults(const edm::Event& iEvent, bool isHLT, edm::EDG
 
   const edm::TriggerNames& triggerNames = iEvent.triggerNames(*trigResults);
 
+
   // Get full trigger list, and remember the indices of triggers we need to save
+  for(TString triggerName : toSave) triggerIndices[triggerName] = -1;
   if(firstEvent_){
     std::cout << "Available triggers:" << std::endl;
     for (unsigned int i = 0; i < trigResults->size(); ++i){
@@ -498,6 +503,11 @@ void trilepton::getTriggerResults(const edm::Event& iEvent, bool isHLT, edm::EDG
 
   // Save our triggers/flags
   for(TString triggerName : toSave){
+    if(triggerIndices[triggerName] == -1){
+      triggerFlags[triggerName] = false;
+      triggerPrescales[triggerName] = 0;
+      continue;
+    }
     triggerFlags[triggerName] = trigResults->accept(triggerIndices[triggerName]);
     if(isHLT){
       triggerPrescales[triggerName] = prescales->getPrescaleForIndex(triggerIndices[triggerName]);
@@ -792,8 +802,8 @@ void trilepton::analyze(const edm::Event& iEvent, const edm::EventSetup& iEventS
     //==================================
     
     //============ Pat Muons ============
-    edm::Handle< std::vector<pat::Muon> > thePatMuons;
-    iEvent.getByToken( IT_muon, thePatMuons );
+    edm::Handle<std::vector<pat::Muon>> muons;
+    iEvent.getByToken(IT_muon, muons);
     //if( ! thePatMuons.isValid() )  ERR(IT_muon) ;
     //==================================
     
@@ -926,11 +936,7 @@ void trilepton::analyze(const edm::Event& iEvent, const edm::EventSetup& iEventS
 	W_N_W // 20
     };
     
-    
-    //std::vector<const pat::Muon* > sMu = ssbMediumMuonSelector( *thePatMuons, _minPt0, PV, _looseD0Mu);
-    std::vector<const pat::Muon* > sMu = ssbLooseMuonSelector( *thePatMuons, _minPt0, PV, _looseD0Mu);
-    
-    //std::vector<const pat::Electron* > sEl = ssbMVAElectronSelector( *thePatElectrons, _minPt1, PV, _looseD0E, _chargeConsistency, theConversions, BS, true);
+       //std::vector<const pat::Electron* > sEl = ssbMVAElectronSelector( *thePatElectrons, _minPt1, PV, _looseD0E, _chargeConsistency, theConversions, BS, true);
 
     //Taus
     edm::Handle<pat::TauCollection> PatTaus;
@@ -988,254 +994,228 @@ void trilepton::analyze(const edm::Event& iEvent, const edm::EventSetup& iEventS
     }
     _n_JetsAll = SelectedJetsAll.size();
     
+
+    /*
+     * Leptons
+     */
+
+
+
     int leptonCounter = 0;
-    std::cout << "Muon selection started " << std::endl;
-    for(unsigned int i = 0 ; i < sMu.size() ;i++ ){
-        
-        
-        const pat::Muon *iM = sMu[i];
-        //if (iM->pt() < 10) continue;
-        
-        //_hitsNumber[i] = 0;
+ 
+    for(auto muon = muons->begin(); muon != muons->end(); ++muon){
+      if(muon->pt() < _minPt0)   continue;
+      if(abs(muon->eta()) > 2.5) continue;
+      if(!muon->isLooseMuon())   continue;  // Store only loose muons, see https://twiki.cern.ch/twiki/bin/viewauth/CMS/SWGuideMuonIdRun2
+     
+      if(muon->innerTrack().isNull()) 			continue;  // Store only when we have an innertrack
+      if(abs(muon->innerTrack()->dxy(PV)) > _looseD0Mu) continue;
+      if(abs(muon->innerTrack()->dz(PV)) > 0.1  ) 	continue;
 
-        if (leptonCounter == 10) continue;
+      if (leptonCounter == 10) continue;  // using arrays, so do not store more than 10 muons, they are sorted in pt anyway
 
-        _flavors[leptonCounter] = 1;
-        _charges[leptonCounter] = iM->charge();
-        _isolation[leptonCounter] = pfRelIso(iM,myRhoJECJets);
-        _isolationDB[leptonCounter] = pfRelIso(iM);
-        
-        _miniisolation[leptonCounter][0] = getPFIsolation(pfcands, dynamic_cast<const reco::Candidate *>(iM), 0.05, 0.2, 10., false, false, myRhoJets);
-        _miniisolation[leptonCounter][1] = getPFIsolation(pfcands, dynamic_cast<const reco::Candidate *>(iM), 0.05, 0.3, 10., false, false, myRhoJets);
+      // might be preferable to change to vectors instead of arrays because we do not know the length
+      _flavors[leptonCounter]     = 1;
+      _charges[leptonCounter]     = muon->charge();
+      _isolation[leptonCounter]   = pfRelIso(&*muon,myRhoJECJets);  // should check out this function
+      _isolationDB[leptonCounter] = pfRelIso(&*muon);
+      
+      _miniisolation[leptonCounter][0] 	      = getPFIsolation(pfcands, &*muon, 0.05, 0.2, 10., false, false, myRhoJets);  // to check 
+      _miniisolation[leptonCounter][1] 	      = getPFIsolation(pfcands, &*muon, 0.05, 0.3, 10., false, false, myRhoJets); // also to check
+      _miniisolationCharged[leptonCounter][0] = getPFIsolation(pfcands, &*muon, 0.05, 0.2, 10., false, true,  myRhoJets); // also to check
+      _miniisolationCharged[leptonCounter][1] = getPFIsolation(pfcands, &*muon, 0.05, 0.3, 10., false, true,  myRhoJets); // also to check
 
-        _miniisolationCharged[leptonCounter][0] = getPFIsolation(pfcands, dynamic_cast<const reco::Candidate *>(iM), 0.05, 0.2, 10., false, true, myRhoJets);
-        _miniisolationCharged[leptonCounter][1] = getPFIsolation(pfcands, dynamic_cast<const reco::Candidate *>(iM), 0.05, 0.3, 10., false, true, myRhoJets);
+      _ipPV[leptonCounter]     = muon->innerTrack()->dxy(PV);
+      _ipPVerr[leptonCounter]  = muon->innerTrack()->dxyError();
+      _ipZPV[leptonCounter]    = muon->innerTrack()->dz(PV);
+      _ipZPVerr[leptonCounter] = muon->innerTrack()->dzError();
+      _3dIP[leptonCounter]    = muon->dB(pat::Muon::PV3D);
+      _3dIPerr[leptonCounter] = muon->edB(pat::Muon::PV3D);
+      _3dIPsig[leptonCounter] = fabs(_3dIP[leptonCounter]/_3dIPerr[leptonCounter]);
+     
+      bool goodGlb      = muon->isGlobalMuon() and muon->globalTrack()->normalizedChi2() < 3 and muon->combinedQuality().chi2LocalPosition < 12 and muon->combinedQuality().trkKink < 20;
+      bool isMedium     = muon->isLooseMuon() and muon->innerTrack()->validFraction() > 0.49 and muon->segmentCompatibility() >= (goodGlb ? 0.303 : 0.451); // temporary ICHEP recommendation
+//    bool isMedium     = muon->isMediumMuon();  // default definition with  muon->innerTrack()->validFraction() > 8 instead
+      bool looseMiniIso = _miniisolation[leptonCounter][0] < 0.4; // maybe call this looseMiniIso instead
 
-        _ipPV[leptonCounter] = iM->innerTrack()->dxy(PV);
-        _ipPVerr[leptonCounter] = iM->innerTrack()->dxyError();
-        
-        _ipZPV[leptonCounter] = iM->innerTrack()->dz(PV);
-        _ipZPVerr[leptonCounter] = iM->innerTrack()->dzError();
-        
-        
-        //bool good = iM->innerTrack()->validFraction() > 0.8 && iM->segmentCompatibility() >= (goodGlb ? 0.303 : 0.451);
-        //bool good = iM->innerTrack()->validFraction() > 0.49 && iM->segmentCompatibility() >= (goodGlb ? 0.303 : 0.451) && iM->isMediumMuon() && iM->isPFMuon() && (iM->isTrackerMuon() || iM->isGlobalMuon() ) && _miniisolation[leptonCounter][0] < 0.4; // short term
+      _muonSegmentComp[leptonCounter] = muon->segmentCompatibility(); // do we really use this variable in our trees? should be enough to select loose or medium
+      
+      if(_isolationDB[leptonCounter] > 1.0 ) continue; // wait still cutting after we started filling? now it makes sense why arrays are used instead of vectors
+      _isloose[leptonCounter] = goodGlb && (_3dIPsig[leptonCounter] < 4) && isMedium && looseMiniIso; // horrible, we should not call our own definitions loose or tight
+      _istight[leptonCounter] = goodGlb && (_isolationDB[leptonCounter] < 0.15) && (_3dIPsig[leptonCounter] < 4)&& isMedium && looseMiniIso; // even more horrible
 
-        //bool good = iM->innerTrack()->validFraction() > 0.8 && iM->segmentCompatibility() >= (goodGlb ? 0.303 : 0.451);
-        //bool good = iM->innerTrack()->validFraction() > 0.49 && iM->segmentCompatibility() >= (goodGlb ? 0.303 : 0.451); // short term 
+      if(!_isloose[leptonCounter]) continue;
+      
+      ((TLorentzVector *)_leptonP4->At(leptonCounter))->SetPtEtaPhiE(muon->pt(), muon->eta(), muon->phi(), muon->energy());
+      _mt[leptonCounter] = MT_calc(*((TLorentzVector *)_leptonP4->At(leptonCounter)), _met, _met_phi);
 
+      // So for some reason, here we are adding again the same stuff to out tree
+      _lPt[leptonCounter]  = muon->pt();
+      _lEta[leptonCounter] = muon->eta(); 
+      _lPhi[leptonCounter] = muon->phi();
+      _lE[leptonCounter]   = muon->energy();
+      
 
-
-	//bool goodGlb = iM->isGlobalMuon() && iM->globalTrack()->normalizedChi2() < 3 && iM->combinedQuality().chi2LocalPosition < 12 && iM->combinedQuality().trkKink < 20;
-
-	//	bool goodGlobaltest = iM->isPFMuon() && (iM->isTrackerMuon() || iM->isGlobalMuon() ) && (iM->globalTrack()->normalizedChi2() < 3) &&  iM->combinedQuality().chi2LocalPosition < 12 &&  iM->combinedQuality().trkKink < 20; 
-
-	bool goodGlb = iM->isGlobalMuon() && iM->globalTrack()->normalizedChi2() < 3 && iM->combinedQuality().chi2LocalPosition < 12 && iM->combinedQuality().trkKink < 20;
-
-	bool isMedium =iM->isPFMuon() && (iM->isTrackerMuon() || iM->isGlobalMuon() )&& iM->innerTrack()->validFraction() > 0.8 && iM->segmentCompatibility() >= (goodGlb ? 0.303 : 0.451);
-
-	bool isotest=  _miniisolation[leptonCounter][0] < 0.4;
-
-
-        //double _muonSegmentComp[leptonCounter] = iM->segmentCompatibility();
-        _muonSegmentComp[leptonCounter] = iM->segmentCompatibility();
-        
-        //_istightID[leptonCounter] = good;
-        
-        _3dIP[leptonCounter]    = iM->dB(pat::Muon::PV3D);
-        _3dIPerr[leptonCounter] = iM->edB(pat::Muon::PV3D);
-        _3dIPsig[leptonCounter] = fabs(_3dIP[leptonCounter]/_3dIPerr[leptonCounter]);
-        
-
-        //if(_miniisolation[leptonCounter][0] > 0.4) continue;
-        if(_isolationDB[leptonCounter] > 1.0 ) continue;
-        _isloose[leptonCounter] = goodGlb && (_3dIPsig[leptonCounter] < 4) && isMedium && isotest;
-        _istight[leptonCounter] = goodGlb && (_isolationDB[i] < 0.15) && (_3dIPsig[leptonCounter] < 4)&& isMedium && isotest;
-
-
-        if(!_isloose[leptonCounter]) continue;
-        
-        
-        ((TLorentzVector *)_leptonP4->At(leptonCounter))->SetPtEtaPhiE(iM->pt(), iM->eta(), iM->phi(), iM->energy());
-        _mt[leptonCounter] = MT_calc(*((TLorentzVector *)_leptonP4->At(leptonCounter)), _met, _met_phi);
-        
-        _lPt[leptonCounter] = ((TLorentzVector *)_leptonP4->At(leptonCounter))->Pt();
-        _lEta[leptonCounter] = ((TLorentzVector *)_leptonP4->At(leptonCounter))->Eta();
-        _lPhi[leptonCounter] = ((TLorentzVector *)_leptonP4->At(leptonCounter))->Phi();
-        _lE[leptonCounter] = ((TLorentzVector *)_leptonP4->At(leptonCounter))->E();
-        
-        std::cout<< "Muon loose selection passed -> " << _lPt[leptonCounter] << endl;
-
-        fillCloseJetVars(leptonCounter, PV);
-        
-        if (not isData) {
-            const GenParticle* mc = GPM.matchedMC(iM);
-            if ( mc!=0 ) {
-                fillMCVars(mc, leptonCounter);
-                _ipPVmc[leptonCounter] = TMath::Abs(iM->innerTrack()->dxy(PVmc));
-            }
-            else {
-                //std::cout<<"No match mu"<<std::endl;
-                _origin[leptonCounter] = -1;
-                _originReduced[leptonCounter] = -1;
-                
-                _mompt[leptonCounter] = 0;
-                _momphi[leptonCounter] = 0;
-                _mometa[leptonCounter] = 0;
-                _mompdg[leptonCounter] = 0;
-            }
-            
+      fillCloseJetVars(leptonCounter, PV);
+      
+      if(not isData){
+	  const GenParticle* mc = GPM.matchedMC(&*muon);
+	  if(mc!=0){
+	      fillMCVars(mc, leptonCounter);
+	      _ipPVmc[leptonCounter] = TMath::Abs(muon->innerTrack()->dxy(PVmc));
+	  } else {
+	      _origin[leptonCounter] = -1;
+	      _originReduced[leptonCounter] = -1;
+	      
+	      _mompt[leptonCounter]  = 0;
+	      _momphi[leptonCounter] = 0;
+	      _mometa[leptonCounter] = 0;
+	      _mompdg[leptonCounter] = 0;
+	  }
         }
         
-        
         leptonCounter++;
-
-        
     }
     _nMu = leptonCounter;
-    
-    std::cout << "Electron selection started" << std::endl;
+   
+    // Need more cleanup here 
     for (size_t i = 0; i < thePatElectrons->size(); ++i){
-      _passedMVA80[leptonCounter ] =0;
-      _passedMVA90[leptonCounter ] =0;
-      _findMatched[leptonCounter ] =-1;
-      if (leptonCounter == 10) continue;
+      _passedMVA80[leptonCounter] =0; // unitialized for muons? probably not a big issue though
+      _passedMVA90[leptonCounter] =0;
+      _findMatched[leptonCounter] =-1;
+      if (leptonCounter == 10) continue; // This will go terribly wrong when there are about 8-10 muons or more (even though improbable)
 
       const auto iE = thePatElectrons->ptrAt(i);
-        std::cout << "Pat electron: " << iE->pt() << " " << iE->superCluster()->eta() << " " << iE->phi() << " " << std::endl;
-        if (!ssbMVAElectronSelectorPassed(iE, _minPt1, PV, _looseD0E, _chargeConsistency, theConversions, BS, false)) continue;
-        std::cout << "Passed electron selector" << std::endl;
-        _mvaValue[leptonCounter] = (*mvaValues)[iE];
+      if(iE->pt() < _minPt1) continue;
+      if(abs(iE->eta()) > 2.5) continue;
+      if(!iE->gsfTrack().isNonnull()) continue;
 
-	bool passedMVA90 = false;
-	if(iE->pt() <10 ){//selection 5<pt<10
-	  passedMVA90 = false;
-	  if (TMath::Abs(iE->eta()) < 0.8 ) {
-	    passedMVA90 = _mvaValue[leptonCounter]> looseMVA[0][1];
-	  } else if (TMath::Abs(iE->eta()) < 1.479 ) {
-	    passedMVA90 = _mvaValue[leptonCounter]> looseMVA[1][1];
-	  } else {
-	    passedMVA90 = _mvaValue[leptonCounter]> looseMVA[2][1];
-	  }
-	}//end //selection 5<pt<10
+      _mvaValue[leptonCounter] = (*mvaValues)[iE];
 
-	if (iE->pt()>=10  ){
-	  passedMVA90 = false;
-	  if (TMath::Abs(iE->eta()) < 0.8 ) {
-	    passedMVA90 = _mvaValue[leptonCounter] > looseMVA[3][1];
-	  } else if (TMath::Abs(iE->eta()) < 1.479 ) {
-	    passedMVA90 = _mvaValue[leptonCounter] > looseMVA[4][1];
-	  } else {
-	    passedMVA90 = _mvaValue[leptonCounter] > looseMVA[5][1];
-	  }
-	}// end 10 pt
-
-	bool passedMVA80 = false;
-	if(iE->pt() <10 ){//selection 5<pt<10
-	  passedMVA80 = false;
-	  if (TMath::Abs(iE->eta()) < 0.8 ) {
-	    passedMVA80 = _mvaValue[leptonCounter]> looseMVA[0][0];
-	  } else if (TMath::Abs(iE->eta()) < 1.479 ) {
-	    passedMVA80 = _mvaValue[leptonCounter]> looseMVA[1][0];
-	  } else {
-	    passedMVA80 = _mvaValue[leptonCounter]> looseMVA[2][0];
-	  }
-	}//end //selection 5<pt<10
-
-	if (iE->pt()>=10){
-	  passedMVA80 = false;
-	  if (TMath::Abs(iE->eta()) < 0.8 ) {
-	    passedMVA80 = _mvaValue[leptonCounter] > looseMVA[3][0];
-	  } else if (TMath::Abs(iE->eta()) < 1.479 ) {
-	    passedMVA80 = _mvaValue[leptonCounter] > looseMVA[4][0];
-	  } else {
-	    passedMVA80 = _mvaValue[leptonCounter] > looseMVA[5][0];
-	  }
-	}// end 10 pt
-
-
-
-
-      
-        _flavors[leptonCounter] = 0;
-        _charges[leptonCounter] = iE->charge();
-        _isolation[leptonCounter] = pfRelIso(&*iE, myRhoJECJets);
-
-        cout << "Isolation value of electron: " << _isolation[leptonCounter] << endl;
-        
-        _ipPV[leptonCounter] = iE->gsfTrack()->dxy(PV);
-        _ipZPV[leptonCounter] = iE->gsfTrack()->dz(PV);
-
-        if(TMath::Abs(_ipPV[leptonCounter]) > 0.05) continue;
-        if(TMath::Abs(_ipZPV[leptonCounter]) > 0.1) continue;
-        
-        _miniisolation[leptonCounter][0] = getPFIsolation(pfcands, dynamic_cast<const reco::Candidate *>(&*iE), 0.05, 0.2, 10., false, false, myRhoJets);
-        _miniisolation[leptonCounter][1] = getPFIsolation(pfcands, dynamic_cast<const reco::Candidate *>(&*iE), 0.05, 0.3, 10., false, false, myRhoJets);
-
-        _miniisolationCharged[leptonCounter][0] = getPFIsolation(pfcands, dynamic_cast<const reco::Candidate *>(&*iE), 0.05, 0.2, 10., false, true, myRhoJets);
-        _miniisolationCharged[leptonCounter][1] = getPFIsolation(pfcands, dynamic_cast<const reco::Candidate *>(&*iE), 0.05, 0.3, 10., false, true, myRhoJets);
-
-        _chargeConst[leptonCounter] = iE->isGsfCtfScPixChargeConsistent();
-        _vtxFitConversion[leptonCounter] = ConversionTools::hasMatchedConversion(reco::GsfElectron (*&*iE), theConversions, BS);
-        _hitsNumber[leptonCounter] = iE->gsfTrack()->hitPattern().numberOfHits(reco::HitPattern::MISSING_INNER_HITS);
-
-        _trigEmulator[leptonCounter] = triggerEmulatorReturned(&*iE);
-        _isotrigEmulator[leptonCounter] = isoTriggerEmulator(&*iE);
-
-        _3dIP[leptonCounter]    = iE->dB(pat::Electron::PV3D);
-        _3dIPerr[leptonCounter] = iE->edB(pat::Electron::PV3D);
-        _3dIPsig[leptonCounter] = fabs(_3dIP[leptonCounter]/_3dIPerr[leptonCounter]);
-
-	_passedMVA80[leptonCounter ] = passedMVA80;
-	_passedMVA90[leptonCounter ] = passedMVA90;
-
-	
-        std::cout << "Before Loose selection passed : " << iE->pt() << " " << _trigEmulator[leptonCounter] << " " << (_miniisolation[leptonCounter][0] < 0.4) << " "  << (_hitsNumber[leptonCounter] == 0)  << " " << (!_vtxFitConversion[leptonCounter]) << " " << (_3dIPsig[leptonCounter] < 4) << endl;
-
-       
-        if(_isolation[leptonCounter] > 1) continue;
-        if(_3dIPsig[leptonCounter] > 4) continue;
-
-	if (!_passedMVA90[leptonCounter]) continue;
-
-        
-        
-        ((TLorentzVector *)_leptonP4->At(leptonCounter))->SetPtEtaPhiE(iE->pt(), iE->eta(), iE->phi(), iE->energy());
-        
-        _mt[leptonCounter] = MT_calc(*((TLorentzVector *)_leptonP4->At(leptonCounter)), _met, _met_phi);
-        
-        _lPt[leptonCounter] = ((TLorentzVector *)_leptonP4->At(leptonCounter))->Pt();
-        _lEta[leptonCounter] = ((TLorentzVector *)_leptonP4->At(leptonCounter))->Eta();
-        _lPhi[leptonCounter] = ((TLorentzVector *)_leptonP4->At(leptonCounter))->Phi();
-        _lE[leptonCounter] = ((TLorentzVector *)_leptonP4->At(leptonCounter))->E();
-
-       
-        fillCloseJetVars(leptonCounter, PV);
-        
-        if (not isData) {
-	  _findMatched[leptonCounter]=-1;
-            const GenParticle* mc = GPM.matchedMC(&*iE);
-            if ( mc!=0 ) {
-                fillMCVars(mc, leptonCounter);
-                //Vertex::Point PVmc = mcMom->vertex();
-                _ipPVmc[leptonCounter] = TMath::Abs(iE->gsfTrack()->dxy(PVmc));
-		_findMatched[leptonCounter]=1;
-            }
-            else {
-                //std::cout<<"No match e"<<std::endl;
-                _origin[leptonCounter] = -1;
-                _originReduced[leptonCounter] = -1;
-                _mompt[leptonCounter] = 0;
-                _momphi[leptonCounter] = 0;
-                _mometa[leptonCounter] = 0;
-                _mompdg[leptonCounter] = 0;
-		_findMatched[leptonCounter]=0;
-            }
+      // maybe better implement cut based id though, and/or clean up this MVA cutting part
+      bool passedMVA90 = false;
+      if(iE->pt() <10 ){//selection 5<pt<10
+	passedMVA90 = false;
+	if (TMath::Abs(iE->eta()) < 0.8 ) {
+	  passedMVA90 = _mvaValue[leptonCounter]> looseMVA[0][1];
+	} else if (TMath::Abs(iE->eta()) < 1.479 ) {
+	  passedMVA90 = _mvaValue[leptonCounter]> looseMVA[1][1];
+	} else {
+	  passedMVA90 = _mvaValue[leptonCounter]> looseMVA[2][1];
 	}
-        
+      }//end //selection 5<pt<10
+
+      if (iE->pt()>=10  ){
+	passedMVA90 = false;
+	if (TMath::Abs(iE->eta()) < 0.8 ) {
+	  passedMVA90 = _mvaValue[leptonCounter] > looseMVA[3][1];
+	} else if (TMath::Abs(iE->eta()) < 1.479 ) {
+	  passedMVA90 = _mvaValue[leptonCounter] > looseMVA[4][1];
+	} else {
+	  passedMVA90 = _mvaValue[leptonCounter] > looseMVA[5][1];
+	}
+      }// end 10 pt
+
+      bool passedMVA80 = false;
+      if(iE->pt() <10 ){//selection 5<pt<10
+	passedMVA80 = false;
+	if (TMath::Abs(iE->eta()) < 0.8 ) {
+	  passedMVA80 = _mvaValue[leptonCounter]> looseMVA[0][0];
+	} else if (TMath::Abs(iE->eta()) < 1.479 ) {
+	  passedMVA80 = _mvaValue[leptonCounter]> looseMVA[1][0];
+	} else {
+	  passedMVA80 = _mvaValue[leptonCounter]> looseMVA[2][0];
+	}
+      }//end //selection 5<pt<10
+
+      if (iE->pt()>=10){
+	passedMVA80 = false;
+	if (TMath::Abs(iE->eta()) < 0.8 ) {
+	  passedMVA80 = _mvaValue[leptonCounter] > looseMVA[3][0];
+	} else if (TMath::Abs(iE->eta()) < 1.479 ) {
+	  passedMVA80 = _mvaValue[leptonCounter] > looseMVA[4][0];
+	} else {
+	  passedMVA80 = _mvaValue[leptonCounter] > looseMVA[5][0];
+	}
+      }// end 10 pt
+
+    
+      _flavors[leptonCounter] = 0;
+      _charges[leptonCounter] = iE->charge();
+      _isolation[leptonCounter] = pfRelIso(&*iE, myRhoJECJets);
+
+      _ipPV[leptonCounter]  = iE->gsfTrack()->dxy(PV);
+      _ipZPV[leptonCounter] = iE->gsfTrack()->dz(PV);
+
+      if(TMath::Abs(_ipPV[leptonCounter]) > 0.05) continue;
+      if(TMath::Abs(_ipZPV[leptonCounter]) > 0.1) continue;
       
-        leptonCounter++;
-        
+      _miniisolation[leptonCounter][0] = getPFIsolation(pfcands, dynamic_cast<const reco::Candidate *>(&*iE), 0.05, 0.2, 10., false, false, myRhoJets);
+      _miniisolation[leptonCounter][1] = getPFIsolation(pfcands, dynamic_cast<const reco::Candidate *>(&*iE), 0.05, 0.3, 10., false, false, myRhoJets);
+
+      _miniisolationCharged[leptonCounter][0] = getPFIsolation(pfcands, dynamic_cast<const reco::Candidate *>(&*iE), 0.05, 0.2, 10., false, true, myRhoJets);
+      _miniisolationCharged[leptonCounter][1] = getPFIsolation(pfcands, dynamic_cast<const reco::Candidate *>(&*iE), 0.05, 0.3, 10., false, true, myRhoJets);
+
+      _chargeConst[leptonCounter] = iE->isGsfCtfScPixChargeConsistent();
+      _vtxFitConversion[leptonCounter] = ConversionTools::hasMatchedConversion(reco::GsfElectron (*&*iE), theConversions, BS);
+      _hitsNumber[leptonCounter] = iE->gsfTrack()->hitPattern().numberOfHits(reco::HitPattern::MISSING_INNER_HITS);
+
+      _trigEmulator[leptonCounter] = triggerEmulatorReturned(&*iE);
+      _isotrigEmulator[leptonCounter] = isoTriggerEmulator(&*iE);
+
+      _3dIP[leptonCounter]    = iE->dB(pat::Electron::PV3D);
+      _3dIPerr[leptonCounter] = iE->edB(pat::Electron::PV3D);
+      _3dIPsig[leptonCounter] = fabs(_3dIP[leptonCounter]/_3dIPerr[leptonCounter]);
+
+      _passedMVA80[leptonCounter] = passedMVA80;
+      _passedMVA90[leptonCounter] = passedMVA90;
+
+      
+      std::cout << "Before Loose selection passed : " << iE->pt() << " " << _trigEmulator[leptonCounter] << " " << (_miniisolation[leptonCounter][0] < 0.4) << " "  << (_hitsNumber[leptonCounter] == 0)  << " " << (!_vtxFitConversion[leptonCounter]) << " " << (_3dIPsig[leptonCounter] < 4) << endl;
+
+     
+      if(_isolation[leptonCounter] > 1) continue;
+      if(_3dIPsig[leptonCounter] > 4) continue;
+
+      if (!_passedMVA90[leptonCounter]) continue;
+      
+      
+      ((TLorentzVector *)_leptonP4->At(leptonCounter))->SetPtEtaPhiE(iE->pt(), iE->eta(), iE->phi(), iE->energy());
+      
+      _mt[leptonCounter] = MT_calc(*((TLorentzVector *)_leptonP4->At(leptonCounter)), _met, _met_phi);
+      
+      _lPt[leptonCounter]  = iE->pt(); 
+      _lEta[leptonCounter] = iE->eta(); 
+      _lPhi[leptonCounter] = iE->phi(); 
+      _lE[leptonCounter]   = iE->energy();
+
+     
+      fillCloseJetVars(leptonCounter, PV);
+      
+      if (not isData) {
+	_findMatched[leptonCounter]=-1;
+	  const GenParticle* mc = GPM.matchedMC(&*iE);
+	  if ( mc!=0 ) {
+	      fillMCVars(mc, leptonCounter);
+	      //Vertex::Point PVmc = mcMom->vertex();
+	      _ipPVmc[leptonCounter] = TMath::Abs(iE->gsfTrack()->dxy(PVmc));
+	      _findMatched[leptonCounter]=1;
+	  }
+	  else {
+	      //std::cout<<"No match e"<<std::endl;
+	      _origin[leptonCounter] = -1;
+	      _originReduced[leptonCounter] = -1;
+	      _mompt[leptonCounter] = 0;
+	      _momphi[leptonCounter] = 0;
+	      _mometa[leptonCounter] = 0;
+	      _mompdg[leptonCounter] = 0;
+	      _findMatched[leptonCounter]=0;
+	  }
+      }
+      
+    
+      leptonCounter++;
+      
     }
 
     _nEle = leptonCounter-_nMu;

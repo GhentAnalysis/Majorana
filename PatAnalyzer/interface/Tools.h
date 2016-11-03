@@ -128,15 +128,6 @@ namespace tools {
                                                                reco::Vertex::Point PV,
                                                                double v_muon_d0);
 
-    std::vector<const pat::Muon* > ssbLooseMuonSelector(const std::vector<pat::Muon>  & thePatMuons,
-                                                               double v_muon_pt,
-                                                               reco::Vertex::Point PV,
-                                                               double v_muon_d0);
-
-    std::vector<const pat::Muon* > ssbMediumMuonSelector(const std::vector<pat::Muon>  & thePatMuons,
-                                                                double v_muon_pt,
-                                                                reco::Vertex::Point PV,
-                                                                double v_muon_d0);
 
     std::vector<const pat::Electron* > ssbMVAElectronSelector(const std::vector<pat::Electron>  & thePatElectrons,
                                                                           double v_electron_pt,
