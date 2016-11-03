@@ -24,7 +24,7 @@ def passTriggers(tree, triggerList):
     if not hasattr(tree, trigger): continue
     if getattr(tree, trigger + '_prescale') != 1:
       print 'Warning: prescaled trigger: ' + trigger + ' (' + hasattr(tree, trigger + '_prescale') + ')'
-    if getattr(tree, trigger): 
+    if getattr(tree, trigger):
       return True
   return False
 
@@ -33,8 +33,7 @@ def run(inputTree, triggers, dir):
   try: os.mkdir(dir)
   except: pass
   hists = {}
-#  ptThresholds = ['10to15','15to20','20to30','30to40','40to50']
-  ptThresholds = ['10to15']
+  ptThresholds = ['10to15','15to20','20to30','30to40','40to50']
   for ptThreshold in ptThresholds:
     hists[ptThreshold] = {}
     for triggerApplied in [True, False]:
@@ -51,7 +50,7 @@ def run(inputTree, triggers, dir):
     for i in range(3):
       if inputTree._flavors[i] == 0:
         if inputTree._miniisolation[i] > 0.2: continue
-        if not inputTree._passedMVA90[i]: continue # this is buggy in the tree
+        if not inputTree._passedMVA90[i]: continue
       else:
         if not inputTree._istight[i]: continue
      
@@ -73,7 +72,8 @@ def run(inputTree, triggers, dir):
         if pt[0] < ptMin or pt[0] > ptMax: continue
 
       hists[ptThreshold][False][channel].Fill(pt[2], pt[1])
-      if passTriggers(inputTree, triggers[nMuon]): hists[ptThreshold][True][channel].Fill(pt[2], pt[1])
+      if passTriggers(inputTree, triggers[nMuon]): 
+        hists[ptThreshold][True][channel].Fill(pt[2], pt[1])
 
   ROOT.gROOT.LoadMacro("$CMSSW_BASE/src/Majorana/analysis/tdrstyle.C")
   ROOT.setTDRStyle()
@@ -114,7 +114,8 @@ def run(inputTree, triggers, dir):
 
 import glob
 chain = ROOT.TChain('trileptonProducer/trileptonTree')
-listOfFiles = glob.glob('/pnfs/iihe/cms/store/user/tomc/majorana/WZJToLLLNu_TuneCUETP8M1_13TeV-amcnlo-pythia8/crab_test2/161030_121836/0000/trilepton*.root')
+# listOfFiles = glob.glob('/pnfs/iihe/cms/store/user/tomc/majorana/WZJToLLLNu_TuneCUETP8M1_13TeV-amcnlo-pythia8/crab_test2/161030_121836/0000/trilepton*.root') # of course again pnfs problems
+listOfFiles = glob.glob('/user/tomc/public/majorana/WZJToLLLNu_TuneCUETP8M1_13TeV-amcnlo-pythia8/local_test2/trilepton*.root')
 for i in listOfFiles:
   chain.Add(i)
 
@@ -134,7 +135,7 @@ triggers_3l2l = {3: triggers_3l[3] + triggers_2l[2],
                  2: triggers_3l[2] + triggers_2l[2] + triggers_2l[1],
                  1: triggers_3l[1] + triggers_2l[1] + triggers_2l[0],
                  0: triggers_3l[0] + triggers_2l[0]}
-#run(chain, triggers_3l2l, '3l2l')
+run(chain, triggers_3l2l, '3l2l')
 
 
 # 1l triggers (removed HLT_IsoMu24_eta2p1, HLT_IsoTkMu24_eta2p1, HLT_Ele30_WPTight_Gsf, HLT_Ele30_eta2p1_WPTight_Gsf)
@@ -144,7 +145,10 @@ triggers_3l2l1l = {3: triggers_3l2l[3] + triggers_1l[1],
                    2: triggers_3l2l[2] + triggers_1l[1] + triggers_1l[0],
                    1: triggers_3l2l[1] + triggers_1l[1] + triggers_1l[0],
                    0: triggers_3l2l[0] + triggers_1l[0]}
-#run(chain, triggers_3l2l1l, '3l2l1l')
+run(chain, triggers_3l2l1l, '3l2l1l')
 
-
-
+triggers_only1l = {3: triggers_1l[1],
+                   2: triggers_1l[1] + triggers_1l[0],
+                   1: triggers_1l[1] + triggers_1l[0],
+                   0: triggers_1l[0]}
+run(chain, triggers_only1l, '1l')
