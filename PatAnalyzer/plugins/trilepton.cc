@@ -45,12 +45,7 @@
 #include <iostream>
 
 // In the long run, we should get rid of these using namespace statements, this is bad coding
-using namespace std;
-using namespace edm;
-using namespace reco;
-using namespace tools;
-using namespace math;
-using namespace reco::tau;
+//using namespace std;
 
 trilepton::trilepton(const edm::ParameterSet & iConfig) :
   genparticleToken(                      consumes<reco::GenParticleCollection>(   iConfig.getParameter<edm::InputTag>("genPartsLabel"))),
@@ -128,56 +123,37 @@ void trilepton::beginJob()
     
     _hCounter = fs->make<TH1D>("hCounter", "Events counter", 5,0,5);
 
-    _leptonP4 = new TClonesArray("TLorentzVector", nLeptonsMax);
-    for (int i=0; i!=nLeptonsMax; ++i) {
-        new ( (*_leptonP4)[i] ) TLorentzVector();
-    }
-    outputTree->Branch("_leptonP4", "TClonesArray", &_leptonP4, 32000, 0);
-
-    // =============== GEN ================================
+    _leptonP4     = new TClonesArray("TLorentzVector", nLeptonsMax);
     _gen_leptonP4 = new TClonesArray("TLorentzVector", nLeptonsMax);
-    for (int i=0; i!=nLeptonsMax; ++i) {
-      new ( (*_gen_leptonP4)[i] ) TLorentzVector();
+    _gen_nuP4     = new TClonesArray("TLorentzVector", nLeptonsMax);
+    _gen_majoP4   = new TClonesArray("TLorentzVector", nLeptonsMax);
+    _gen_majoP4   = new TClonesArray("TLorentzVector", nLeptonsMax);
+    _gen_wP4      = new TClonesArray("TLorentzVector", nLeptonsMax);
+    _jetP4        = new TClonesArray("TLorentzVector", 100); // Currently not used?
+    _jetAllP4     = new TClonesArray("TLorentzVector", 100);
+
+    for(int i=0; i!=nLeptonsMax; ++i){
+      new ((*_leptonP4)[i])     TLorentzVector();
+      new ((*_gen_leptonP4)[i]) TLorentzVector(); 
+      new ((*_gen_nuP4)[i])     TLorentzVector();
+      new ((*_gen_majoP4)[i])   TLorentzVector();
+      new ((*_gen_majoP4)[i])   TLorentzVector();
+      new ((*_gen_wP4)[i])      TLorentzVector();
     }
+
+    for(int i=0; i!=100; ++i){
+      new ((*_jetP4)[i])    TLorentzVector();
+      new ((*_jetAllP4)[i]) TLorentzVector();
+    }
+ 
+    outputTree->Branch("_leptonP4",     "TClonesArray", &_leptonP4,     32000, 0);
     outputTree->Branch("_gen_leptonP4", "TClonesArray", &_gen_leptonP4, 32000, 0);
-
-    _gen_nuP4 = new TClonesArray("TLorentzVector", nLeptonsMax);
-    for (int i=0; i!=nLeptonsMax; ++i) {
-      new ( (*_gen_nuP4)[i] ) TLorentzVector();
-    }
-    outputTree->Branch("_gen_nuP4", "TClonesArray", &_gen_nuP4, 32000, 0);
-
-    _gen_majoP4 = new TClonesArray("TLorentzVector", nLeptonsMax);
-    for (int i=0; i!=nLeptonsMax; ++i) {
-      new ( (*_gen_majoP4)[i] ) TLorentzVector();
-    }
-    outputTree->Branch("_gen_majoP4", "TClonesArray", &_gen_majoP4, 32000, 0);
-
-     _gen_majoP4 = new TClonesArray("TLorentzVector", nLeptonsMax);
-    for (int i=0; i!=nLeptonsMax; ++i) {
-      new ( (*_gen_majoP4)[i] ) TLorentzVector();
-    }
-    outputTree->Branch("_gen_majoP4", "TClonesArray", &_gen_majoP4, 32000, 0);
-
-   
-    _gen_wP4 = new TClonesArray("TLorentzVector", nLeptonsMax);
-    for (int i=0; i!=nLeptonsMax; ++i) {
-      new ( (*_gen_wP4)[i] ) TLorentzVector();
-    }
-    outputTree->Branch("_gen_wP4", "TClonesArray", &_gen_wP4, 32000, 0);
-
-     // ===============================================
-    _jetP4 = new TClonesArray("TLorentzVector", 100);
-    for (int i=0; i!=100; ++i) {
-      new ( (*_jetP4)[i] ) TLorentzVector();
-    }
-    //outputTree->Branch("_jetP4", "TClonesArray", &_jetP4, 32000, 0);
-    
-    _jetAllP4 = new TClonesArray("TLorentzVector", 100);
-    for (int i=0; i!=100; ++i) {
-        new ( (*_jetAllP4)[i] ) TLorentzVector();
-    }
-    //outputTree->Branch("_jetAllP4", "TClonesArray", &_jetAllP4, 32000, 0);
+    outputTree->Branch("_gen_nuP4",     "TClonesArray", &_gen_nuP4,     32000, 0);
+    outputTree->Branch("_gen_majoP4",   "TClonesArray", &_gen_majoP4,   32000, 0);
+    outputTree->Branch("_gen_majoP4",   "TClonesArray", &_gen_majoP4,   32000, 0);
+    outputTree->Branch("_gen_wP4",      "TClonesArray", &_gen_wP4,      32000, 0);
+  //outputTree->Branch("_jetP4",        "TClonesArray", &_jetP4,        32000, 0);
+  //outputTree->Branch("_jetAllP4",     "TClonesArray", &_jetAllP4,     32000, 0);
     
     outputTree->Branch("_eventNb",   &_eventNb,   "_eventNb/l");
     outputTree->Branch("_runNb",     &_runNb,     "_runNb/l");
@@ -469,10 +445,6 @@ void trilepton::endJob() {
     
 }
 
-void trilepton::beginRun(const edm::Run& iRun, edm::EventSetup const& iSetup){
-    return;
-}
-
 
 void trilepton::getTriggerResults(const edm::Event& iEvent, bool isHLT, edm::EDGetTokenT<edm::TriggerResults> token, std::vector<TString> toSave){
   edm::Handle<edm::TriggerResults> trigResults;       iEvent.getByToken(token,                 trigResults);
@@ -715,29 +687,24 @@ void trilepton::analyze(const edm::Event& iEvent, const edm::EventSetup& iEventS
 
     realdata_ = iEvent.isRealData();
 
-    Double_t weight = 1.;
+    _weight = 1.;
     if(not isData) {
         edm::Handle<GenEventInfoProduct> pdfvariables;
         iEvent.getByToken(pdfvariablesToken, pdfvariables);
-        weight = pdfvariables->weight();
-        _weight=weight;
+        _weight = pdfvariables->weight();
     }
 
-    _runNb = iEvent.id().run();
-    _eventNb = iEvent.id().event();
+    _runNb     = iEvent.id().run();
+    _eventNb   = iEvent.id().event();
     _lumiBlock = iEvent.luminosityBlock();
    
-   
-    //if (_eventNb != 44802315) return;
-    //if ((_eventNb != 17707) || (_runNb != 1) || (_lumiBlock != 178)) return;
-    
     std::cout<<"EVENT "<<_runNb << " " << _lumiBlock << " " << _eventNb<<std::endl;
   
     
     //============ Total number of events is the sum of the events ============
     //============ in each of these luminosity blocks ============
     _nEventsTotalCounted++;
-    _hCounter->Fill(0., weight);
+    _hCounter->Fill(0., _weight);
     
    
     
@@ -771,11 +738,10 @@ void trilepton::analyze(const edm::Event& iEvent, const edm::EventSetup& iEventS
     //edm::InputTag IT_goodVtx = edm::InputTag("offlineSlimmedPrimaryVertices");
     edm::Handle<std::vector<Vertex> > theVertices;
     iEvent.getByToken( goodOfflinePrimaryVerticesToken, theVertices) ;
-    int nvertex = theVertices->size();
+    _n_PV = theVertices->size();
     
-    _n_PV = nvertex;
-    Nvtx->Fill(TMath::Min(nvertex,39));
-    if(! nvertex ){
+    Nvtx->Fill(_n_PV);
+    if(! _n_PV ){
         cout << "[WARNING]: No candidate primary vertices passed the quality cuts, so skipping event" << endl;
         return ;
     }
@@ -835,8 +801,8 @@ void trilepton::analyze(const edm::Event& iEvent, const edm::EventSetup& iEventS
     double corrMetx = rawmetX;
     double corrMety = rawmetY;
 
-    
-    for( std::vector<pat::Jet>::const_iterator jet = (*thePatJets).begin(); jet != (*thePatJets).end(); jet++ ) {
+    // Ok, this whole part down here is a bit strange and I am not sure if we can trust, but it only affects met which we do not use yet 
+    for(auto jet = (*thePatJets).begin(); jet != (*thePatJets).end(); jet++){
         TLorentzVector pJet;
         pJet.SetPtEtaPhiE(((&*jet)->correctedP4("Uncorrected")).Pt(), ((&*jet)->correctedP4("Uncorrected")).Eta(),((&*jet)->correctedP4("Uncorrected")).Phi(), ((&*jet)->correctedP4("Uncorrected")).E());
         const std::vector<reco::CandidatePtr> & cands = (&*jet)->daughterPtrVector();
@@ -865,13 +831,9 @@ void trilepton::analyze(const edm::Event& iEvent, const edm::EventSetup& iEventS
         corrMetx += corr.first ;
         corrMety += corr.second;
     }
-    double newmet    = sqrt(corrMetx*corrMetx + corrMety*corrMety);
-    double newmetphi = atan2(corrMety, corrMetx);
 
-    //std::cout<< "New and old met: " << newmet<<" "<<_met<<"; "<<newmetphi<<" "<<_met_phi<<" "<<std::endl;
-    _met = newmet;
-    _met_phi = newmetphi;
-    std::cout<< "met: " <<_met<<"; "<<_met_phi<<std::endl;
+    _met     = sqrt(corrMetx*corrMetx + corrMety*corrMety);
+    _met_phi = atan2(corrMety, corrMetx);
 
 
     enum decay {
@@ -904,14 +866,13 @@ void trilepton::analyze(const edm::Event& iEvent, const edm::EventSetup& iEventS
     iEvent.getByToken( IT_tau, PatTaus );
     std::vector<const pat::Tau* > sTau;
     for (const pat::Tau &tau : *PatTaus) {
-        
-        if (tau.pt() < _tauPt) continue;
-        if (fabs(tau.eta()) > _tauEta) continue;
-  sTau.push_back(&tau);
+        if(tau.pt() < _tauPt) continue;
+        if(fabs(tau.eta()) > _tauEta) continue;
+        sTau.push_back(&tau);
     }
     
-    SelectedJetsAll = JetSelectorAll(*thePatJets, 5., 3.0);
-    std::vector<const pat::Jet* > SelectedJets = JetSelector(*thePatJets, _jetPtCut, _jetEtaCut);
+    SelectedJetsAll = tools::JetSelectorAll(*thePatJets, 5., 3.0);
+    std::vector<const pat::Jet*> SelectedJets = tools::JetSelector(*thePatJets, _jetPtCut, _jetEtaCut);
 
     HT = 0.;
     std::vector< const pat::Jet* > Bjets;
@@ -978,13 +939,13 @@ void trilepton::analyze(const edm::Event& iEvent, const edm::EventSetup& iEventS
       // might be preferable to change to vectors instead of arrays because we do not know the length
       _flavors[leptonCounter]     = 1;
       _charges[leptonCounter]     = muon->charge();
-      _isolation[leptonCounter]   = pfRelIso(&*muon,myRhoJECJets);  // should check out this function
-      _isolationDB[leptonCounter] = pfRelIso(&*muon);
+      _isolation[leptonCounter]   = tools::pfRelIso(&*muon,myRhoJECJets);  // should check out this function
+      _isolationDB[leptonCounter] = tools::pfRelIso(&*muon);
       
-      _miniisolation[leptonCounter][0] 	      = getPFIsolation(pfcands, &*muon, 0.05, 0.2, 10., false, false, myRhoJets);  // to check 
-      _miniisolation[leptonCounter][1] 	      = getPFIsolation(pfcands, &*muon, 0.05, 0.3, 10., false, false, myRhoJets); // also to check
-      _miniisolationCharged[leptonCounter][0] = getPFIsolation(pfcands, &*muon, 0.05, 0.2, 10., false, true,  myRhoJets); // also to check
-      _miniisolationCharged[leptonCounter][1] = getPFIsolation(pfcands, &*muon, 0.05, 0.3, 10., false, true,  myRhoJets); // also to check
+      _miniisolation[leptonCounter][0] 	      = tools::getPFIsolation(pfcands, &*muon, 0.05, 0.2, 10., false, false, myRhoJets);  // to check 
+      _miniisolation[leptonCounter][1] 	      = tools::getPFIsolation(pfcands, &*muon, 0.05, 0.3, 10., false, false, myRhoJets); // also to check
+      _miniisolationCharged[leptonCounter][0] = tools::getPFIsolation(pfcands, &*muon, 0.05, 0.2, 10., false, true,  myRhoJets); // also to check
+      _miniisolationCharged[leptonCounter][1] = tools::getPFIsolation(pfcands, &*muon, 0.05, 0.3, 10., false, true,  myRhoJets); // also to check
 
       _ipPV[leptonCounter]     = muon->innerTrack()->dxy(PV);
       _ipPVerr[leptonCounter]  = muon->innerTrack()->dxyError();
@@ -1008,7 +969,7 @@ void trilepton::analyze(const edm::Event& iEvent, const edm::EventSetup& iEventS
       if(!_isloose[leptonCounter]) continue;
       
       ((TLorentzVector *)_leptonP4->At(leptonCounter))->SetPtEtaPhiE(muon->pt(), muon->eta(), muon->phi(), muon->energy());
-      _mt[leptonCounter] = MT_calc(*((TLorentzVector *)_leptonP4->At(leptonCounter)), _met, _met_phi);
+      _mt[leptonCounter] = tools::MT_calc(*((TLorentzVector *)_leptonP4->At(leptonCounter)), _met, _met_phi);
 
       // So for some reason, here we are adding again the same stuff to out tree
       _lPt[leptonCounter]  = muon->pt();
@@ -1061,7 +1022,7 @@ void trilepton::analyze(const edm::Event& iEvent, const edm::EventSetup& iEventS
 
       _flavors[leptonCounter]   = 0;
       _charges[leptonCounter]   = electron->charge();
-      _isolation[leptonCounter] = pfRelIso(&*electron, myRhoJECJets);
+      _isolation[leptonCounter] = tools::pfRelIso(&*electron, myRhoJECJets);
 
       _ipPV[leptonCounter]  = electron->gsfTrack()->dxy(PV);
       _ipZPV[leptonCounter] = electron->gsfTrack()->dz(PV);
@@ -1069,17 +1030,17 @@ void trilepton::analyze(const edm::Event& iEvent, const edm::EventSetup& iEventS
       if(abs(_ipPV[leptonCounter]) > 0.05) continue;
       if(abs(_ipZPV[leptonCounter]) > 0.1) continue;
       
-      _miniisolation[leptonCounter][0]        = getPFIsolation(pfcands, &*electron, 0.05, 0.2, 10., false, false, myRhoJets);
-      _miniisolation[leptonCounter][1]        = getPFIsolation(pfcands, &*electron, 0.05, 0.3, 10., false, false, myRhoJets);
-      _miniisolationCharged[leptonCounter][0] = getPFIsolation(pfcands, &*electron, 0.05, 0.2, 10., false, true, myRhoJets);
-      _miniisolationCharged[leptonCounter][1] = getPFIsolation(pfcands, &*electron, 0.05, 0.3, 10., false, true, myRhoJets);
+      _miniisolation[leptonCounter][0]        = tools::getPFIsolation(pfcands, &*electron, 0.05, 0.2, 10., false, false, myRhoJets);
+      _miniisolation[leptonCounter][1]        = tools::getPFIsolation(pfcands, &*electron, 0.05, 0.3, 10., false, false, myRhoJets);
+      _miniisolationCharged[leptonCounter][0] = tools::getPFIsolation(pfcands, &*electron, 0.05, 0.2, 10., false, true, myRhoJets);
+      _miniisolationCharged[leptonCounter][1] = tools::getPFIsolation(pfcands, &*electron, 0.05, 0.3, 10., false, true, myRhoJets);
 
       _chargeConst[leptonCounter]      = electron->isGsfCtfScPixChargeConsistent();
       _vtxFitConversion[leptonCounter] = ConversionTools::hasMatchedConversion(reco::GsfElectron (*&*electron), theConversions, BS);
       _hitsNumber[leptonCounter]       = electron->gsfTrack()->hitPattern().numberOfHits(reco::HitPattern::MISSING_INNER_HITS);
 
-      _trigEmulator[leptonCounter]    = triggerEmulatorReturned(&*electron);
-      _isotrigEmulator[leptonCounter] = isoTriggerEmulator(&*electron);
+      _trigEmulator[leptonCounter]    = tools::triggerEmulatorReturned(&*electron);
+      _isotrigEmulator[leptonCounter] = tools::isoTriggerEmulator(&*electron);
 
       _3dIP[leptonCounter]    = electron->dB(pat::Electron::PV3D);
       _3dIPerr[leptonCounter] = electron->edB(pat::Electron::PV3D);
@@ -1094,7 +1055,7 @@ void trilepton::analyze(const edm::Event& iEvent, const edm::EventSetup& iEventS
       
       ((TLorentzVector *)_leptonP4->At(leptonCounter))->SetPtEtaPhiE(electron->pt(), electron->eta(), electron->phi(), electron->energy());
       
-      _mt[leptonCounter] = MT_calc(*((TLorentzVector *)_leptonP4->At(leptonCounter)), _met, _met_phi);
+      _mt[leptonCounter] = tools::MT_calc(*((TLorentzVector *)_leptonP4->At(leptonCounter)), _met, _met_phi);
       
       _lPt[leptonCounter]  = electron->pt();
       _lEta[leptonCounter] = electron->eta();
@@ -1310,7 +1271,7 @@ void trilepton::fillMCVars(const GenParticle* mc, const int leptonCounter) {
         
         TLorentzVector lmc;
         lmc.SetPtEtaPhiE(_lPtmc[leptonCounter],_lEtamc[leptonCounter],_lPhimc[leptonCounter],_lEmc[leptonCounter]);
-        _mtmc[leptonCounter] = MT_calc(lmc, _nuPtmc[leptonCounter], _nuPhimc[leptonCounter]);
+        _mtmc[leptonCounter] = tools::MT_calc(lmc, _nuPtmc[leptonCounter], _nuPhimc[leptonCounter]);
     } else {
         _mompt[leptonCounter] = 0;
         _momphi[leptonCounter] = 0;

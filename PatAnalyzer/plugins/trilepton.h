@@ -120,7 +120,7 @@ public:
 private:
     
     //virtual void analyze(edm::Event & iEvent, const edm::EventSetup & iSetup);
-    virtual void beginRun(const edm::Run& iRun, edm::EventSetup const& iSetup) override;
+    virtual void beginRun(const edm::Run& iRun, edm::EventSetup const& iSetup){};
     virtual void analyze(const edm::Event&, const edm::EventSetup&);
     virtual void beginJob();
     virtual void endJob(void);
