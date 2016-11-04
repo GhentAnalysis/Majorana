@@ -57,8 +57,8 @@ def run(inputTree, triggers, dir):
     # flavor of muon is 1, flavor of electron is 0 
     nMuon = sum(inputTree._flavors[i] for i in range(3))
     if   nMuon == 3: channel = "mumumu"
-    elif nMuon == 2: channel = "eemu"
-    elif nMuon == 1: channel = "emumu"
+    elif nMuon == 2: channel = "emumu"
+    elif nMuon == 1: channel = "eemu"
     elif nMuon == 0: channel = "eee"
 
     pt = [i for i in inputTree._lPt]
