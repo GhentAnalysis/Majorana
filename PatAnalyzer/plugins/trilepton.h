@@ -363,6 +363,7 @@ private:
     bool _sameParton[nLeptonsMax];
     
     bool _isloose[nLeptonsMax];
+    bool _ismedium[nLeptonsMax];
     bool _istight[nLeptonsMax];
     bool _istightID[nLeptonsMax];
     bool _isvetoIDCutBased[nLeptonsMax];
