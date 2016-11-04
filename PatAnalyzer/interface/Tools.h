@@ -129,15 +129,6 @@ namespace tools {
                                                                double v_muon_d0);
 
 
-    std::vector<const pat::Electron* > ssbMVAElectronSelector(const std::vector<pat::Electron>  & thePatElectrons,
-                                                                          double v_electron_pt,
-                                                                          reco::Vertex::Point PV,
-                                                                          double v_electron_d0,
-                                                                          bool bool_electron_chargeConsistency,
-                                                                          edm::Handle< std::vector<reco::Conversion> > &theConversions,
-                                                                          reco::BeamSpot::Point BS,
-                                                                          bool tight);
-    
     bool effMVAElectronSelectorPassed(const edm::Ptr<pat::Electron>  el,
                                                                           double v_electron_pt,
                                                                           reco::Vertex::Point PV,
@@ -147,18 +138,6 @@ namespace tools {
                                                                           reco::BeamSpot::Point BS,
                                                                           bool tight);
     
-    bool ssbMVAElectronSelectorPassed(const edm::Ptr<pat::Electron>  el,
-                                                                          double v_electron_pt,
-                                                                          reco::Vertex::Point PV,
-                                                                          double v_electron_d0,
-                                                                          bool bool_electron_chargeConsistency,
-                                                                          edm::Handle< std::vector<reco::Conversion> > &theConversions,
-                                                                          reco::BeamSpot::Point BS,
-                                                                          bool tight);
-    
-    void ERR( edm::InputTag& IT );
-    
-
     
     double pfRelIso(const pat::Muon *mu);
     double pfRelIso(const pat::Electron *el, double myRho);
@@ -170,13 +149,6 @@ namespace tools {
     bool isoTriggerEmulator(const pat::Electron *iE);
 
 
-    /////////////////////////  Selectors //////////////////
-    std::vector<const pat::Muon* > ssbMuonSelector(const std::vector<pat::Muon>  & thePatMuons,
-                                                   double v_muon_pt,
-                                                   reco::Vertex::Point PV,
-                                                   double v_muon_d0);
-
-    
      std::vector<const pat::Muon* > fakeMuonSelector(const std::vector<pat::Muon>  & thePatMuons,
                                                    double v_muon_pt,
                                                    reco::Vertex::Point PV,
@@ -188,14 +160,6 @@ namespace tools {
                                                    reco::Vertex::Point PV,
                                                    double v_muon_d0);
 
-    
-    bool ssbElectronSelectorPassed(const edm::Ptr<pat::Electron> el,
-                                                           double v_electron_pt,
-                                                           reco::Vertex::Point PV,
-                                                           double v_electron_d0,
-                                                           bool bool_electron_chargeConsistency,
-                                                           edm::Handle< std::vector<reco::Conversion> > &theConversions,
-                                                           reco::BeamSpot::Point BS);
     
     
     std::vector<const pat::Electron* > ewkElectronSelector(const std::vector<pat::Electron>  & thePatElectrons,
@@ -237,14 +201,6 @@ namespace tools {
     
     
     
-    std::vector<const pat::Electron* > ssbElectronVetoSelector(const std::vector<pat::Electron>  & thePatElectrons,
-                                                                        double Rho,
-                                                                      reco::Vertex::Point PV,
-                                                                      const char* cutName);
-
-    std::vector<const pat::Muon* > ssbMuonVetoSelector(const std::vector<pat::Muon>  & thePatMuons,
-                                                              const char* cutName);
-  
     bool cleanUp(const pat::Muon* testMu,
                        std::vector<const pat::Muon* > allMu,
                        const char* cutName);

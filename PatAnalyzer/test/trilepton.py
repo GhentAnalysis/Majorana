@@ -49,7 +49,7 @@ process.load('Configuration.StandardSequences.Reconstruction_cff')
 from PhysicsTools.SelectorUtils.tools.vid_id_tools import *
 switchOnVIDElectronIdProducer(process, DataFormat.MiniAOD)
 my_id_modules = ['RecoEgamma.ElectronIdentification.Identification.mvaElectronID_Spring15_25ns_nonTrig_V1_cff',
-                 'RecoEgamma.ElectronIdentification.Identification.cutBasedElectronID_Spring15_25ns_V1_cff']
+                 'RecoEgamma.ElectronIdentification.Identification.cutBasedElectronID_Summer16_80X_V1_cff']
 for idmod in my_id_modules:
     setupAllVIDIdsInModule(process,idmod,setupVIDElectronSelection)
 
@@ -63,7 +63,8 @@ process.trileptonProducer = cms.EDAnalyzer("trilepton",
                                            qualityCuts                            = PFTauQualityCuts,
 					   isData                                 = cms.untracked.bool(isData),
 					   SampleName                             = cms.untracked.string("default"),
-					   mvaValuesMap                           = cms.InputTag("electronMVAValueMapProducer:ElectronMVAEstimatorRun2Spring15NonTrig25nsV1Values"),
+					   electronMvaIdMap                       = cms.InputTag("electronMVAValueMapProducer:ElectronMVAEstimatorRun2Spring15NonTrig25nsV1Values"),
+					   electronCutBasedIdMap                  = cms.InputTag("egmGsfElectronIDs:cutBasedElectronID-Summer16-80X-V1-tight"),
 					   genPartsLabel                          = cms.InputTag("prunedGenParticles"),
 					   pdfvariablesLabel                      = cms.InputTag("generator"),
 					   BeamSpotLabel                          = cms.InputTag("offlineBeamSpot"),

@@ -54,7 +54,8 @@ using namespace reco::tau;
 
 trilepton::trilepton(const edm::ParameterSet & iConfig) :
   genparticleToken(                      consumes<reco::GenParticleCollection>(   iConfig.getParameter<edm::InputTag>("genPartsLabel"))),
-  mvaValuesMapToken(                     consumes<edm::ValueMap<float>>(          iConfig.getParameter<edm::InputTag>("mvaValuesMap"))),
+  electronMvaIdMapToken(                 consumes<edm::ValueMap<float>>(          iConfig.getParameter<edm::InputTag>("electronMvaIdMap"))),
+  electronCutBasedIdMapToken(            consumes<edm::ValueMap<float>>(          iConfig.getParameter<edm::InputTag>("electronCutBasedIdMap"))),
   pdfvariablesToken(                     consumes<GenEventInfoProduct>(           iConfig.getParameter<edm::InputTag>("pdfvariablesLabel"))),
   IT_beamspot(                           consumes<reco::BeamSpot>(                iConfig.getParameter<edm::InputTag>("BeamSpotLabel"))),
   PileUpToken(                           consumes<vector<PileupSummaryInfo>>(     iConfig.getParameter<edm::InputTag>("slimmedAddPileupInfoLabel"))),
@@ -547,11 +548,11 @@ void trilepton::analyze(const edm::Event& iEvent, const edm::EventSetup& iEventS
             cout << "Particle ids in the event" << endl;
             for(GenParticleCollection::const_reverse_iterator p = TheGenParticles->rbegin() ; p != TheGenParticles->rend() ; p++ )
             {
-                int id = TMath::Abs(p->pdgId());
+                int id = abs(p->pdgId());
                 /*
                 if(p->status() == 1){
                     const GenParticle *mom = GPM.getMother(&*p);
-                    cout << id << " " << p->pt() << " " << TMath::Abs(mom->pdgId()) << endl;
+                    cout << id << " " << p->pt() << " " << abs(mom->pdgId()) << endl;
                 }
                 */
 		if(id == 9900012) _nMajorana++;
@@ -585,7 +586,7 @@ void trilepton::analyze(const edm::Event& iEvent, const edm::EventSetup& iEventS
 	    for(GenParticleCollection::const_reverse_iterator p = TheGenParticles->rbegin() ; p != TheGenParticles->rend() ; ++p ){
 	      //if(nL > 10 || nPh > 10 || nNu > 10) break;
 	      if(p->status() == 0) continue;								//status 0 contains no useful information and should be skipped
-	      unsigned id = TMath::Abs(p->pdgId());
+	      unsigned id = abs(p->pdgId());
 	      const reco::GenStatusFlags StatusFlags;
 	      //MCTruthHelper::fillGenStatusFlags(*p,StatusFlags);
 	      //if( id == 11 || id ==13 || id == 15){
@@ -708,9 +709,9 @@ void trilepton::analyze(const edm::Event& iEvent, const edm::EventSetup& iEventS
 	}
     }
 
-     getTriggerResults(iEvent, true,  triggerResultsHLTToken,  triggersToSave);
-     getTriggerResults(iEvent, false, triggerResultsRECOToken, filtersToSave);
-     firstEvent_ = false;
+    getTriggerResults(iEvent, true,  triggerResultsHLTToken,  triggersToSave);
+    getTriggerResults(iEvent, false, triggerResultsRECOToken, filtersToSave);
+    firstEvent_ = false;
 
     realdata_ = iEvent.isRealData();
 
@@ -742,9 +743,7 @@ void trilepton::analyze(const edm::Event& iEvent, const edm::EventSetup& iEventS
     
     //============ Beamspot ============
     edm::Handle< reco::BeamSpot > theBeamSpot;
-    //iEvent.getByLabel( IT_beamspot, theBeamSpot );
     iEvent.getByToken( IT_beamspot, theBeamSpot );
-    //if( ! theBeamSpot.isValid() ) ERR( IT_beamspot ) ;
     BeamSpot::Point  BS= theBeamSpot->position();;
     //==================================
     
@@ -772,7 +771,6 @@ void trilepton::analyze(const edm::Event& iEvent, const edm::EventSetup& iEventS
     //edm::InputTag IT_goodVtx = edm::InputTag("offlineSlimmedPrimaryVertices");
     edm::Handle<std::vector<Vertex> > theVertices;
     iEvent.getByToken( goodOfflinePrimaryVerticesToken, theVertices) ;
-    //if( ! theVertices.isValid() ) ERR(IT_goodVtx ) ;
     int nvertex = theVertices->size();
     
     _n_PV = nvertex;
@@ -793,58 +791,28 @@ void trilepton::analyze(const edm::Event& iEvent, const edm::EventSetup& iEventS
     _PVerr[2] = PVtx->zError();
     //==================================
     
-    //==================================
-    
-    //============ PF cand ============
-    edm::Handle<pat::PackedCandidateCollection> pfcands;
-    iEvent.getByToken(packedPFCandidatesToken, pfcands);
-    //==================================
-    
-    //============ Pat Muons ============
-    edm::Handle<std::vector<pat::Muon>> muons;
-    iEvent.getByToken(IT_muon, muons);
-    //==================================
-    
-    //============ Pat Electrons ============
-    edm::Handle< edm::View<pat::Electron>> electrons;
-    iEvent.getByToken(IT_electron, electrons);
-    //==================================
-   
-    // Get MVA values and categories (optional)
-    edm::Handle<edm::ValueMap<float>> mvaValues;
-    iEvent.getByToken(mvaValuesMapToken, mvaValues);
+    edm::Handle<pat::PackedCandidateCollection> pfcands;       iEvent.getByToken(packedPFCandidatesToken, pfcands);
+    edm::Handle<std::vector<pat::Muon>> muons;                 iEvent.getByToken(IT_muon, muons);
+    edm::Handle<edm::View<pat::Electron>> electrons;           iEvent.getByToken(IT_electron, electrons);
+    edm::Handle<edm::ValueMap<float>> electronMvaIdMap;        iEvent.getByToken(electronMvaIdMapToken, electronMvaIdMap);
+    edm::Handle<edm::ValueMap<float>> electronCutBasedIdMap;   iEvent.getByToken(electronCutBasedIdMapToken, electronCutBasedIdMap);
+    edm::Handle<std::vector<reco::Conversion>> theConversions; iEvent.getByToken(reducedEgammaToken, theConversions);
+    edm::Handle<std::vector<pat::Jet>> thePatJets;             iEvent.getByToken(IT_jet , thePatJets );
+    edm::Handle<double> rhoJets;                               iEvent.getByToken(fixedGridRhoFastjetCentralNeutralToken , rhoJets);
+    edm::Handle<double> rhoJECJets;                            iEvent.getByToken(fixedGridRhoFastjetAllToken , rhoJECJets);//kt6PFJets
 
-
-    //============ Conversions ============
-    edm::Handle< std::vector<reco::Conversion> > theConversions;
-    iEvent.getByToken(reducedEgammaToken, theConversions);
-    //==================================
-    
-    //============ Pat Jets ============
-    edm::Handle< std::vector< pat::Jet> > thePatJets;
-    iEvent.getByToken(IT_jet , thePatJets );
-    //if( ! thePatJets.isValid() ) ERR(IT_jet);
-    //==================================
-    edm::Handle<double> rhoJets;
-    iEvent.getByToken(fixedGridRhoFastjetCentralNeutralToken , rhoJets);//kt6PFJets
     myRhoJets = *rhoJets;
-    //==================================
-    edm::Handle<double> rhoJECJets;
-    iEvent.getByToken(fixedGridRhoFastjetAllToken , rhoJECJets);//kt6PFJets
     myRhoJECJets = *rhoJECJets;
 
 
-    //============ Pat MET ============
-    
-    edm::Handle< vector<pat::MET> > ThePFMET;
+    edm::Handle<vector<pat::MET>> ThePFMET;
     iEvent.getByToken(IT_pfmet, ThePFMET);
-    //if( ! ThePFMET.isValid() ) ERR( IT_pfmet );
     const vector<pat::MET> *pfmetcol = ThePFMET.product();
     const pat::MET *pfmet;
     pfmet = &(pfmetcol->front());
     // Old MET implementation, 2 FEB 2016
-    _met = pfmet->pt();
-    _met_phi = pfmet->phi();
+//    _met = pfmet->pt();
+//    _met_phi = pfmet->phi();
 
     // New MET implementation
     //==================================
@@ -1054,7 +1022,7 @@ void trilepton::analyze(const edm::Event& iEvent, const edm::EventSetup& iEventS
 	  const GenParticle* mc = GPM.matchedMC(&*muon);
 	  if(mc!=0){
 	      fillMCVars(mc, leptonCounter);
-	      _ipPVmc[leptonCounter] = TMath::Abs(muon->innerTrack()->dxy(PVmc));
+	      _ipPVmc[leptonCounter] = abs(muon->innerTrack()->dxy(PVmc));
 	  } else {
 	      _origin[leptonCounter] = -1;
 	      _originReduced[leptonCounter] = -1;
@@ -1070,7 +1038,6 @@ void trilepton::analyze(const edm::Event& iEvent, const edm::EventSetup& iEventS
     }
     _nMu = leptonCounter;
    
-    // Need more cleanup here 
     for(auto electron = electrons->begin(); electron != electrons->end(); ++electron){
       if (leptonCounter == 10) continue; // This will go terribly wrong when there are about 8-10 muons or more (even though this is an improbable situation)
 
@@ -1084,7 +1051,8 @@ void trilepton::analyze(const edm::Event& iEvent, const edm::EventSetup& iEventS
 
       // There will be a new electron MVA soon
       edm::RefToBase<pat::Electron> electronRef(edm::Ref<edm::View<pat::Electron>>(electrons, (electron - electrons->begin())));
-      _mvaValue[leptonCounter] = (*mvaValues)[electronRef];
+      _mvaValue[leptonCounter] = (*electronMvaIdMap)[electronRef];
+      // bool passCutBasedId = (*electronCutBasedIdMap)[electronRef]; // uncomment this to get the cutbased id
 
       // maybe better implement cut based id though, and/or clean up this MVA cutting part
       int index                   = (electron->pt() > 10 ? 3 : 0) + (abs(electron->eta()) > 1.479 ? 2 : (abs(electron->eta()) > 0.8 ? 1 : 0 ));
@@ -1142,7 +1110,7 @@ void trilepton::analyze(const edm::Event& iEvent, const edm::EventSetup& iEventS
 	  if ( mc!=0 ) {
 	      fillMCVars(mc, leptonCounter);
 	      //Vertex::Point PVmc = mcMom->vertex();
-	      _ipPVmc[leptonCounter] = TMath::Abs(electron->gsfTrack()->dxy(PVmc));
+	      _ipPVmc[leptonCounter] = abs(electron->gsfTrack()->dxy(PVmc));
 	      _findMatched[leptonCounter]=1;
 	  }
 	  else {
@@ -1456,7 +1424,7 @@ void trilepton::matchCloseJet(const int leptonCounter) {
     
 
         for(GenParticleCollection::const_reverse_iterator p = TheGenParticles->rbegin() ; p != TheGenParticles->rend() ; p++ ) {
-            int id = TMath::Abs(p->pdgId());
+            int id = abs(p->pdgId());
         
             if ((id > 0 && id < 6) || (id == 21) || (id == 22)) {
              if (p->status() != 2) {
@@ -1511,7 +1479,7 @@ void trilepton::fillIsoMCVars(const int leptonCounter) {
         _isolationMC[leptonCounter][2] = 0;
         _isolationMC[leptonCounter][3] = 0;
         for(GenParticleCollection::const_reverse_iterator p = TheGenParticles->rbegin() ; p != TheGenParticles->rend() ; p++ ) {
-            //int id = TMath::Abs(p->pdgId());
+            //int id = abs(p->pdgId());
             if (p->status() == 1) {
                 TLorentzVector pmc; pmc.SetPtEtaPhiM( p->pt(), p->eta(), p->phi(), p->mass() );
                 double ang = ((TLorentzVector *)_leptonP4->At(leptonCounter))->DeltaR( pmc );

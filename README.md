@@ -5,6 +5,8 @@ cd CMSSW_8_0_20/src
 cmsenv
 git cms-init
 git clone https://github.com/GhentAnalysis/Majorana
+git cms-merge-topic ikrav:egm_id_80X_v1
+scram b -j 8
 ```
 
 # How to produce tuples (tested on T2_BE_IIHE)

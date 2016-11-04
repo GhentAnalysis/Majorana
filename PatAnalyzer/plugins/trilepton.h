@@ -158,7 +158,8 @@ private:
     edm::EDGetTokenT<edm::ValueMap<bool>> eleTightIdMapToken;
 
     edm::EDGetTokenT<reco::GenParticleCollection>    genparticleToken;
-    edm::EDGetTokenT<edm::ValueMap<float>>           mvaValuesMapToken;
+    edm::EDGetTokenT<edm::ValueMap<float>>           electronMvaIdMapToken;
+    edm::EDGetTokenT<edm::ValueMap<float>>           electronCutBasedIdMapToken;
     edm::EDGetTokenT<GenEventInfoProduct>            pdfvariablesToken;
     edm::EDGetTokenT<reco::BeamSpot>                 IT_beamspot;
     edm::EDGetTokenT<vector<PileupSummaryInfo>>      PileUpToken; 
