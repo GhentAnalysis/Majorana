@@ -288,7 +288,7 @@ private:
     int _flavors[nLeptonsMax];
     double _charges[nLeptonsMax];
     double _isolation[nLeptonsMax];
-    double _isolationDB[nLeptonsMax];
+    double _isolation_absolute[nLeptonsMax];
     double _isolationComponents[nLeptonsMax][4];
     double _isolationMC[nLeptonsMax][4]; //all daughters; all visible daughters; all daughters in the cone; all visible daughters in the cone
     double _miniisolation[nLeptonsMax][2];
