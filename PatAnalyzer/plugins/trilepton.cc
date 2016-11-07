@@ -940,7 +940,7 @@ void trilepton::analyze(const edm::Event& iEvent, const edm::EventSetup& iEventS
       _flavors[leptonCounter]     = 1;
       _charges[leptonCounter]     = muon->charge();
       _isolation[leptonCounter]   = tools::pfRelIso(&*muon,myRhoJECJets);  // should check out this function
-      _isolation_absolute[leptonCounter] = tools::pfRelIso(&*muon);
+      _isolation_absolute[leptonCounter] = tools::pfAbsIso(&*muon);
       
       _miniisolation[leptonCounter][0] 	      = tools::getPFIsolation(pfcands, &*muon, 0.05, 0.2, 10., false, false, myRhoJets);  // to check 
       _miniisolation[leptonCounter][1] 	      = tools::getPFIsolation(pfcands, &*muon, 0.05, 0.3, 10., false, false, myRhoJets); // also to check
@@ -1031,7 +1031,7 @@ void trilepton::analyze(const edm::Event& iEvent, const edm::EventSetup& iEventS
       _flavors[leptonCounter]   = 0;
       _charges[leptonCounter]   = electron->charge();
       _isolation[leptonCounter] = tools::pfRelIso(&*electron, myRhoJECJets);
-	_isolation_absolute[leptonCounter] = tools::pfRelIso(&*iE, myRhoJECJets);
+	_isolation_absolute[leptonCounter] = tools::pfAbsIso(&*iE, myRhoJECJets);
 
       _ipPV[leptonCounter]  = electron->gsfTrack()->dxy(PV);
       _ipZPV[leptonCounter] = electron->gsfTrack()->dz(PV);
