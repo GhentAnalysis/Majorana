@@ -481,11 +481,76 @@ double tools::pfRelIso(const pat::Muon *mu)
     double neutralHadronIso = mu->pfIsolationR03().sumNeutralHadronEt;
     double photonIso = mu->pfIsolationR03().sumPhotonEt;
     double beta = mu->pfIsolationR03().sumPUPt;
+    double pfRelIsoMu  = ( chargedHadronIso + TMath::Max ( 0.0 ,neutralHadronIso + photonIso - 0.5 * beta ) )/mu->pt();
+    return pfRelIsoMu;
+}
+// Muon absolute isolation
+double tools::pfAbsIso(const pat::Muon *mu)
+{
+ 	//******************** absolute isolation 
+	double chargedHadronIso = mu->pfIsolationR03().sumChargedHadronPt;
+    double neutralHadronIso = mu->pfIsolationR03().sumNeutralHadronEt;
+    double photonIso = mu->pfIsolationR03().sumPhotonEt;
+    double beta = mu->pfIsolationR03().sumPUPt;
     double pfRelIsoMu  = ( chargedHadronIso + TMath::Max ( 0.0 ,neutralHadronIso + photonIso - 0.5 * beta ) );
     return pfRelIsoMu;
 }
 
+
+
+
+
 double tools::pfRelIso(const pat::Electron *iE, double myRho)
+{
+    //double  Aeff[ 7 ] = { 0.10, 0.12, 0.085, 0.11, 0.12, 0.12, 0.13  };
+    //double  Aeff[ 7 ] = { 0.13, 0.14, 0.07, 0.09, 0.11, 0.11, 0.14  };
+    //double  Aeff[ 5 ] = { 0.1013, 0.0988, 0.0572, 0.0842, 0.1530};
+    double  Aeff[ 7 ] = { 0.1752, 0.1862, 0.1411, 0.1534, 0.1903, 0.2243, 0.2687};
+
+    double CorrectedTerm=0.0;
+    if( TMath::Abs( iE->superCluster()->eta() ) < 1.0                                            )   CorrectedTerm = myRho * Aeff[ 0 ];
+     else if( TMath::Abs( iE->superCluster()->eta() ) > 1.0   && TMath::Abs( iE->superCluster()->eta() ) < 1.479  )   CorrectedTerm = myRho * Aeff[ 1 ];
+     else if( TMath::Abs( iE->superCluster()->eta() ) > 1.479 && TMath::Abs( iE->superCluster()->eta() ) < 2.0    )   CorrectedTerm = myRho * Aeff[ 2 ];
+     else if( TMath::Abs( iE->superCluster()->eta() ) > 2.0   && TMath::Abs( iE->superCluster()->eta() ) < 2.2    )   CorrectedTerm = myRho * Aeff[ 3 ];
+     else if( TMath::Abs( iE->superCluster()->eta() ) > 2.2   && TMath::Abs( iE->superCluster()->eta() ) < 2.3    )   CorrectedTerm = myRho * Aeff[ 4 ];
+     else if( TMath::Abs( iE->superCluster()->eta() ) > 2.3   && TMath::Abs( iE->superCluster()->eta() ) < 2.4    )   CorrectedTerm = myRho * Aeff[ 5 ];
+     else  CorrectedTerm = myRho * Aeff[ 6 ];
+    
+    /*if( TMath::Abs( iE->superCluster()->eta() ) < 0.8 ) CorrectedTerm = myRho * Aeff[ 0 ];
+    else if( TMath::Abs( iE->superCluster()->eta() ) < 1.3  )   CorrectedTerm = myRho * Aeff[ 1 ];
+    else if( TMath::Abs( iE->superCluster()->eta() ) < 2.0  )   CorrectedTerm = myRho * Aeff[ 2 ];
+    else if( TMath::Abs( iE->superCluster()->eta() ) < 2.2  )   CorrectedTerm = myRho * Aeff[ 3 ];
+    else  CorrectedTerm = myRho * Aeff[ 4 ];*/
+
+    /*
+    if( TMath::Abs( iE->eta() ) < 0.8 ) CorrectedTerm = myRho * Aeff[ 0 ];
+    else if( TMath::Abs( iE->eta() ) < 1.3  )   CorrectedTerm = myRho * Aeff[ 1 ];
+    else if( TMath::Abs( iE->eta() ) < 2.0  )   CorrectedTerm = myRho * Aeff[ 2 ];
+    else if( TMath::Abs( iE->eta() ) < 2.2  )   CorrectedTerm = myRho * Aeff[ 3 ];
+    else  CorrectedTerm = myRho * Aeff[ 4 ];
+    */
+
+    //double pfRelIsoE = (iE->chargedHadronIso() + TMath::Max(0.0, iE->neutralHadronIso() + iE->photonIso() - CorrectedTerm ) ) /iE->pt() ;
+     //std::cout << iE->pfIsolationVariables().sumChargedHadronPt << " " << iE->pfIsolationVariables().sumNeutralHadronEt << " " <<  iE->pfIsolationVariables().sumPhotonEt << " " << CorrectedTerm << " " << iE->pt() << std::endl ;
+
+    // Iso 0.3, 22 Jan 2016
+    cout << "Info about iso: " << iE->pfIsolationVariables().sumChargedHadronPt << " " << iE->pfIsolationVariables().sumNeutralHadronEt << " " << iE->pfIsolationVariables().sumPhotonEt << " " << CorrectedTerm << endl; 
+    double pfRelIsoE = (iE->pfIsolationVariables().sumChargedHadronPt + TMath::Max(0.0, iE->pfIsolationVariables().sumNeutralHadronEt + iE->pfIsolationVariables().sumPhotonEt - CorrectedTerm ) )/iE->Pt();
+
+    return pfRelIsoE;
+
+     /* Iso 0.4, 22 Jan 2016
+    double chargedHadronIso = iE->chargedHadronIso();
+    double neutralHadronIso = iE->neutralHadronIso();
+    double photonIso = iE->photonIso();
+    //double beta = mu->pfIsolationR03().sumPUPt;
+    
+    double pfRelIsoE = (chargedHadronIso + TMath::Max(0.0, neutralHadronIso + photonIso - CorrectedTerm/(0.3 * 0.3 / (0.4 * 0.4)) ) ) / iE->pt() ;
+    
+    return pfRelIsoE;
+    */
+}
+double tools::pfAbsIso(const pat::Electron *iE, double myRho)
 {
     //double  Aeff[ 7 ] = { 0.10, 0.12, 0.085, 0.11, 0.12, 0.12, 0.13  };
     //double  Aeff[ 7 ] = { 0.13, 0.14, 0.07, 0.09, 0.11, 0.11, 0.14  };
@@ -535,6 +600,7 @@ double tools::pfRelIso(const pat::Electron *iE, double myRho)
     return pfRelIsoE;
     */
 }
+
 
 /*
 double tools::pfRelIso(const edm::Ptr<reco::GsfElectron> iE, double myRho)
