@@ -196,7 +196,7 @@ void trilepton::beginJob()
     outputTree->Branch("_flavors", &_flavors, "_flavors[_nLeptons]/I");
     outputTree->Branch("_charges", &_charges, "_charges[_nLeptons]/D");
     outputTree->Branch("_isolation", &_isolation, "_isolation[_nLeptons]/D");
-    outputTree->Branch("_isolationDB", &_isolationDB, "_isolationDB[_nLeptons]/D");
+    outputTree->Branch("_isolation_absolute", &_isolation_absolute, "_isolation_absolute[_nLeptons]/D");
     //outputTree->Branch("_isolationComponents", &_isolationComponents, "_isolationComponents[4][6]/D");
     //outputTree->Branch("_isolationMC", &_isolationMC, "_isolationMC[4][6]/D");
     outputTree->Branch("_miniisolation", &_miniisolation, "_miniisolation[_nLeptons][2]/D");
@@ -940,7 +940,7 @@ void trilepton::analyze(const edm::Event& iEvent, const edm::EventSetup& iEventS
       _flavors[leptonCounter]     = 1;
       _charges[leptonCounter]     = muon->charge();
       _isolation[leptonCounter]   = tools::pfRelIso(&*muon,myRhoJECJets);  // should check out this function
-      _isolationDB[leptonCounter] = tools::pfRelIso(&*muon);
+      _isolation_absolute[leptonCounter] = tools::pfRelIso(&*muon);
       
       _miniisolation[leptonCounter][0] 	      = tools::getPFIsolation(pfcands, &*muon, 0.05, 0.2, 10., false, false, myRhoJets);  // to check 
       _miniisolation[leptonCounter][1] 	      = tools::getPFIsolation(pfcands, &*muon, 0.05, 0.3, 10., false, false, myRhoJets); // also to check
@@ -1031,6 +1031,7 @@ void trilepton::analyze(const edm::Event& iEvent, const edm::EventSetup& iEventS
       _flavors[leptonCounter]   = 0;
       _charges[leptonCounter]   = electron->charge();
       _isolation[leptonCounter] = tools::pfRelIso(&*electron, myRhoJECJets);
+	_isolation_absolute[leptonCounter] = tools::pfRelIso(&*iE, myRhoJECJets);
 
       _ipPV[leptonCounter]  = electron->gsfTrack()->dxy(PV);
       _ipZPV[leptonCounter] = electron->gsfTrack()->dz(PV);
