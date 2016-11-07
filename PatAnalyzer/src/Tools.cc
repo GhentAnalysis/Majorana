@@ -535,7 +535,7 @@ double tools::pfRelIso(const pat::Electron *iE, double myRho)
 
     // Iso 0.3, 22 Jan 2016
     cout << "Info about iso: " << iE->pfIsolationVariables().sumChargedHadronPt << " " << iE->pfIsolationVariables().sumNeutralHadronEt << " " << iE->pfIsolationVariables().sumPhotonEt << " " << CorrectedTerm << endl; 
-    double pfRelIsoE = (iE->pfIsolationVariables().sumChargedHadronPt + TMath::Max(0.0, iE->pfIsolationVariables().sumNeutralHadronEt + iE->pfIsolationVariables().sumPhotonEt - CorrectedTerm ) )/iE->Pt();
+    double pfRelIsoE = (iE->pfIsolationVariables().sumChargedHadronPt + TMath::Max(0.0, iE->pfIsolationVariables().sumNeutralHadronEt + iE->pfIsolationVariables().sumPhotonEt - CorrectedTerm ) )/iE->pt();
 
     return pfRelIsoE;
 

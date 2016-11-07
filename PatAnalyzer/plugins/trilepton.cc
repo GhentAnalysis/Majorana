@@ -955,24 +955,15 @@ void trilepton::analyze(const edm::Event& iEvent, const edm::EventSetup& iEventS
       _3dIPerr[leptonCounter]  = muon->edB(pat::Muon::PV3D);
       _3dIPsig[leptonCounter]  = fabs(_3dIP[leptonCounter]/_3dIPerr[leptonCounter]);
      
-      //bool goodGlb      = muon->isGlobalMuon() and muon->globalTrack()->normalizedChi2() < 3 and muon->combinedQuality().chi2LocalPosition < 12 and muon->combinedQuality().trkKink < 20;
-      //bool isMedium     = muon->isLooseMuon() and muon->innerTrack()->validFraction() > 0.49 and muon->segmentCompatibility() >= (goodGlb ? 0.303 : 0.451); // temporary ICHEP recommendation
+      bool goodGlb      = muon->isGlobalMuon() and muon->globalTrack()->normalizedChi2() < 3 and muon->combinedQuality().chi2LocalPosition < 12 and muon->combinedQuality().trkKink < 20;
+      bool isMedium     = muon->isLooseMuon() and muon->innerTrack()->validFraction() > 0.49 and muon->segmentCompatibility() >= (goodGlb ? 0.303 : 0.451); // temporary ICHEP recommendation
 //    bool isMedium     = muon->isMediumMuon();  // default definition with  muon->innerTrack()->validFraction() > 0.8 instead
-	//**************** POG definition
-	bool isloose= iM->isPFMuon() && (iM->isTrackerMuon() || iM->isGlobalMuon() );
-	bool goodGlb = iM->isGlobalMuon() && iM->globalTrack()->normalizedChi2() < 3 && iM->combinedQuality().chi2LocalPosition < 12 && iM->combinedQuality().trkKink < 20;
-	bool isMedium =iM->isPFMuon() && (iM->isTrackerMuon() || iM->isGlobalMuon() )&& iM->innerTrack()->validFraction() > 0.8 && iM->segmentCompatibility() >= (goodGlb ? 0.303 : 0.451);
-	bool istight = iM->isGlobalMuon() && iM->globalTrack()->normalizedChi2() < 10  && iM->globalTrack()->hitPattern().numberOfValidMuonHits() > 0 && iM->numberOfMatchedStations() > 1 && fabs(iM->muonBestTrack()->dxy(PV)) < 0.2  && fabs(iM->muonBestTrack()->dz(PV)) < 0.5 && iM->innerTrack()->hitPattern().numberOfValidPixelHits() > 0 && iM->innerTrack()->hitPattern().trackerLayersWithMeasurement() > 5;
-	    
-	    
-	    
-	    
+ 
       _muonSegmentComp[leptonCounter] = muon->segmentCompatibility(); // do we really use this variable in our trees? should be enough to select loose or medium
-      
-     
-      	_isloose[leptonCounter] = isloose;
-	_ismedium[leptonCounter] =isMedium;
-        _istight[leptonCounter] = istight;
+ 
+      _isloose[leptonCounter]  = muon->isLooseMuon();
+      _ismedium[leptonCounter] = isMedium;
+      _istight[leptonCounter]  = muon->isTightMuon(*PVtx);
 
       //if(!_isloose[leptonCounter]) continue;
       
@@ -1028,10 +1019,10 @@ void trilepton::analyze(const edm::Event& iEvent, const edm::EventSetup& iEventS
       _passedMVA80[leptonCounter] = _mvaValue[leptonCounter]> looseMVA[index][0];
       _passedMVA90[leptonCounter] = _mvaValue[leptonCounter]> looseMVA[index][1];
 
-      _flavors[leptonCounter]   = 0;
-      _charges[leptonCounter]   = electron->charge();
-      _isolation[leptonCounter] = tools::pfRelIso(&*electron, myRhoJECJets);
-	_isolation_absolute[leptonCounter] = tools::pfAbsIso(&*iE, myRhoJECJets);
+      _flavors[leptonCounter]            = 0;
+      _charges[leptonCounter]            = electron->charge();
+      _isolation[leptonCounter]          = tools::pfRelIso(&*electron, myRhoJECJets);
+      _isolation_absolute[leptonCounter] = tools::pfAbsIso(&*electron, myRhoJECJets);
 
       _ipPV[leptonCounter]  = electron->gsfTrack()->dxy(PV);
       _ipZPV[leptonCounter] = electron->gsfTrack()->dz(PV);
@@ -1059,10 +1050,6 @@ void trilepton::analyze(const edm::Event& iEvent, const edm::EventSetup& iEventS
       //if(_isolation[leptonCounter] > 1) continue;
       //if(_3dIPsig[leptonCounter] > 4) continue;
 
-      	_passedMVA80[leptonCounter ] = passedMVA80;
-	_passedMVA90[leptonCounter ] = passedMVA90;
-
-      
       
       ((TLorentzVector *)_leptonP4->At(leptonCounter))->SetPtEtaPhiE(electron->pt(), electron->eta(), electron->phi(), electron->energy());
       
