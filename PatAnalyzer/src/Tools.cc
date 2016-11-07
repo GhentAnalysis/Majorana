@@ -470,11 +470,18 @@ std::vector<const pat::Muon* > tools::effMuonSelector(const std::vector<pat::Muo
 double tools::pfRelIso(const pat::Muon *mu)
 {
     // change to R04 for Deniz analysis
-    double chargedHadronIso = mu->pfIsolationR04().sumChargedHadronPt;
+    /*double chargedHadronIso = mu->pfIsolationR04().sumChargedHadronPt;
     double neutralHadronIso = mu->pfIsolationR04().sumNeutralHadronEt;
     double photonIso = mu->pfIsolationR04().sumPhotonEt;
     double beta = mu->pfIsolationR04().sumPUPt;
     double pfRelIsoMu  = ( chargedHadronIso + TMath::Max ( 0.0 ,neutralHadronIso + photonIso - 0.5 * beta ) )/mu->pt() ;
+    return pfRelIsoMu;*/
+	//******************** absolute isolation 
+	double chargedHadronIso = mu->pfIsolationR03().sumChargedHadronPt;
+    double neutralHadronIso = mu->pfIsolationR03().sumNeutralHadronEt;
+    double photonIso = mu->pfIsolationR03().sumPhotonEt;
+    double beta = mu->pfIsolationR03().sumPUPt;
+    double pfRelIsoMu  = ( chargedHadronIso + TMath::Max ( 0.0 ,neutralHadronIso + photonIso - 0.5 * beta ) );
     return pfRelIsoMu;
 }
 
@@ -513,7 +520,7 @@ double tools::pfRelIso(const pat::Electron *iE, double myRho)
 
     // Iso 0.3, 22 Jan 2016
     cout << "Info about iso: " << iE->pfIsolationVariables().sumChargedHadronPt << " " << iE->pfIsolationVariables().sumNeutralHadronEt << " " << iE->pfIsolationVariables().sumPhotonEt << " " << CorrectedTerm << endl; 
-    double pfRelIsoE = (iE->pfIsolationVariables().sumChargedHadronPt + TMath::Max(0.0, iE->pfIsolationVariables().sumNeutralHadronEt + iE->pfIsolationVariables().sumPhotonEt - CorrectedTerm ) ) /iE->pt() ;
+    double pfRelIsoE = (iE->pfIsolationVariables().sumChargedHadronPt + TMath::Max(0.0, iE->pfIsolationVariables().sumNeutralHadronEt + iE->pfIsolationVariables().sumPhotonEt - CorrectedTerm ) );
 
     return pfRelIsoE;
 
