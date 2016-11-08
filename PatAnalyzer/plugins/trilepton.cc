@@ -888,7 +888,7 @@ void trilepton::analyze(const edm::Event& iEvent, const edm::EventSetup& iEventS
     for(auto muon = muons->begin(); muon != muons->end(); ++muon){
       if(muon->pt() < _minPt0)   continue;
       if(abs(muon->eta()) > 2.5) continue;
-      //if(!muon->isLooseMuon())   continue;  // Store only loose muons, see https://twiki.cern.ch/twiki/bin/viewauth/CMS/SWGuideMuonIdRun2
+      if(!muon->isLooseMuon())   continue;  // Store only loose muons, see https://twiki.cern.ch/twiki/bin/viewauth/CMS/SWGuideMuonIdRun2
      
       if(muon->innerTrack().isNull()) 			continue;  // Store only when we have an innertrack
       //if(abs(muon->innerTrack()->dxy(PV)) > _looseD0Mu) continue;
@@ -968,6 +968,7 @@ void trilepton::analyze(const edm::Event& iEvent, const edm::EventSetup& iEventS
       if(electron->pt() < _minPt1) continue;
       if(abs(electron->eta()) > 2.5) continue;
       if(!electron->gsfTrack().isNonnull()) continue;
+      if(!tools::isLooseCutBasedElectronWithoutIsolation(&*electron)) continue; //only store those passing the loose cut based id, without isolation requirement
 
       // There will be a new electron MVA soon
       edm::RefToBase<pat::Electron> electronRef(edm::Ref<edm::View<pat::Electron>>(electrons, (electron - electrons->begin())));
