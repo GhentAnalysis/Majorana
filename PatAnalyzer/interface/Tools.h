@@ -263,10 +263,6 @@ namespace tools {
                                                     std::vector<const pat::Muon*> & thePatMuons,
                                                     const std::vector<const pat::Electron*>  & thePatElectrons);
     
-    std::vector<const pat::Jet* > JetSelectorAll(const std::vector<pat::Jet>  & thePatJets,
-                                                        double  v_jet_pt,
-                                                        double  v_jet_eta);
-    
     double MT_calc(TLorentzVector Vect, double MET, double MET_Phi);
     double Tau_dz(ROOT::Math::PositionVector3D<ROOT::Math::Cartesian3D<double> >, TLorentzVector, reco::Vertex::Point);
     

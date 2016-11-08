@@ -139,16 +139,7 @@ private:
     edm::Handle<std::vector<reco::GenParticle>> TheGenParticles;
     
     
-    bool isData;
-    std::string SampleName;
-    //edm::InputTag IT_muon;
-    //edm::InputTag IT_electron;
-    //edm::InputTag IT_tau;
     edm::InputTag IT_tauDiscriminator;
-    //edm::InputTag IT_jet;
-    //edm::InputTag IT_pfmet;
-    //edm::InputTag IT_beamspot;
-    //edm::InputTag IT_hltresults;
     edm::InputTag IT_METFilters;
     
     // MVA values and categories (optional)
@@ -177,7 +168,10 @@ private:
     edm::EDGetTokenT<edm::TriggerResults>            triggerResultsRECOToken;
     edm::EDGetTokenT<pat::PackedTriggerPrescales>    triggerPrescalesToken;
     edm::EDGetTokenT<LHEEventProduct>                IT_externalLHEProducer;
-    
+    bool isData;
+    bool treeForFakeRate;
+    std::string SampleName;
+
 
     edm::Service<TFileService> fs;
     FILE *outfile;

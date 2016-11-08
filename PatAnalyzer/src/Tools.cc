@@ -1113,51 +1113,6 @@ double tools::Tau_dz(ROOT::Math::PositionVector3D<ROOT::Math::Cartesian3D<double
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-std::vector<const pat::Jet* > tools::JetSelectorAll(const std::vector<pat::Jet>  & thePatJets,
-                                                 double  v_jet_pt,
-                                                 double  v_jet_eta)
-{
-    bool    bool_jet_id = false;
-    
-    std::vector< const pat::Jet* > vJets;
-    
-    for( std::vector<pat::Jet>::const_iterator jet = thePatJets.begin(); jet != thePatJets.end(); jet++ )
-	{
-
-        
-        if( jet->pt() < v_jet_pt )continue;
-        if( TMath::Abs( jet->eta() ) > v_jet_eta) continue;
-        if( bool_jet_id )
-	    {
-            if( jet->neutralHadronEnergyFraction() >= 0.99 ) continue;
-            if( jet->neutralEmEnergyFraction() >= 0.99 ) continue;
-            //if( ( jet->neutralHadronMultiplicity() + jet->chargedHadronMultiplicity() ) < 2 ) continue;
-            if( ( jet->neutralHadronMultiplicity() + jet->chargedHadronMultiplicity() + jet->photonMultiplicity() ) < 2 ) continue;
-            if( TMath::Abs( jet->eta() ) < 2.4 )
-            {
-                if( jet->chargedHadronEnergyFraction() == 0. ) continue;
-                if( jet->chargedEmEnergyFraction() >= 0.99 ) continue;
-                if( jet->chargedMultiplicity() == 0 ) continue;
-            }
-	    }
-        vJets.push_back( &*jet );
-        
-        /*unsigned int nConst = jet->getPFConstituents().size();
-         std::cout<<"Number of constituents "<<nConst<<std::endl;
-         for (unsigned int i=0; i!=nConst; ++i) {
-         std::cout<<jet->getPFConstituent(i)->reco::LeafCandidate::vz()<<std::endl;
-         }*/
-        
-        
-    }
-    return vJets;
-}
-
-
-
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 std::vector<const pat::Jet* > tools::JetSelector(const std::vector<pat::Jet>  & thePatJets,
                                                  double  v_jet_pt,
                                                  double  v_jet_eta)

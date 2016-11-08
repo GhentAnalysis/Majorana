@@ -44,9 +44,6 @@
 
 #include <iostream>
 
-// In the long run, we should get rid of these using namespace statements, this is bad coding
-//using namespace std;
-
 trilepton::trilepton(const edm::ParameterSet & iConfig) :
   genparticleToken(                      consumes<reco::GenParticleCollection>(   iConfig.getParameter<edm::InputTag>("genPartsLabel"))),
   electronMvaIdMapToken(                 consumes<edm::ValueMap<float>>(          iConfig.getParameter<edm::InputTag>("electronMvaIdMap"))),
@@ -68,6 +65,9 @@ trilepton::trilepton(const edm::ParameterSet & iConfig) :
   triggerResultsRECOToken(               consumes<edm::TriggerResults>(           iConfig.getParameter<edm::InputTag>("triggerResultsRECO"))),
   triggerPrescalesToken(                 consumes<pat::PackedTriggerPrescales>(   iConfig.getParameter<edm::InputTag>("prescales"))),
   IT_externalLHEProducer(                consumes<LHEEventProduct>(               iConfig.getParameter<edm::InputTag>("exernalLHEPLabel"))),
+  isData(                                                                         iConfig.getUntrackedParameter<bool>("isData")),
+  treeForFakeRate(                                                                iConfig.getUntrackedParameter<bool>("treeForFakeRate")),
+  SampleName(                                                                     iConfig.getUntrackedParameter<std::string>("SampleName")),
   _relIsoCutE(999.),//0.15
   _relIsoCutMu(999.),//0.15
   _relIsoCutEloose(999.), //0.5
@@ -88,9 +88,6 @@ trilepton::trilepton(const edm::ParameterSet & iConfig) :
   _tauEta(2.3),
   _regression(false)
 {
-    isData              = iConfig.getUntrackedParameter<bool>("isData") ;
-    SampleName          = iConfig.getUntrackedParameter<std::string>("SampleName") ;
-
     // eventually move this to config level
     // just a bunch of lepton triggers, might need a closer look for cleanup or additions
     triggersToSave = {"HLT_TripleMu_12_10_5", "HLT_DiMu9_Ele9_CaloIdL_TrackIdL", "HLT_Mu8_DiEle12_CaloIdL_TrackIdL", "HLT_Ele16_Ele12_Ele8_CaloIdL_TrackIdL",   // 3l
@@ -118,7 +115,8 @@ trilepton::trilepton(const edm::ParameterSet & iConfig) :
 
 void trilepton::beginJob()
 {
-    outputTree = fs->make<TTree>("trileptonTree","trileptonTree");
+    if(treeForFakeRate) outputTree = fs->make<TTree>("fakeRateTree", "fakeRateTree");
+    else                outputTree = fs->make<TTree>("trileptonTree","trileptonTree");
     Nvtx = fs->make<TH1F>("N_{vtx}", "Number of vertices;N_{vtx};events / 1"  ,    40, 0., 40.);
     
     _hCounter = fs->make<TH1D>("hCounter", "Events counter", 5,0,5);
@@ -871,58 +869,20 @@ void trilepton::analyze(const edm::Event& iEvent, const edm::EventSetup& iEventS
         sTau.push_back(&tau);
     }
     
-    SelectedJetsAll = tools::JetSelectorAll(*thePatJets, 5., 3.0);
-    std::vector<const pat::Jet*> SelectedJets = tools::JetSelector(*thePatJets, _jetPtCut, _jetEtaCut);
-
-    HT = 0.;
-    std::vector< const pat::Jet* > Bjets;
-    
-    _n_bJetsAll = 0;
-    
-    int n_bJetsAll30 = 0;
-    
-    
-    _n_Jets = 0;
-    _n_bJets = 0;
-    
-    for(unsigned int i = 0 ; i < SelectedJetsAll.size() ;i++ ){
-        
-        //double uncPt = (SelectedJetsAll[i]->correctedP4("Uncorrected")).Pt();
-        double uncEta = (SelectedJetsAll[i]->correctedP4("Uncorrected")).Eta();
-        double uncPhi = (SelectedJetsAll[i]->correctedP4("Uncorrected")).Phi();
-        
-        //double corr = fMetCorrector->getJetCorrectionRawPt(uncPt, uncEta, myRhoJets, SelectedJetsAll[i]->jetArea(),_corrLevel);
-        
-        _jetEtaAll[i] = uncEta;
-        _jetPhiAll[i] = uncPhi;
-        _jetPtAll[i] = SelectedJetsAll[i]->pt();
-        _jetEAll[i] = SelectedJetsAll[i]->energy();
-        
-        ((TLorentzVector *)_jetAllP4->At(i))->SetPtEtaPhiM( _jetPtAll[i], _jetEtaAll[i], _jetPhiAll[i], _jetEAll[i]);
-        
-        _csvAll[i] = SelectedJetsAll[i]->bDiscriminator("combinedInclusiveSecondaryVertexV2BJetTags");
-        
-        if(SelectedJetsAll[i]->bDiscriminator("combinedInclusiveSecondaryVertexV2BJetTags") > 0.814) {
-            _bTaggedAll[i] = true;
-            _n_bJetsAll++;
-            if (_jetPtAll[i] > _jetPtCut) {
-                //bIndex[n_bJetsAll30] = i;
-                n_bJetsAll30++;
-            }
-        } else _bTaggedAll[i] = false;
-        
-       
-        
+    // This are actually not really "selected" jets, it are basically all jets in the central region, only to be used for lepton variables
+    SelectedJetsAll.clear();
+    for(auto jet = thePatJets->begin(); jet != thePatJets->end(); ++jet){
+      if(jet->pt() < 5) continue;
+      if(jet->eta() > 3.0) continue;
+      SelectedJetsAll.push_back(&*jet);
     }
     _n_JetsAll = SelectedJetsAll.size();
-    
+
+
 
     /*
      * Leptons
      */
-
-
-
     int leptonCounter = 0;
  
     for(auto muon = muons->begin(); muon != muons->end(); ++muon){
@@ -1093,7 +1053,6 @@ void trilepton::analyze(const edm::Event& iEvent, const edm::EventSetup& iEventS
     _nTau = 0;
 
    
-    if (_nEle + _nMu < 3) return;
       
     _nLeptons = leptonCounter;
    
@@ -1103,6 +1062,8 @@ void trilepton::analyze(const edm::Event& iEvent, const edm::EventSetup& iEventS
     _n_Jets = 0;
     _n_bJets = 0;
     HT = 0;
+
+    std::vector<const pat::Jet*> SelectedJets = tools::JetSelector(*thePatJets, _jetPtCut, _jetEtaCut);
     for(unsigned int i = 0 ; i < SelectedJets.size() ;i++ ){
         
 
@@ -1168,7 +1129,17 @@ void trilepton::analyze(const edm::Event& iEvent, const edm::EventSetup& iEventS
         _n_Jets++;
     }
 
-    std::cout<<_runNb<<" "<<_lumiBlock<<" "<<_eventNb<<" "<<_nMu<<" "<<_nEle<<" "<<_nTau<<" "<<_n_Jets<<" "<<_n_bJets<<std::endl;
+
+    // Here we make the decision on what to save
+    if(treeForFakeRate){
+      if(_nLeptons != 1)       return;
+      if(_n_Jets < 1)          return;				// For fake rate tree: exactly 1 lepton + at least 1 jet
+      if(_jetPt[0] < 30)       return;				// with deltaR(j, l) > 1 (back-to-back)
+      if(_jetDeltaR[0][0] < 1) return;
+    } else {
+      if(_nLeptons < 3) return;
+    }
+
     outputTree->Fill();
 }
 

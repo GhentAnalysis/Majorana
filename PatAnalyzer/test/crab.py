@@ -4,8 +4,7 @@ import os
 # Get parameters from submit script
 productionLabel = os.environ['CRAB_PRODUCTIONLABEL']
 dataset         = os.environ['CRAB_DATASET']
-#dataset        = '/WZJToLLLNu_TuneCUETP8M1_13TeV-amcnlo-pythia8/RunIISpring16MiniAODv2-PUSpring16RAWAODSIM_reHLT_80X_mcRun2_asymptotic_v14-v1/MINIAODSIM'
-#dataset        = '/DoubleMuon/Run2016B-PromptReco-v2/MINIAOD'
+treeForFakeRate = os.environ['CRAB_TREEFORFAKERATE']
 
 
 # Crab configuration
@@ -17,9 +16,9 @@ config.General.workArea     = os.path.join('crab', productionLabel, dataset.spli
 
 config.section_('JobType')
 config.JobType.psetName                = 'trilepton.py'
-config.JobType.pyCfgParams             = ['isData=True'] if not 'SIM' in dataset else []
+config.JobType.pyCfgParams             = (['isData=True'] if not 'SIM' in dataset else []) + (['treeForFakeRate=True'] if treeForFakeRate else [])
 config.JobType.pluginName              = 'analysis'
-config.JobType.outputFiles             = ['trilepton.root']
+config.JobType.outputFiles             = ['trilepton.root' if treeForFakeRate=='False' else 'fakeRate.root']
 config.JobType.allowUndistributedCMSSW = True 
 
 config.section_('Data')

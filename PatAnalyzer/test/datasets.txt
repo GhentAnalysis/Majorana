@@ -20,3 +20,8 @@
 #/user/tomc/public/Majorana/MajoranaNeutrino_trilepton_M-40_5f_NLO
 #/user/tomc/public/Majorana/MajoranaNeutrino_trilepton_M-50_5f_NLO
 #/user/tomc/public/Majorana/MajoranaNeutrino_trilepton_M-60_5f_NLO
+
+
+# Datasets for fake rate tree (simply put "FAKERATE:" before the path)
+#FAKERATE:/QCD_Pt-20to30_MuEnrichedPt5_TuneCUETP8M1_13TeV_pythia8/RunIISpring16MiniAODv2-PUSpring16RAWAODSIM_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1/MINIAODSIM
+FAKERATE:/pnfs/iihe/cms/ph/sc4/store/mc/RunIISpring16MiniAODv2/QCD_Pt-20to30_MuEnrichedPt5_TuneCUETP8M1_13TeV_pythia8/MINIAODSIM/PUSpring16RAWAODSIM_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1
