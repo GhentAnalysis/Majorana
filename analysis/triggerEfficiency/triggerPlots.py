@@ -6,7 +6,7 @@ import os
 import Majorana.tools.sample as sample
 import Majorana.tools.style  as style
 
-style.setDefault()
+style.setDefault2D()
 
 
 
