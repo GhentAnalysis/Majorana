@@ -1,11 +1,13 @@
 #! /usr/bin/env python
 
-from ROOT import TFile, TTree, TH2D, TCanvas, gROOT
 import ROOT
 from collections import defaultdict
 import os
+import Majorana.tools.sample as sample
+import Majorana.tools.style  as style
 
-ROOT.gROOT.SetBatch(True)
+style.setDefault()
+
 
 
 def makeCumul(hist):
@@ -40,7 +42,7 @@ def run(inputTree, triggers, dir):
       hists[ptThreshold][triggerApplied] = {}
       for channel in ['eee', 'eemu', 'emumu', 'mumumu']: 
         name = channel + "_pt" + str(ptThreshold) + ("" if triggerApplied else "_noTrig")
-        hists[ptThreshold][triggerApplied][channel] = TH2D(name, name, 9, 5, 50, 9, 5, 50)
+        hists[ptThreshold][triggerApplied][channel] = ROOT.TH2D(name, name, 9, 5, 50, 9, 5, 50)
 
   # loop over events
   for i in range(inputTree.GetEntries()):
@@ -75,17 +77,6 @@ def run(inputTree, triggers, dir):
       if passTriggers(inputTree, triggers[nMuon]): 
         hists[ptThreshold][True][channel].Fill(pt[2], pt[1])
 
-  ROOT.gROOT.LoadMacro("$CMSSW_BASE/src/Majorana/analysis/tdrstyle.C")
-  ROOT.setTDRStyle()
-  ROOT.gROOT.SetStyle('tdrStyle')
-  ROOT.gStyle.SetPaintTextFormat("3.2f")
-  ROOT.gStyle.SetPadRightMargin(0.12)
-  ROOT.gStyle.SetPadTopMargin(0.15)
-  ROOT.gStyle.SetTitleX(0.005)
-  ROOT.gStyle.SetTitleY(0.985)
-  ROOT.gStyle.SetOptTitle(1)
-  ROOT.gROOT.ForceStyle()
- 
 
   for ptThreshold in ptThresholds:
     for channel in ['eee', 'eemu', 'emumu', 'mumumu']:
@@ -97,7 +88,7 @@ def run(inputTree, triggers, dir):
 	eff.Divide(hists[ptThreshold][False][channel])
    
 	if hasattr("ROOT","c1"): del ROOT.c1 
-	c1 = TCanvas(eff.GetName() + ('_cumul' if useCumul else ''), eff.GetName())
+	c1 = ROOT.TCanvas(eff.GetName() + ('_cumul' if useCumul else ''), eff.GetName())
 	c1.cd()
 	eff.GetZaxis().SetRangeUser(0, 1);
 	eff.GetXaxis().SetTitle("trailing lepton p_{T} [Gev]")
@@ -112,12 +103,7 @@ def run(inputTree, triggers, dir):
 
   return True
 
-import glob
-chain = ROOT.TChain('trileptonProducer/trileptonTree')
-# listOfFiles = glob.glob('/pnfs/iihe/cms/store/user/tomc/majorana/WZJToLLLNu_TuneCUETP8M1_13TeV-amcnlo-pythia8/crab_test2/161030_121836/0000/trilepton*.root') # of course again pnfs problems
-listOfFiles = glob.glob('/user/tomc/public/majorana/WZJToLLLNu_TuneCUETP8M1_13TeV-amcnlo-pythia8/local_test2/trilepton*.root')
-for i in listOfFiles:
-  chain.Add(i)
+chain = sample.getTree('WZ', productionLabel='test2')
 
 # 3l triggers only
 triggers_3l = {3: ['HLT_TripleMu_12_10_5'],
