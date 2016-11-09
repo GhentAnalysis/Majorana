@@ -361,7 +361,6 @@ private:
     bool _isloose[nLeptonsMax];
     bool _ismedium[nLeptonsMax];
     bool _istight[nLeptonsMax];
-    bool _istightID[nLeptonsMax];
     bool _isvetoIDCutBased[nLeptonsMax];
     bool _islooseIDCutBased[nLeptonsMax];
     bool _ismediumIDCutBased[nLeptonsMax];
@@ -432,10 +431,6 @@ private:
     double _momphi[nLeptonsMax];
     double _mometa[nLeptonsMax];
     int _mompdg[nLeptonsMax];
-
-    bool _decayModeFinding[nLeptonsMax];
-    bool _looseMVA_dR03[nLeptonsMax];
-    bool _mediumMVA_dR03[nLeptonsMax];
 
     double _met;
     double _met_phi;

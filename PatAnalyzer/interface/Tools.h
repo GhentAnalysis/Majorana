@@ -150,7 +150,9 @@ namespace tools {
     bool triggerEmulatorReturned(const pat::Electron *iE);
     bool isoTriggerEmulator(const pat::Electron *iE);
     
+    float dEtaInSeed(const pat::Electron* ele);
     bool isLooseCutBasedElectronWithoutIsolation(const pat::Electron* ele);
+    bool isTightCutBasedElectronWithoutIsolation(const pat::Electron* ele);
     
     bool cleanUp(const pat::Muon* testMu,
                        std::vector<const pat::Muon* > allMu,

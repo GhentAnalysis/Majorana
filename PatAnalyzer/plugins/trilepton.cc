@@ -233,7 +233,6 @@ void trilepton::beginJob()
     outputTree->Branch("_isloose", &_isloose, "_isloose[_nLeptons]/O");
     outputTree->Branch("_ismedium", &_ismedium, "_ismedium[_nLeptons]/O");
     outputTree->Branch("_istight", &_istight, "_istight[_nLeptons]/O");
-    outputTree->Branch("_istightID", &_istightID, "_istightID[_nLeptons]/O");
  
     outputTree->Branch("_trigEmulator", &_trigEmulator, "_trigEmulator[_nLeptons]/O");
     outputTree->Branch("_isotrigEmulator", &_isotrigEmulator, "_isotrigEmulator[_nLeptons]/O");
@@ -249,10 +248,6 @@ void trilepton::beginJob()
     outputTree->Branch("_vtxFitConversion", &_vtxFitConversion, "_vtxFitConversion[_nLeptons]/O");
 
     outputTree->Branch("_mvaValue", &_mvaValue, "_mvaValue[_nLeptons]/D");
-
-    outputTree->Branch("_decayModeFinding", &_decayModeFinding, "_decayModeFinding[_nLeptons]/O");
-    outputTree->Branch("_looseMVA_dR03", &_looseMVA_dR03, "_looseMVA_dR03[_nLeptons]/O");
-    outputTree->Branch("_mediumMVA_dR03", &_mediumMVA_dR03, "_mediumMVA_dR03[_nLeptons]/O");
 
     outputTree->Branch("_passedCutBasedIdTight", &_passedCutBasedIdTight, "_passedCutBasedIdTight[_nLeptons]/O");
     outputTree->Branch("_passedCutBasedIdMedium", &_passedCutBasedIdMedium, "_passedCutBasedIdMedium[_nLeptons]/O");
@@ -966,6 +961,8 @@ void trilepton::analyze(const edm::Event& iEvent, const edm::EventSetup& iEventS
       _mvaValue[leptonCounter]               = (*electronMvaIdMap)[electronRef];
       _passedCutBasedIdTight[leptonCounter]  = (*electronCutBasedIdMapT)[electronRef];
       _passedCutBasedIdMedium[leptonCounter] = (*electronCutBasedIdMapM)[electronRef];
+      //bool crossCheckTight = tools::isTightCutBasedElectronWithoutIsolation(&*electron, false) and tools::pfRelIso(&*electron, myRhoJECJets) < (electron->isEB() ? 0.0588 : 0.0571);
+
 
       // maybe better implement cut based id though, and/or clean up this MVA cutting part
       int index                   = (electron->pt() > 10 ? 3 : 0) + (abs(electron->eta()) > 1.479 ? 2 : (abs(electron->eta()) > 0.8 ? 1 : 0 ));
