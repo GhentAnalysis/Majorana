@@ -44,13 +44,11 @@
 
 #include <iostream>
 
-// In the long run, we should get rid of these using namespace statements, this is bad coding
-//using namespace std;
-
 trilepton::trilepton(const edm::ParameterSet & iConfig) :
   genparticleToken(                      consumes<reco::GenParticleCollection>(   iConfig.getParameter<edm::InputTag>("genPartsLabel"))),
   electronMvaIdMapToken(                 consumes<edm::ValueMap<float>>(          iConfig.getParameter<edm::InputTag>("electronMvaIdMap"))),
-  electronCutBasedIdMapToken(            consumes<edm::ValueMap<float>>(          iConfig.getParameter<edm::InputTag>("electronCutBasedIdMap"))),
+  electronCutBasedIdMapTightToken(       consumes<edm::ValueMap<float>>(          iConfig.getParameter<edm::InputTag>("electronCutBasedIdTightMap"))),
+  electronCutBasedIdMapMediumToken(      consumes<edm::ValueMap<float>>(          iConfig.getParameter<edm::InputTag>("electronCutBasedIdMediumMap"))),
   pdfvariablesToken(                     consumes<GenEventInfoProduct>(           iConfig.getParameter<edm::InputTag>("pdfvariablesLabel"))),
   IT_beamspot(                           consumes<reco::BeamSpot>(                iConfig.getParameter<edm::InputTag>("BeamSpotLabel"))),
   PileUpToken(                           consumes<vector<PileupSummaryInfo>>(     iConfig.getParameter<edm::InputTag>("slimmedAddPileupInfoLabel"))),
@@ -68,6 +66,9 @@ trilepton::trilepton(const edm::ParameterSet & iConfig) :
   triggerResultsRECOToken(               consumes<edm::TriggerResults>(           iConfig.getParameter<edm::InputTag>("triggerResultsRECO"))),
   triggerPrescalesToken(                 consumes<pat::PackedTriggerPrescales>(   iConfig.getParameter<edm::InputTag>("prescales"))),
   IT_externalLHEProducer(                consumes<LHEEventProduct>(               iConfig.getParameter<edm::InputTag>("exernalLHEPLabel"))),
+  isData(                                                                         iConfig.getUntrackedParameter<bool>("isData")),
+  treeForFakeRate(                                                                iConfig.getUntrackedParameter<bool>("treeForFakeRate")),
+  SampleName(                                                                     iConfig.getUntrackedParameter<std::string>("SampleName")),
   _relIsoCutE(999.),//0.15
   _relIsoCutMu(999.),//0.15
   _relIsoCutEloose(999.), //0.5
@@ -88,9 +89,6 @@ trilepton::trilepton(const edm::ParameterSet & iConfig) :
   _tauEta(2.3),
   _regression(false)
 {
-    isData              = iConfig.getUntrackedParameter<bool>("isData") ;
-    SampleName          = iConfig.getUntrackedParameter<std::string>("SampleName") ;
-
     // eventually move this to config level
     // just a bunch of lepton triggers, might need a closer look for cleanup or additions
     triggersToSave = {"HLT_TripleMu_12_10_5", "HLT_DiMu9_Ele9_CaloIdL_TrackIdL", "HLT_Mu8_DiEle12_CaloIdL_TrackIdL", "HLT_Ele16_Ele12_Ele8_CaloIdL_TrackIdL",   // 3l
@@ -118,7 +116,8 @@ trilepton::trilepton(const edm::ParameterSet & iConfig) :
 
 void trilepton::beginJob()
 {
-    outputTree = fs->make<TTree>("trileptonTree","trileptonTree");
+    if(treeForFakeRate) outputTree = fs->make<TTree>("fakeRateTree", "fakeRateTree");
+    else                outputTree = fs->make<TTree>("trileptonTree","trileptonTree");
     Nvtx = fs->make<TH1F>("N_{vtx}", "Number of vertices;N_{vtx};events / 1"  ,    40, 0., 40.);
     
     _hCounter = fs->make<TH1D>("hCounter", "Events counter", 5,0,5);
@@ -234,7 +233,6 @@ void trilepton::beginJob()
     outputTree->Branch("_isloose", &_isloose, "_isloose[_nLeptons]/O");
     outputTree->Branch("_ismedium", &_ismedium, "_ismedium[_nLeptons]/O");
     outputTree->Branch("_istight", &_istight, "_istight[_nLeptons]/O");
-    outputTree->Branch("_istightID", &_istightID, "_istightID[_nLeptons]/O");
  
     outputTree->Branch("_trigEmulator", &_trigEmulator, "_trigEmulator[_nLeptons]/O");
     outputTree->Branch("_isotrigEmulator", &_isotrigEmulator, "_isotrigEmulator[_nLeptons]/O");
@@ -251,24 +249,10 @@ void trilepton::beginJob()
 
     outputTree->Branch("_mvaValue", &_mvaValue, "_mvaValue[_nLeptons]/D");
 
-    outputTree->Branch("_decayModeFinding", &_decayModeFinding, "_decayModeFinding[_nLeptons]/O");
-    outputTree->Branch("_looseMVA_dR03", &_looseMVA_dR03, "_looseMVA_dR03[_nLeptons]/O");
-    outputTree->Branch("_mediumMVA_dR03", &_mediumMVA_dR03, "_mediumMVA_dR03[_nLeptons]/O");
-
-    //outputTree->Branch("_decayModeFindingOldDMs", &_decayModeFindingOldDMs, "_decayModeFindingOldDMs[_nLeptons]/O");
-    outputTree->Branch("_vlooseMVAold", &_vlooseMVAold, "_vlooseMVAold[_nLeptons]/O");
-    outputTree->Branch("_looseMVAold", &_looseMVAold, "_looseMVAold[_nLeptons]/O");
-    outputTree->Branch("_mediumMVAold", &_mediumMVAold, "_mediumMVAold[_nLeptons]/O");
-    outputTree->Branch("_tightMVAold", &_tightMVAold, "_tightMVAold[_nLeptons]/O");
-    outputTree->Branch("_vtightMVAold", &_vtightMVAold, "_vtightMVAold[_nLeptons]/O");
-    
-    outputTree->Branch("_decayModeFindingNewDMs", &_decayModeFindingNewDMs, "_decayModeFindingNewDMs[_nLeptons]/O");
-    outputTree->Branch("_vlooseMVAnew", &_vlooseMVAnew, "_vlooseMVAnew[_nLeptons]/O");
-    outputTree->Branch("_looseMVAnew", &_looseMVAnew, "_looseMVAnew[_nLeptons]/O");
-    outputTree->Branch("_mediumMVAnew", &_mediumMVAnew, "_mediumMVAnew[_nLeptons]/O");
-    outputTree->Branch("_tightMVAnew", &_tightMVAnew, "_tightMVAnew[_nLeptons]/O");
-    outputTree->Branch("_vtightMVAnew", &_vtightMVAnew, "_vtightMVAnew[_nLeptons]/O");
-
+    outputTree->Branch("_passedCutBasedIdTight", &_passedCutBasedIdTight, "_passedCutBasedIdTight[_nLeptons]/O");
+    outputTree->Branch("_passedCutBasedIdMedium", &_passedCutBasedIdMedium, "_passedCutBasedIdMedium[_nLeptons]/O");
+    outputTree->Branch("_passedMVA80", &_passedMVA80, "_passedMVA80[_nLeptons]/O");
+    outputTree->Branch("_passedMVA90", &_passedMVA90, "_passedMVA90[_nLeptons]/O");
  
     outputTree->Branch("_n_PV", &_n_PV, "_n_PV/I");
     outputTree->Branch("_n_MCTruth_PV", &_n_MCTruth_PV, "_n_MCTruth_PV/D");
@@ -298,7 +282,7 @@ void trilepton::beginJob()
     outputTree->Branch("_jetE", &_jetE, "_jetE[_n_Jets]/D");
     outputTree->Branch("_csv", &_csv, "_csv[_n_Jets]/D");
     outputTree->Branch("_jetDeltaR", &_jetDeltaR, "_jetDeltaR[_n_Jets][_nLeptons]/D");
-     outputTree->Branch("_clean", &_clean, "_clean[_n_Jets]/I");
+    outputTree->Branch("_clean", &_clean, "_clean[_n_Jets]/I");
 
     // JEC
     outputTree->Branch("_jecUnc", &_jecUnc, "_jecUnc[_n_Jets]/D");
@@ -326,8 +310,6 @@ void trilepton::beginJob()
     outputTree->Branch("_mchi0", &_mchi0, "_mchi0/D");
     
     outputTree->Branch("_nMajorana", &_nMajorana, "_nMajorana/I");
-    outputTree->Branch("_passedMVA80", &_passedMVA80, "_passedMVA80[_nLeptons]/O");
-    outputTree->Branch("_passedMVA90", &_passedMVA90, "_passedMVA90[_nLeptons]/O");
     outputTree->Branch("_findMatched", &_findMatched, "_findMatched/I");
 
     // trigger
@@ -761,7 +743,8 @@ void trilepton::analyze(const edm::Event& iEvent, const edm::EventSetup& iEventS
     edm::Handle<std::vector<pat::Muon>> muons;                 iEvent.getByToken(IT_muon, muons);
     edm::Handle<edm::View<pat::Electron>> electrons;           iEvent.getByToken(IT_electron, electrons);
     edm::Handle<edm::ValueMap<float>> electronMvaIdMap;        iEvent.getByToken(electronMvaIdMapToken, electronMvaIdMap);
-    edm::Handle<edm::ValueMap<float>> electronCutBasedIdMap;   iEvent.getByToken(electronCutBasedIdMapToken, electronCutBasedIdMap);
+    edm::Handle<edm::ValueMap<float>> electronCutBasedIdMapT;  iEvent.getByToken(electronCutBasedIdMapTightToken, electronCutBasedIdMapT);
+    edm::Handle<edm::ValueMap<float>> electronCutBasedIdMapM;  iEvent.getByToken(electronCutBasedIdMapMediumToken, electronCutBasedIdMapM);
     edm::Handle<std::vector<reco::Conversion>> theConversions; iEvent.getByToken(reducedEgammaToken, theConversions);
     edm::Handle<std::vector<pat::Jet>> thePatJets;             iEvent.getByToken(IT_jet , thePatJets );
     edm::Handle<double> rhoJets;                               iEvent.getByToken(fixedGridRhoFastjetCentralNeutralToken , rhoJets);
@@ -871,64 +854,26 @@ void trilepton::analyze(const edm::Event& iEvent, const edm::EventSetup& iEventS
         sTau.push_back(&tau);
     }
     
-    SelectedJetsAll = tools::JetSelectorAll(*thePatJets, 5., 3.0);
-    std::vector<const pat::Jet*> SelectedJets = tools::JetSelector(*thePatJets, _jetPtCut, _jetEtaCut);
-
-    HT = 0.;
-    std::vector< const pat::Jet* > Bjets;
-    
-    _n_bJetsAll = 0;
-    
-    int n_bJetsAll30 = 0;
-    
-    
-    _n_Jets = 0;
-    _n_bJets = 0;
-    
-    for(unsigned int i = 0 ; i < SelectedJetsAll.size() ;i++ ){
-        
-        //double uncPt = (SelectedJetsAll[i]->correctedP4("Uncorrected")).Pt();
-        double uncEta = (SelectedJetsAll[i]->correctedP4("Uncorrected")).Eta();
-        double uncPhi = (SelectedJetsAll[i]->correctedP4("Uncorrected")).Phi();
-        
-        //double corr = fMetCorrector->getJetCorrectionRawPt(uncPt, uncEta, myRhoJets, SelectedJetsAll[i]->jetArea(),_corrLevel);
-        
-        _jetEtaAll[i] = uncEta;
-        _jetPhiAll[i] = uncPhi;
-        _jetPtAll[i] = SelectedJetsAll[i]->pt();
-        _jetEAll[i] = SelectedJetsAll[i]->energy();
-        
-        ((TLorentzVector *)_jetAllP4->At(i))->SetPtEtaPhiM( _jetPtAll[i], _jetEtaAll[i], _jetPhiAll[i], _jetEAll[i]);
-        
-        _csvAll[i] = SelectedJetsAll[i]->bDiscriminator("combinedInclusiveSecondaryVertexV2BJetTags");
-        
-        if(SelectedJetsAll[i]->bDiscriminator("combinedInclusiveSecondaryVertexV2BJetTags") > 0.814) {
-            _bTaggedAll[i] = true;
-            _n_bJetsAll++;
-            if (_jetPtAll[i] > _jetPtCut) {
-                //bIndex[n_bJetsAll30] = i;
-                n_bJetsAll30++;
-            }
-        } else _bTaggedAll[i] = false;
-        
-       
-        
+    // This are actually not really "selected" jets, it are basically all jets in the central region, only to be used for lepton variables
+    SelectedJetsAll.clear();
+    for(auto jet = thePatJets->begin(); jet != thePatJets->end(); ++jet){
+      if(jet->pt() < 5) continue;
+      if(jet->eta() > 3.0) continue;
+      SelectedJetsAll.push_back(&*jet);
     }
     _n_JetsAll = SelectedJetsAll.size();
-    
+
+
 
     /*
      * Leptons
      */
-
-
-
     int leptonCounter = 0;
  
     for(auto muon = muons->begin(); muon != muons->end(); ++muon){
       if(muon->pt() < _minPt0)   continue;
       if(abs(muon->eta()) > 2.5) continue;
-      //if(!muon->isLooseMuon())   continue;  // Store only loose muons, see https://twiki.cern.ch/twiki/bin/viewauth/CMS/SWGuideMuonIdRun2
+      if(!muon->isLooseMuon())   continue;  // Store only loose muons, see https://twiki.cern.ch/twiki/bin/viewauth/CMS/SWGuideMuonIdRun2
      
       if(muon->innerTrack().isNull()) 			continue;  // Store only when we have an innertrack
       //if(abs(muon->innerTrack()->dxy(PV)) > _looseD0Mu) continue;
@@ -1001,18 +946,23 @@ void trilepton::analyze(const edm::Event& iEvent, const edm::EventSetup& iEventS
     for(auto electron = electrons->begin(); electron != electrons->end(); ++electron){
       if (leptonCounter == 10) continue; // This will go terribly wrong when there are about 8-10 muons or more (even though this is an improbable situation)
 
-      _passedMVA80[leptonCounter] =0; // unitialized for muons? probably not a big issue though
-      _passedMVA90[leptonCounter] =0;
-      _findMatched[leptonCounter] =-1;
+      _passedCutBasedIdTight[leptonCounter] = false; // unitialized for muons? probably not a big issue though
+      _passedMVA90[leptonCounter]           = false;
+      _passedMVA80[leptonCounter]           = false;
+      _findMatched[leptonCounter]           = -1;
 
       if(electron->pt() < _minPt1) continue;
       if(abs(electron->eta()) > 2.5) continue;
       if(!electron->gsfTrack().isNonnull()) continue;
+      if(!tools::isLooseCutBasedElectronWithoutIsolation(&*electron)) continue; //only store those passing the loose cut based id, without isolation requirement
 
       // There will be a new electron MVA soon
       edm::RefToBase<pat::Electron> electronRef(edm::Ref<edm::View<pat::Electron>>(electrons, (electron - electrons->begin())));
-      _mvaValue[leptonCounter] = (*electronMvaIdMap)[electronRef];
-      // bool passCutBasedId = (*electronCutBasedIdMap)[electronRef]; // uncomment this to get the cutbased id
+      _mvaValue[leptonCounter]               = (*electronMvaIdMap)[electronRef];
+      _passedCutBasedIdTight[leptonCounter]  = (*electronCutBasedIdMapT)[electronRef];
+      _passedCutBasedIdMedium[leptonCounter] = (*electronCutBasedIdMapM)[electronRef];
+      //bool crossCheckTight = tools::isTightCutBasedElectronWithoutIsolation(&*electron, false) and tools::pfRelIso(&*electron, myRhoJECJets) < (electron->isEB() ? 0.0588 : 0.0571);
+
 
       // maybe better implement cut based id though, and/or clean up this MVA cutting part
       int index                   = (electron->pt() > 10 ? 3 : 0) + (abs(electron->eta()) > 1.479 ? 2 : (abs(electron->eta()) > 0.8 ? 1 : 0 ));
@@ -1093,7 +1043,6 @@ void trilepton::analyze(const edm::Event& iEvent, const edm::EventSetup& iEventS
     _nTau = 0;
 
    
-    if (_nEle + _nMu < 3) return;
       
     _nLeptons = leptonCounter;
    
@@ -1103,6 +1052,8 @@ void trilepton::analyze(const edm::Event& iEvent, const edm::EventSetup& iEventS
     _n_Jets = 0;
     _n_bJets = 0;
     HT = 0;
+
+    std::vector<const pat::Jet*> SelectedJets = tools::JetSelector(*thePatJets, _jetPtCut, _jetEtaCut);
     for(unsigned int i = 0 ; i < SelectedJets.size() ;i++ ){
         
 
@@ -1168,7 +1119,17 @@ void trilepton::analyze(const edm::Event& iEvent, const edm::EventSetup& iEventS
         _n_Jets++;
     }
 
-    std::cout<<_runNb<<" "<<_lumiBlock<<" "<<_eventNb<<" "<<_nMu<<" "<<_nEle<<" "<<_nTau<<" "<<_n_Jets<<" "<<_n_bJets<<std::endl;
+
+    // Here we make the decision on what to save
+    if(treeForFakeRate){
+      if(_nLeptons != 1)       return;
+      if(_n_Jets < 1)          return;				// For fake rate tree: exactly 1 lepton + at least 1 jet
+      if(_jetPt[0] < 30)       return;				// with deltaR(j, l) > 1 (back-to-back)
+      if(_jetDeltaR[0][0] < 1) return;
+    } else {
+      if(_nLeptons < 3) return;
+    }
+
     outputTree->Fill();
 }
 

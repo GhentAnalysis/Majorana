@@ -2,10 +2,12 @@ import sys
 import FWCore.ParameterSet.Config as cms
 from RecoTauTag.RecoTau.PFRecoTauQualityCuts_cfi import PFTauQualityCuts
 
-isData     = False
-inputFile  = "file:////pnfs/iihe/cms/ph/sc4/store/mc/RunIISpring16MiniAODv2/WGToLNuG_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8/MINIAODSIM/PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0_ext1-v1/90000/2A2DB2EF-C152-E611-8CB3-D4AE526A0B03.root"
-outputFile = "trilepton.root"
-nEvents    = -1
+isData          = False
+treeForFakeRate = False
+#inputFile       = "file:///user/mvit/public/Majorana/MajoranaNeutrino_trilepton_M-10_5f_NLO/Majorana_trilepton_RunIISpring16MiniAODv2_96.root"
+inputFile       = "dcap://maite.iihe.ac.be/pnfs/iihe/cms/ph/sc4/store/mc/RunIISpring16MiniAODv2/QCD_Pt-20to30_MuEnrichedPt5_TuneCUETP8M1_13TeV_pythia8/MINIAODSIM/PUSpring16RAWAODSIM_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1/50000/A218AC41-3A26-E611-AABD-02163E0139A0.root"
+outputFile      = "trilepton.root"
+nEvents         = -1
 
 
 def getVal(arg):
@@ -14,10 +16,11 @@ def getVal(arg):
 ## loop over arguments
 for i in range(1,len(sys.argv)):
     print "[arg "+str(i)+"] : ", sys.argv[i]
-    if   "isData" in sys.argv[i]: isData     = (getVal(sys.argv[i]) == "True")
-    elif "output" in sys.argv[i]: outputFile = getVal(sys.argv[i])
-    elif "input"  in sys.argv[i]: inputFile  = getVal(sys.argv[i])
-    elif "events" in sys.argv[i]: nEvents    = int(getVal(sys.argv[i]))
+    if   "isData"          in sys.argv[i]: isData          = (getVal(sys.argv[i]) == "True")
+    if   "treeForFakeRate" in sys.argv[i]: treeForFakeRate = (getVal(sys.argv[i]) == "True")
+    elif "output"          in sys.argv[i]: outputFile      = getVal(sys.argv[i])
+    elif "input"           in sys.argv[i]: inputFile       = getVal(sys.argv[i])
+    elif "events"          in sys.argv[i]: nEvents         = int(getVal(sys.argv[i]))
 
 
 
@@ -64,7 +67,8 @@ process.trileptonProducer = cms.EDAnalyzer("trilepton",
 					   isData                                 = cms.untracked.bool(isData),
 					   SampleName                             = cms.untracked.string("default"),
 					   electronMvaIdMap                       = cms.InputTag("electronMVAValueMapProducer:ElectronMVAEstimatorRun2Spring15NonTrig25nsV1Values"),
-					   electronCutBasedIdMap                  = cms.InputTag("egmGsfElectronIDs:cutBasedElectronID-Summer16-80X-V1-tight"),
+					   electronCutBasedIdTightMap             = cms.InputTag("egmGsfElectronIDs:cutBasedElectronID-Summer16-80X-V1-tight"),
+					   electronCutBasedIdMediumMap            = cms.InputTag("egmGsfElectronIDs:cutBasedElectronID-Summer16-80X-V1-medium"),
 					   genPartsLabel                          = cms.InputTag("prunedGenParticles"),
 					   pdfvariablesLabel                      = cms.InputTag("generator"),
 					   BeamSpotLabel                          = cms.InputTag("offlineBeamSpot"),
@@ -83,6 +87,7 @@ process.trileptonProducer = cms.EDAnalyzer("trilepton",
                                            triggerResultsHLT                      = cms.InputTag("TriggerResults::HLT" if isData else "TriggerResults::HLT2"), # reHLT samples have their triggers stored in HLT2
                                            triggerResultsRECO                     = cms.InputTag("TriggerResults::RECO"),
 					   exernalLHEPLabel                       = cms.InputTag("externalLHEProducer"),
+                                           treeForFakeRate                        = cms.untracked.bool(treeForFakeRate),
 					   )
 
 process.goodOfflinePrimaryVertices = cms.EDFilter("PrimaryVertexObjectFilter",

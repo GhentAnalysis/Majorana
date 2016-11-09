@@ -469,14 +469,6 @@ std::vector<const pat::Muon* > tools::effMuonSelector(const std::vector<pat::Muo
 //Muon pfRelIso
 double tools::pfRelIso(const pat::Muon *mu)
 {
-    // change to R04 for Deniz analysis
-    /*double chargedHadronIso = mu->pfIsolationR04().sumChargedHadronPt;
-    double neutralHadronIso = mu->pfIsolationR04().sumNeutralHadronEt;
-    double photonIso = mu->pfIsolationR04().sumPhotonEt;
-    double beta = mu->pfIsolationR04().sumPUPt;
-    double pfRelIsoMu  = ( chargedHadronIso + TMath::Max ( 0.0 ,neutralHadronIso + photonIso - 0.5 * beta ) )/mu->pt() ;
-    return pfRelIsoMu;*/
-	//******************** absolute isolation 
 	double chargedHadronIso = mu->pfIsolationR03().sumChargedHadronPt;
     double neutralHadronIso = mu->pfIsolationR03().sumNeutralHadronEt;
     double photonIso = mu->pfIsolationR03().sumPhotonEt;
@@ -499,13 +491,10 @@ double tools::pfAbsIso(const pat::Muon *mu)
 
 
 
-
+// TODO: clean this up
 double tools::pfRelIso(const pat::Electron *iE, double myRho)
 {
-    //double  Aeff[ 7 ] = { 0.10, 0.12, 0.085, 0.11, 0.12, 0.12, 0.13  };
-    //double  Aeff[ 7 ] = { 0.13, 0.14, 0.07, 0.09, 0.11, 0.11, 0.14  };
-    //double  Aeff[ 5 ] = { 0.1013, 0.0988, 0.0572, 0.0842, 0.1530};
-    double  Aeff[ 7 ] = { 0.1752, 0.1862, 0.1411, 0.1534, 0.1903, 0.2243, 0.2687};
+    double  Aeff[ 7 ] = { 0.1703, 0.1715, 0.1213, 0.1230, 0.1635, 0.1937, 0.2393};
 
     double CorrectedTerm=0.0;
     if( TMath::Abs( iE->superCluster()->eta() ) < 1.0                                            )   CorrectedTerm = myRho * Aeff[ 0 ];
@@ -516,46 +505,11 @@ double tools::pfRelIso(const pat::Electron *iE, double myRho)
      else if( TMath::Abs( iE->superCluster()->eta() ) > 2.3   && TMath::Abs( iE->superCluster()->eta() ) < 2.4    )   CorrectedTerm = myRho * Aeff[ 5 ];
      else  CorrectedTerm = myRho * Aeff[ 6 ];
     
-    /*if( TMath::Abs( iE->superCluster()->eta() ) < 0.8 ) CorrectedTerm = myRho * Aeff[ 0 ];
-    else if( TMath::Abs( iE->superCluster()->eta() ) < 1.3  )   CorrectedTerm = myRho * Aeff[ 1 ];
-    else if( TMath::Abs( iE->superCluster()->eta() ) < 2.0  )   CorrectedTerm = myRho * Aeff[ 2 ];
-    else if( TMath::Abs( iE->superCluster()->eta() ) < 2.2  )   CorrectedTerm = myRho * Aeff[ 3 ];
-    else  CorrectedTerm = myRho * Aeff[ 4 ];*/
-
-    /*
-    if( TMath::Abs( iE->eta() ) < 0.8 ) CorrectedTerm = myRho * Aeff[ 0 ];
-    else if( TMath::Abs( iE->eta() ) < 1.3  )   CorrectedTerm = myRho * Aeff[ 1 ];
-    else if( TMath::Abs( iE->eta() ) < 2.0  )   CorrectedTerm = myRho * Aeff[ 2 ];
-    else if( TMath::Abs( iE->eta() ) < 2.2  )   CorrectedTerm = myRho * Aeff[ 3 ];
-    else  CorrectedTerm = myRho * Aeff[ 4 ];
-    */
-
-    //double pfRelIsoE = (iE->chargedHadronIso() + TMath::Max(0.0, iE->neutralHadronIso() + iE->photonIso() - CorrectedTerm ) ) /iE->pt() ;
-     //std::cout << iE->pfIsolationVariables().sumChargedHadronPt << " " << iE->pfIsolationVariables().sumNeutralHadronEt << " " <<  iE->pfIsolationVariables().sumPhotonEt << " " << CorrectedTerm << " " << iE->pt() << std::endl ;
-
-    // Iso 0.3, 22 Jan 2016
-    cout << "Info about iso: " << iE->pfIsolationVariables().sumChargedHadronPt << " " << iE->pfIsolationVariables().sumNeutralHadronEt << " " << iE->pfIsolationVariables().sumPhotonEt << " " << CorrectedTerm << endl; 
-    double pfRelIsoE = (iE->pfIsolationVariables().sumChargedHadronPt + TMath::Max(0.0, iE->pfIsolationVariables().sumNeutralHadronEt + iE->pfIsolationVariables().sumPhotonEt - CorrectedTerm ) )/iE->pt();
-
-    return pfRelIsoE;
-
-     /* Iso 0.4, 22 Jan 2016
-    double chargedHadronIso = iE->chargedHadronIso();
-    double neutralHadronIso = iE->neutralHadronIso();
-    double photonIso = iE->photonIso();
-    //double beta = mu->pfIsolationR03().sumPUPt;
-    
-    double pfRelIsoE = (chargedHadronIso + TMath::Max(0.0, neutralHadronIso + photonIso - CorrectedTerm/(0.3 * 0.3 / (0.4 * 0.4)) ) ) / iE->pt() ;
-    
-    return pfRelIsoE;
-    */
+    return (iE->pfIsolationVariables().sumChargedHadronPt + TMath::Max(0.0, iE->pfIsolationVariables().sumNeutralHadronEt + iE->pfIsolationVariables().sumPhotonEt - CorrectedTerm ) )/iE->pt();
 }
 double tools::pfAbsIso(const pat::Electron *iE, double myRho)
 {
-    //double  Aeff[ 7 ] = { 0.10, 0.12, 0.085, 0.11, 0.12, 0.12, 0.13  };
-    //double  Aeff[ 7 ] = { 0.13, 0.14, 0.07, 0.09, 0.11, 0.11, 0.14  };
-    //double  Aeff[ 5 ] = { 0.1013, 0.0988, 0.0572, 0.0842, 0.1530};
-    double  Aeff[ 7 ] = { 0.1752, 0.1862, 0.1411, 0.1534, 0.1903, 0.2243, 0.2687};
+    double  Aeff[ 7 ] = { 0.1703, 0.1715, 0.1213, 0.1230, 0.1635, 0.1937, 0.2393};
 
     double CorrectedTerm=0.0;
     if( TMath::Abs( iE->superCluster()->eta() ) < 1.0                                            )   CorrectedTerm = myRho * Aeff[ 0 ];
@@ -566,77 +520,9 @@ double tools::pfAbsIso(const pat::Electron *iE, double myRho)
      else if( TMath::Abs( iE->superCluster()->eta() ) > 2.3   && TMath::Abs( iE->superCluster()->eta() ) < 2.4    )   CorrectedTerm = myRho * Aeff[ 5 ];
      else  CorrectedTerm = myRho * Aeff[ 6 ];
     
-    /*if( TMath::Abs( iE->superCluster()->eta() ) < 0.8 ) CorrectedTerm = myRho * Aeff[ 0 ];
-    else if( TMath::Abs( iE->superCluster()->eta() ) < 1.3  )   CorrectedTerm = myRho * Aeff[ 1 ];
-    else if( TMath::Abs( iE->superCluster()->eta() ) < 2.0  )   CorrectedTerm = myRho * Aeff[ 2 ];
-    else if( TMath::Abs( iE->superCluster()->eta() ) < 2.2  )   CorrectedTerm = myRho * Aeff[ 3 ];
-    else  CorrectedTerm = myRho * Aeff[ 4 ];*/
-
-    /*
-    if( TMath::Abs( iE->eta() ) < 0.8 ) CorrectedTerm = myRho * Aeff[ 0 ];
-    else if( TMath::Abs( iE->eta() ) < 1.3  )   CorrectedTerm = myRho * Aeff[ 1 ];
-    else if( TMath::Abs( iE->eta() ) < 2.0  )   CorrectedTerm = myRho * Aeff[ 2 ];
-    else if( TMath::Abs( iE->eta() ) < 2.2  )   CorrectedTerm = myRho * Aeff[ 3 ];
-    else  CorrectedTerm = myRho * Aeff[ 4 ];
-    */
-
-    //double pfRelIsoE = (iE->chargedHadronIso() + TMath::Max(0.0, iE->neutralHadronIso() + iE->photonIso() - CorrectedTerm ) ) /iE->pt() ;
-     //std::cout << iE->pfIsolationVariables().sumChargedHadronPt << " " << iE->pfIsolationVariables().sumNeutralHadronEt << " " <<  iE->pfIsolationVariables().sumPhotonEt << " " << CorrectedTerm << " " << iE->pt() << std::endl ;
-
-    // Iso 0.3, 22 Jan 2016
-    cout << "Info about iso: " << iE->pfIsolationVariables().sumChargedHadronPt << " " << iE->pfIsolationVariables().sumNeutralHadronEt << " " << iE->pfIsolationVariables().sumPhotonEt << " " << CorrectedTerm << endl; 
-    double pfRelIsoE = (iE->pfIsolationVariables().sumChargedHadronPt + TMath::Max(0.0, iE->pfIsolationVariables().sumNeutralHadronEt + iE->pfIsolationVariables().sumPhotonEt - CorrectedTerm ) );
-
-    return pfRelIsoE;
-
-     /* Iso 0.4, 22 Jan 2016
-    double chargedHadronIso = iE->chargedHadronIso();
-    double neutralHadronIso = iE->neutralHadronIso();
-    double photonIso = iE->photonIso();
-    //double beta = mu->pfIsolationR03().sumPUPt;
-    
-    double pfRelIsoE = (chargedHadronIso + TMath::Max(0.0, neutralHadronIso + photonIso - CorrectedTerm/(0.3 * 0.3 / (0.4 * 0.4)) ) ) / iE->pt() ;
-    
-    return pfRelIsoE;
-    */
+    return (iE->pfIsolationVariables().sumChargedHadronPt + TMath::Max(0.0, iE->pfIsolationVariables().sumNeutralHadronEt + iE->pfIsolationVariables().sumPhotonEt - CorrectedTerm ) );
 }
 
-
-/*
-double tools::pfRelIso(const edm::Ptr<reco::GsfElectron> iE, double myRho)
-{
-    //double  Aeff[ 7 ] = { 0.10, 0.12, 0.085, 0.11, 0.12, 0.12, 0.13  };
-    //double  Aeff[ 5 ] = { 0.1013, 0.0988, 0.0572, 0.0842, 0.1530};
-
-    double  Aeff[ 7 ] = { 0.1752, 0.1862, 0.1411, 0.1534, 0.1903, 0.2243, 0.2687};
-    double CorrectedTerm=0.0;
-    if( TMath::Abs( iE->eta() ) < 1.0                                            )   CorrectedTerm = myRho * Aeff[ 0 ];
-     else if( TMath::Abs( iE->eta() ) > 1.0   && TMath::Abs( iE->eta() ) < 1.479  )   CorrectedTerm = myRho * Aeff[ 1 ];
-     else if( TMath::Abs( iE->eta() ) > 1.479 && TMath::Abs( iE->eta() ) < 2.0    )   CorrectedTerm = myRho * Aeff[ 2 ];
-     else if( TMath::Abs( iE->eta() ) > 2.0   && TMath::Abs( iE->eta() ) < 2.2    )   CorrectedTerm = myRho * Aeff[ 3 ];
-     else if( TMath::Abs( iE->eta() ) > 2.2   && TMath::Abs( iE->eta() ) < 2.3    )   CorrectedTerm = myRho * Aeff[ 4 ];
-     else if( TMath::Abs( iE->eta() ) > 2.3   && TMath::Abs( iE->eta() ) < 2.4    )   CorrectedTerm = myRho * Aeff[ 5 ];
-    else CorrectedTerm = myRho * Aeff[6];
-    
-    if( TMath::Abs( iE->superCluster()->eta() ) < 0.8 ) CorrectedTerm = myRho * Aeff[ 0 ];
-    else if( TMath::Abs( iE->superCluster()->eta() ) < 1.3  )   CorrectedTerm = myRho * Aeff[ 1 ];
-    else if( TMath::Abs( iE->superCluster()->eta() ) < 2.0  )   CorrectedTerm = myRho * Aeff[ 2 ];
-    else if( TMath::Abs( iE->superCluster()->eta() ) < 2.2  )   CorrectedTerm = myRho * Aeff[ 3 ];
-    else  CorrectedTerm = myRho * Aeff[ 4 ];
-
-
-    if( TMath::Abs( iE->eta() ) < 0.8 ) CorrectedTerm = myRho * Aeff[ 0 ];
-    else if( TMath::Abs( iE->eta() ) < 1.3  )   CorrectedTerm = myRho * Aeff[ 1 ];
-    else if( TMath::Abs( iE->eta() ) < 2.0  )   CorrectedTerm = myRho * Aeff[ 2 ];
-    else if( TMath::Abs( iE->eta() ) < 2.2  )   CorrectedTerm = myRho * Aeff[ 3 ];
-    else  CorrectedTerm = myRho * Aeff[ 4 ];
-
-    //double pfRelIsoE = (iE->chargedHadronIso() + TMath::Max(0.0, iE->neutralHadronIso() + iE->photonIso() - CorrectedTerm ) ) /iE->pt() ;
-    double pfRelIsoE = (iE->pfIsolationVariables().sumChargedHadronPt + TMath::Max(0.0, iE->pfIsolationVariables().sumNeutralHadronEt + iE->pfIsolationVariables().sumPhotonEt - CorrectedTerm ) ) /iE->pt() ;
-
-    return pfRelIsoE;
-}
-*/
 
 double tools::pfRelIso(const pat::Muon *mu, double myRho)
 {
@@ -725,374 +611,41 @@ bool tools::isoTriggerEmulator(const pat::Electron *iE) {
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-//Muon Selector
-
-std::vector<const pat::Muon* > tools::fakeMuonSelector(const std::vector<pat::Muon>  & thePatMuons,
-                                                      double v_muon_pt,
-                                                      reco::Vertex::Point PV,
-                                                      double v_muon_d0)
-{
-    double v_muon_eta = 2.4;
-    //double v_muon_dz = 0.2;
-    
-    int v_muon_numberOfMatchedStations = 2;
-    int v_muon_nPixelValidHits = 1;
-    int v_muon_numberOfValidMuonHits = 1;
-    int v_muon_nValidHits = 6;
-    double v_muon_chi2Norm = 10.;
-    
-    std::vector<const pat::Muon* > vMuons;
-    for( std::vector<pat::Muon>::const_iterator mu = thePatMuons.begin() ; mu != thePatMuons.end() ; mu++ ) {
-        if ( mu->pt() < v_muon_pt ) continue;
-        if ( TMath::Abs( mu->eta() ) > v_muon_eta ) continue;
-        //if ( !mu->isTrackerMuon() ) continue;
-        if ( !mu->isGlobalMuon()  ) continue;
-        if ( !mu->isPFMuon() ) continue;
-        if ( mu->numberOfMatchedStations() < v_muon_numberOfMatchedStations ) continue;   //we should add this to skim
-        
-        const reco::TrackRef innerTrack = mu->innerTrack();
-        if( innerTrack.isNull() ) continue;
-        if( innerTrack->hitPattern().trackerLayersWithMeasurement() < v_muon_nValidHits ) continue;
-        if( innerTrack->hitPattern().numberOfValidPixelHits() < v_muon_nPixelValidHits  ) continue;
-        
-        const reco::TrackRef globalTrack = mu->globalTrack() ;
-        if( globalTrack.isNull() ) continue;
-        if( globalTrack->normalizedChi2() > v_muon_chi2Norm ) continue;
-        if( globalTrack->hitPattern().numberOfValidMuonHits() < v_muon_numberOfValidMuonHits ) continue;
-        
-        if(TMath::Abs(innerTrack->dxy(PV)) > v_muon_d0  ) continue;
-        //if(TMath::Abs(innerTrack->dz(PV)) > v_muon_dz  ) continue;
-        
-        vMuons.push_back(&*mu);
-    }
-    
-    return vMuons;
+float tools::dEtaInSeed(const pat::Electron* ele){
+  if(ele->superCluster().isNonnull() and ele->superCluster()->seed().isNonnull()) return ele->deltaEtaSuperClusterTrackAtVtx() - ele->superCluster()->eta() + ele->superCluster()->seed()->eta();
+  else                                                                            return std::numeric_limits<float>::max();
 }
 
-std::vector<const pat::Muon* > tools::ewkMuonSelector(const std::vector<pat::Muon>  & thePatMuons,
-                                                      double v_muon_pt,
-                                                      reco::Vertex::Point PV,
-                                                      double v_muon_d0)
-{
-    double v_muon_eta = 2.4;
-    //double v_muon_dz = 0.2; <2012
-    double v_muon_dz = 0.5;
-    
-    int v_muon_numberOfMatchedStations = 2;
-    int v_muon_nPixelValidHits = 1;
-    int v_muon_numberOfValidMuonHits = 1;
-    int v_muon_nValidHits = 6;
-    double v_muon_chi2Norm = 10.;
-        
-    std::vector<const pat::Muon* > vMuons;
-    for( std::vector<pat::Muon>::const_iterator mu = thePatMuons.begin() ; mu != thePatMuons.end() ; mu++ ) {
-        if ( mu->pt() < v_muon_pt ) continue;
-        if ( TMath::Abs( mu->eta() ) > v_muon_eta ) continue;
-        //if ( !mu->isTrackerMuon() ) continue;
-        if ( !mu->isGlobalMuon()  ) continue;
-        if ( !mu->isPFMuon() ) continue;
-        if ( mu->numberOfMatchedStations() < v_muon_numberOfMatchedStations ) continue;   //we should add this to skim
-        
-        const reco::TrackRef innerTrack = mu->innerTrack();
-        if( innerTrack.isNull() ) continue;
-        if( innerTrack->hitPattern().trackerLayersWithMeasurement() < v_muon_nValidHits ) continue;
-        if( innerTrack->hitPattern().numberOfValidPixelHits() < v_muon_nPixelValidHits  ) continue;
-        
-        const reco::TrackRef globalTrack = mu->globalTrack() ;
-        if( globalTrack.isNull() ) continue;
-        if( globalTrack->normalizedChi2() > v_muon_chi2Norm ) continue;
-        if( globalTrack->hitPattern().numberOfValidMuonHits() < v_muon_numberOfValidMuonHits ) continue;
+bool tools::isLooseCutBasedElectronWithoutIsolation(const pat::Electron* ele){
+    if(not (ele->isEB() or ele->isEE())) return false;
 
-        if(TMath::Abs(innerTrack->dxy(PV)) > v_muon_d0  ) continue;
-        if(TMath::Abs(innerTrack->dz(PV)) > v_muon_dz  ) continue;
-        
-        vMuons.push_back(&*mu);
-    }
-    
-    return vMuons;
+    float eInvMinusPInv = std::abs(1.0 - ele->eSuperClusterOverP())/ele->ecalEnergy();
+
+    if(ele->full5x5_sigmaIetaIeta()               >= (ele->isEB() ? 0.11    : 0.0314 ))       return false;
+    if(abs(dEtaInSeed(ele))                       >= (ele->isEB() ? 0.00477 : 0.00868))       return false;
+    if(abs(ele->deltaPhiSuperClusterTrackAtVtx()) >= (ele->isEB() ? 0.222   : 0.213  ))       return false;
+    if(ele->hadronicOverEm()                      >= (ele->isEB() ? 0.298   : 0.101  ))       return false;
+    if(eInvMinusPInv                              >= (ele->isEB() ? 0.241   : 0.14   ))       return false;
+    if(ele->gsfTrack()->hitPattern().numberOfHits(reco::HitPattern::MISSING_INNER_HITS) >  1) return false;
+    if(not ele->passConversionVeto())                                                         return false;
+    return true;
 }
 
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//Electron Selector
-std::vector<const pat::Electron* > tools::ewkElectronSelector(const std::vector<pat::Electron>  & thePatElectrons,
-                                                              double v_electron_pt,
-                                                              reco::Vertex::Point PV,
-                                                              double v_electron_d0,
-                                                              bool bool_electron_chargeConsistency,
-                                                              edm::Handle< std::vector<reco::Conversion> > &theConversions,
-                                                              reco::BeamSpot::Point BS)
-{
-    double v_electron_dz = 0.2;
-    //bool bool_electron_ecalDriven = true;
-    double v_electron_eta=2.4;
-    
-    std::vector<const pat::Electron* > vElectrons;
-    for( std::vector<pat::Electron>::const_iterator el = thePatElectrons.begin() ; el != thePatElectrons.end() ; el++ )
-	{
-        const reco::GsfTrackRef gsfTrack = el->gsfTrack();
-        if (!gsfTrack.isNonnull()) {
-            continue;
-        } 
-     /*   std::cout<<TMath::Abs(el->eta())<<std::endl;
-        std::cout<<TMath::Abs(el->superCluster()->eta())<<std::endl;
-        std::cout<<el->pt()<<std::endl;
-        std::cout<<TMath::Abs(gsfTrack->dxy(PV))<<std::endl;
-        std::cout<<TMath::Abs(gsfTrack->dz(PV))<<std::endl;
-        std::cout<<TMath::Abs(1.0/el->ecalEnergy() - el->eSuperClusterOverP()/el->ecalEnergy())<<std::endl;
-        std::cout<<"Conversion  "<<ConversionTools::hasMatchedConversion(reco::GsfElectron (*el), theConversions, BS)<<std::endl;
-        std::cout<<gsfTrack->trackerExpectedHitsInner().numberOfHits()<<std::endl;
-        
-        std::cout<<"********"<<std::endl;*/
-        
-        if( el->pt() < v_electron_pt ) continue;
-        if( TMath::Abs(el->eta()) > v_electron_eta ) continue;
-        if( TMath::Abs(el->superCluster()->eta()) < 1.566 &&  TMath::Abs(el->superCluster()->eta()) > 1.4442 ) continue;
-        //if( bool_electron_ecalDriven && !el->ecalDrivenSeed() ) continue;
-        //if (!el->trackerDrivenSeed() ) continue;
+// It has been checked that (this + isolation cut) == cutBasedElectronID-Summer16-80X-V1-tight 
+bool tools::isTightCutBasedElectronWithoutIsolation(const pat::Electron* ele){
+    if(not (ele->isEB() or ele->isEE())) return false;
 
-        if( TMath::Abs(gsfTrack->dxy(PV)) > v_electron_d0  )  continue;
-        if( TMath::Abs(gsfTrack->dz(PV))  > v_electron_dz  ) continue;
-
-        if( bool_electron_chargeConsistency && !el->isGsfCtfScPixChargeConsistent() )  continue;
-        
-        //if( el->pt() < 20. )
-	    //{
-        //    if( ! ( el->fbrem() > 0.15 || ( TMath::Abs( el->superCluster()->eta() ) < 1.0 && el->eSuperClusterOverP() > 0.95 ) ) ) continue;
-	    //}
-        
-        
-        //if( TMath::Fabs(( 1./ el->trackMomentumAtVtx().p() ) - ( 1./ el->ecalEnergy() ) ) > 0.05 ) continue;
-        if( TMath::Abs(1.0/el->ecalEnergy() - el->eSuperClusterOverP()/el->ecalEnergy()) > 0.05 ) continue;
-    
-        bool vtxFitConversion = ConversionTools::hasMatchedConversion(reco::GsfElectron (*el), theConversions, BS);
-        if( vtxFitConversion )  continue;
-                
-        //if( gsfTrack->trackerExpectedHitsInner().numberOfHits() > 1 ) continue;
-        if( gsfTrack->hitPattern().numberOfHits(reco::HitPattern::MISSING_INNER_HITS) > 1 ) continue;
-
-        if( TMath::Abs( el->eta()) < 1.5  )
-	    {
-            if( TMath::Abs(el->deltaPhiSuperClusterTrackAtVtx()) > 0.15  ) continue;
-            if( TMath::Abs(el->deltaEtaSuperClusterTrackAtVtx()) > 0.007 ) continue;
-            if( TMath::Abs(el->scSigmaIEtaIEta()) > 0.01 ) continue;
-            if( TMath::Abs(el->hadronicOverEm())  > 0.12  ) continue;  //recommended is 0.12 but HLT applies 0.1
-        }
-        else if( TMath::Abs( el->eta() ) < 2.4 )
-	    {
-            if( TMath::Abs(el->deltaPhiSuperClusterTrackAtVtx()) > 0.10 ) continue;
-            if( TMath::Abs(el->deltaEtaSuperClusterTrackAtVtx()) > 0.009 ) continue;
-            if( TMath::Abs(el->scSigmaIEtaIEta()) > 0.03 ) continue;
-            if( TMath::Abs(el->hadronicOverEm()) > 0.10 ) continue;   /// at the HLT 0.075  recommended is 0.1
-        }
-        
-        vElectrons.push_back(&*el );
-	}
-    return vElectrons;
+    float eInvMinusPInv = std::abs(1.0 - ele->eSuperClusterOverP())/ele->ecalEnergy();
+    if(ele->full5x5_sigmaIetaIeta()               >= (ele->isEB() ? 0.00998 : 0.0292))        return false;
+    if(abs(dEtaInSeed(ele))                       >= (ele->isEB() ? 0.00308 : 0.00605))       return false;
+    if(abs(ele->deltaPhiSuperClusterTrackAtVtx()) >= (ele->isEB() ? 0.0816  : 0.0394))        return false;
+    if(ele->hadronicOverEm()                      >= (ele->isEB() ? 0.0414  : 0.0641))        return false;
+    if(eInvMinusPInv                              >= (ele->isEB() ? 0.0129  : 0.0129))        return false;
+    if(ele->gsfTrack()->hitPattern().numberOfHits(reco::HitPattern::MISSING_INNER_HITS) >  1) return false;
+    if(not ele->passConversionVeto())                                                         return false;
+    return true;
 }
 
-
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//Electron Selector
-std::vector<const pat::Electron* > tools::fakeElectronSelector(const std::vector<pat::Electron>  & thePatElectrons,
-                                                              double v_electron_pt,
-                                                              reco::Vertex::Point PV,
-                                                              double v_electron_d0,
-                                                              bool bool_electron_chargeConsistency,
-                                                              edm::Handle< std::vector<reco::Conversion> > &theConversions,
-                                                              reco::BeamSpot::Point BS)
-{
-    double v_electron_dz = 0.1;
-    double v_electron_eta=2.5;
-    
-    std::vector<const pat::Electron* > vElectrons;
-    for( std::vector<pat::Electron>::const_iterator el = thePatElectrons.begin() ; el != thePatElectrons.end() ; el++ )
-	{
-        const reco::GsfTrackRef gsfTrack = el->gsfTrack();
-        if (!gsfTrack.isNonnull()) {
-            continue;
-        }
-        /*   std::cout<<TMath::Abs(el->eta())<<std::endl;
-         std::cout<<TMath::Abs(el->superCluster()->eta())<<std::endl;
-         std::cout<<el->pt()<<std::endl;
-         std::cout<<TMath::Abs(gsfTrack->dxy(PV))<<std::endl;
-         std::cout<<TMath::Abs(gsfTrack->dz(PV))<<std::endl;
-         std::cout<<TMath::Abs(1.0/el->ecalEnergy() - el->eSuperClusterOverP()/el->ecalEnergy())<<std::endl;
-         std::cout<<"Conversion  "<<ConversionTools::hasMatchedConversion(reco::GsfElectron (*el), theConversions, BS)<<std::endl;
-         std::cout<<gsfTrack->trackerExpectedHitsInner().numberOfHits()<<std::endl;
-         
-         std::cout<<"********"<<std::endl;*/
-        
-        if( el->pt() < v_electron_pt ) continue;
-        
-        //std::cout<<TMath::Abs(el->eta())<<std::endl;
-        
-        if( TMath::Abs(el->eta()) > v_electron_eta ) continue;
-        //if( TMath::Abs(el->superCluster()->eta()) < 1.566 &&  TMath::Abs(el->superCluster()->eta()) > 1.4442 ) continue;
-
-        //std::cout<<TMath::Abs(gsfTrack->dxy(PV))<<std::endl;
-        //std::cout<<TMath::Abs(gsfTrack->dz(PV))<<std::endl;
-
-        
-        if( TMath::Abs(gsfTrack->dxy(PV)) > v_electron_d0  )  continue;
-        if( TMath::Abs(gsfTrack->dz(PV))  > v_electron_dz  ) continue;
-        
-        if( bool_electron_chargeConsistency && !el->isGsfCtfScPixChargeConsistent() )  continue;
-        
-        //if( el->pt() < 20. )
-	    //{
-        //    if( ! ( el->fbrem() > 0.15 || ( TMath::Abs( el->superCluster()->eta() ) < 1.0 && el->eSuperClusterOverP() > 0.95 ) ) ) continue;
-	    //}
-        
-        
-        //if( TMath::Fabs(( 1./ el->trackMomentumAtVtx().p() ) - ( 1./ el->ecalEnergy() ) ) > 0.05 ) continue;
-
-        //std::cout<<TMath::Abs(1.0/el->ecalEnergy() - el->eSuperClusterOverP()/el->ecalEnergy())<<std::endl;
-
-        if( TMath::Abs(1.0/el->ecalEnergy() - el->eSuperClusterOverP()/el->ecalEnergy()) > 0.05 ) continue;
-        
-        bool vtxFitConversion = ConversionTools::hasMatchedConversion(reco::GsfElectron (*el), theConversions, BS);
-        //std::cout<<vtxFitConversion<<std::endl;
-        if( vtxFitConversion )  continue;
-        //std::cout<<gsfTrack->trackerExpectedHitsInner().numberOfHits()<<std::endl;
-        
-        //if( gsfTrack->trackerExpectedHitsInner().numberOfHits() > 0 ) continue;
-        if( gsfTrack->hitPattern().numberOfHits(reco::HitPattern::MISSING_INNER_HITS) > 0 ) continue;
-
-        if( TMath::Abs( el->superCluster()->eta()) < 1.479  )
-	    {
-            if( TMath::Abs(el->deltaPhiSuperClusterTrackAtVtx()) > 0.06  ) continue;
-            if( TMath::Abs(el->deltaEtaSuperClusterTrackAtVtx()) > 0.004 ) continue;
-            if( TMath::Abs(el->scSigmaIEtaIEta()) > 0.01 ) continue;
-            if( TMath::Abs(el->hadronicOverEm())  > 0.12  ) continue;  //recommended is 0.12 but HLT applies 0.1
-        }
-        else //if( TMath::Abs( el->superCluster()->eta() ) < v_electron_eta )
-	    {
-            if( TMath::Abs(el->deltaPhiSuperClusterTrackAtVtx()) > 0.03 ) continue;
-            if( TMath::Abs(el->deltaEtaSuperClusterTrackAtVtx()) > 0.007 ) continue;
-            if( TMath::Abs(el->scSigmaIEtaIEta()) > 0.03 ) continue;
-            if( TMath::Abs(el->hadronicOverEm()) > 0.10 ) continue;   /// at the HLT 0.075  recommended is 0.1
-        }
-        
-        vElectrons.push_back(&*el );
-	}
-    return vElectrons;
-}
-
-
-std::vector<const pat::Electron* > tools::phys14LooseElectronSelector(const std::vector<pat::Electron>  & thePatElectrons,
-                                                               double v_electron_pt,
-                                                               reco::Vertex::Point PV,
-                                                               double v_electron_d0,
-                                                               bool bool_electron_chargeConsistency,
-                                                               edm::Handle< std::vector<reco::Conversion> > &theConversions,
-                                                               reco::BeamSpot::Point BS)
-{
-    //double v_electron_dz = 0.54342;
-    double v_electron_eta=2.5;
-    
-    std::vector<const pat::Electron* > vElectrons;
-    for( std::vector<pat::Electron>::const_iterator el = thePatElectrons.begin() ; el != thePatElectrons.end() ; el++ )
-    {
-        const reco::GsfTrackRef gsfTrack = el->gsfTrack();
-        if (!gsfTrack.isNonnull()) {
-            continue;
-        }
-        if( el->pt() < v_electron_pt ) continue;
-
-        if( TMath::Abs(el->eta()) > v_electron_eta ) continue;
-        
-        if( TMath::Abs(gsfTrack->dxy(PV)) > v_electron_d0  )  continue;
-        
-        if( bool_electron_chargeConsistency && !el->isGsfCtfScPixChargeConsistent() )  continue;
-        
-        bool vtxFitConversion = ConversionTools::hasMatchedConversion(reco::GsfElectron (*el), theConversions, BS);
-        if( vtxFitConversion )  continue;
-
-        //if( gsfTrack->trackerExpectedHitsInner().numberOfHits() > 1 ) continue;
-        if( gsfTrack->hitPattern().numberOfHits(reco::HitPattern::MISSING_INNER_HITS) > 0 ) continue;
-
-        if( TMath::Abs( el->superCluster()->eta()) < 1.479  )
-        {
-            if( TMath::Abs(el->deltaPhiSuperClusterTrackAtVtx()) > 0.072624  ) continue;
-            if( TMath::Abs(el->deltaEtaSuperClusterTrackAtVtx()) > 0.012442 ) continue;
-            if( TMath::Abs(el->scSigmaIEtaIEta()) > 0.010557 ) continue;
-            if( TMath::Abs(el->hadronicOverEm())  > 0.121476  ) continue;  //recommended is 0.12 but HLT applies 0.1
-            if( TMath::Abs(1.0/el->ecalEnergy() - el->eSuperClusterOverP()/el->ecalEnergy()) > 0.221803 ) continue;
-            if( TMath::Abs(gsfTrack->dz(PV))  > 0.173670  ) continue;
-        }
-        else //if( TMath::Abs( el->superCluster()->eta() ) < v_electron_eta )
-        {
-            if( TMath::Abs(el->deltaPhiSuperClusterTrackAtVtx()) > 0.145129 ) continue;
-            if( TMath::Abs(el->deltaEtaSuperClusterTrackAtVtx()) > 0.010654 ) continue;
-            if( TMath::Abs(el->scSigmaIEtaIEta()) > 0.032602 ) continue;
-            if( TMath::Abs(el->hadronicOverEm()) > 0.131862 ) continue;   /// at the HLT 0.075  recommended is 0.1
-            if( TMath::Abs(1.0/el->ecalEnergy() - el->eSuperClusterOverP()/el->ecalEnergy()) > 0.142283 ) continue;
-            if( TMath::Abs(gsfTrack->dz(PV))  > 0.198444  ) continue;
-        }
-        
-        vElectrons.push_back(&*el );
-    }
-    return vElectrons;
-}
-
-std::vector<const pat::Electron* > tools::csa14MediumElectronSelector(const std::vector<pat::Electron>  & thePatElectrons,
-                                                                     double v_electron_pt,
-                                                                     reco::Vertex::Point PV,
-                                                                     double v_electron_d0,
-                                                                     bool bool_electron_chargeConsistency,
-                                                                     edm::Handle< std::vector<reco::Conversion> > &theConversions,
-                                                                     reco::BeamSpot::Point BS)
-{
-    //double v_electron_dz = 0.54342;
-    double v_electron_eta=2.5;
-    
-    std::vector<const pat::Electron* > vElectrons;
-    for( std::vector<pat::Electron>::const_iterator el = thePatElectrons.begin() ; el != thePatElectrons.end() ; el++ )
-    {
-        const reco::GsfTrackRef gsfTrack = el->gsfTrack();
-        if (!gsfTrack.isNonnull()) {
-            continue;
-        }
-        if( el->pt() < v_electron_pt ) continue;
-        
-        if( TMath::Abs(el->eta()) > v_electron_eta ) continue;
-        
-        if( TMath::Abs(gsfTrack->dxy(PV)) > v_electron_d0  )  continue;
-        
-        if( bool_electron_chargeConsistency && !el->isGsfCtfScPixChargeConsistent() )  continue;
-        
-        bool vtxFitConversion = ConversionTools::hasMatchedConversion(reco::GsfElectron (*el), theConversions, BS);
-        if( vtxFitConversion )  continue;
-        
-        //if( gsfTrack->trackerExpectedHitsInner().numberOfHits() > 0 ) continue;
-        if( gsfTrack->hitPattern().numberOfHits(reco::HitPattern::MISSING_INNER_HITS) > 0 ) continue;
-
-        
-        if( TMath::Abs( el->superCluster()->eta()) < 1.479  )
-        {
-            if( TMath::Abs(el->deltaPhiSuperClusterTrackAtVtx()) > 0.0323  ) continue;
-            if( TMath::Abs(el->deltaEtaSuperClusterTrackAtVtx()) > 0.0106 ) continue;
-            if( TMath::Abs(el->scSigmaIEtaIEta()) > 0.0107 ) continue;
-            if( TMath::Abs(el->hadronicOverEm())  > 0.067  ) continue;  //recommended is 0.12 but HLT applies 0.1
-            if( TMath::Abs(1.0/el->ecalEnergy() - el->eSuperClusterOverP()/el->ecalEnergy()) > 0.1043 ) continue;
-            if( TMath::Abs(gsfTrack->dz(PV))  > 0.22310  ) continue;
-        }
-        else //if( TMath::Abs( el->superCluster()->eta() ) < v_electron_eta )
-        {
-            if( TMath::Abs(el->deltaPhiSuperClusterTrackAtVtx()) > 0.0455 ) continue;
-            if( TMath::Abs(el->deltaEtaSuperClusterTrackAtVtx()) > 0.0108 ) continue;
-            if( TMath::Abs(el->scSigmaIEtaIEta()) > 0.0318 ) continue;
-            if( TMath::Abs(el->hadronicOverEm()) > 0.097 ) continue;   /// at the HLT 0.075  recommended is 0.1
-            if( TMath::Abs(1.0/el->ecalEnergy() - el->eSuperClusterOverP()/el->ecalEnergy()) > 0.1201 ) continue;
-            if( TMath::Abs(gsfTrack->dz(PV))  > 0.7523  ) continue;
-        }
-        
-        vElectrons.push_back(&*el );
-    }
-    return vElectrons;
-}
 //
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -1110,51 +663,6 @@ double tools::Tau_dz(ROOT::Math::PositionVector3D<ROOT::Math::Cartesian3D<double
     return dz;
 
 }
-
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-std::vector<const pat::Jet* > tools::JetSelectorAll(const std::vector<pat::Jet>  & thePatJets,
-                                                 double  v_jet_pt,
-                                                 double  v_jet_eta)
-{
-    bool    bool_jet_id = false;
-    
-    std::vector< const pat::Jet* > vJets;
-    
-    for( std::vector<pat::Jet>::const_iterator jet = thePatJets.begin(); jet != thePatJets.end(); jet++ )
-	{
-
-        
-        if( jet->pt() < v_jet_pt )continue;
-        if( TMath::Abs( jet->eta() ) > v_jet_eta) continue;
-        if( bool_jet_id )
-	    {
-            if( jet->neutralHadronEnergyFraction() >= 0.99 ) continue;
-            if( jet->neutralEmEnergyFraction() >= 0.99 ) continue;
-            //if( ( jet->neutralHadronMultiplicity() + jet->chargedHadronMultiplicity() ) < 2 ) continue;
-            if( ( jet->neutralHadronMultiplicity() + jet->chargedHadronMultiplicity() + jet->photonMultiplicity() ) < 2 ) continue;
-            if( TMath::Abs( jet->eta() ) < 2.4 )
-            {
-                if( jet->chargedHadronEnergyFraction() == 0. ) continue;
-                if( jet->chargedEmEnergyFraction() >= 0.99 ) continue;
-                if( jet->chargedMultiplicity() == 0 ) continue;
-            }
-	    }
-        vJets.push_back( &*jet );
-        
-        /*unsigned int nConst = jet->getPFConstituents().size();
-         std::cout<<"Number of constituents "<<nConst<<std::endl;
-         for (unsigned int i=0; i!=nConst; ++i) {
-         std::cout<<jet->getPFConstituent(i)->reco::LeafCandidate::vz()<<std::endl;
-         }*/
-        
-        
-    }
-    return vJets;
-}
-
-
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

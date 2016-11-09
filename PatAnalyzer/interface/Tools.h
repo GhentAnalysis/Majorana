@@ -149,59 +149,10 @@ namespace tools {
     bool triggerEmulator(const pat::Electron *iE);
     bool triggerEmulatorReturned(const pat::Electron *iE);
     bool isoTriggerEmulator(const pat::Electron *iE);
-
-
-     std::vector<const pat::Muon* > fakeMuonSelector(const std::vector<pat::Muon>  & thePatMuons,
-                                                   double v_muon_pt,
-                                                   reco::Vertex::Point PV,
-                                                   double v_muon_d0);
-
     
-    std::vector<const pat::Muon* > ewkMuonSelector(const std::vector<pat::Muon>  & thePatMuons,
-                                                   double v_muon_pt,
-                                                   reco::Vertex::Point PV,
-                                                   double v_muon_d0);
-
-    
-    
-    std::vector<const pat::Electron* > ewkElectronSelector(const std::vector<pat::Electron>  & thePatElectrons,
-                                                        double v_electron_pt,
-                                                        reco::Vertex::Point PV,
-                                                        double v_electron_d0,
-                                                        bool bool_electron_chargeConsistency,
-                                                        edm::Handle< std::vector<reco::Conversion> > &theConversions,
-                                                        reco::BeamSpot::Point BS);
-
-    
-    
-    std::vector<const pat::Electron* > fakeElectronSelector(const std::vector<pat::Electron>  & thePatElectrons,
-                                                           double v_electron_pt,
-                                                           reco::Vertex::Point PV,
-                                                           double v_electron_d0,
-                                                           bool bool_electron_chargeConsistency,
-                                                           edm::Handle< std::vector<reco::Conversion> > &theConversions,
-                                                           reco::BeamSpot::Point BS);
-    
-    
-    std::vector<const pat::Electron* > phys14LooseElectronSelector(const std::vector<pat::Electron>  & thePatElectrons,
-                                                                  double v_electron_pt,
-                                                                  reco::Vertex::Point PV,
-                                                                  double v_electron_d0,
-                                                                  bool bool_electron_chargeConsistency,
-                                                                  edm::Handle< std::vector<reco::Conversion> > &theConversions,
-                                                                  reco::BeamSpot::Point BS);
-    
-    
-    std::vector<const pat::Electron* > csa14MediumElectronSelector(const std::vector<pat::Electron>  & thePatElectrons,
-                                                                          double v_electron_pt,
-                                                                          reco::Vertex::Point PV,
-                                                                          double v_electron_d0,
-                                                                          bool bool_electron_chargeConsistency,
-                                                                          edm::Handle< std::vector<reco::Conversion> > &theConversions,
-                                                                          reco::BeamSpot::Point BS);
-    
-    
-    
+    float dEtaInSeed(const pat::Electron* ele);
+    bool isLooseCutBasedElectronWithoutIsolation(const pat::Electron* ele);
+    bool isTightCutBasedElectronWithoutIsolation(const pat::Electron* ele);
     
     bool cleanUp(const pat::Muon* testMu,
                        std::vector<const pat::Muon* > allMu,
@@ -262,10 +213,6 @@ namespace tools {
                                                     edm::Handle<reco::PFTauDiscriminator> & decay,
                                                     std::vector<const pat::Muon*> & thePatMuons,
                                                     const std::vector<const pat::Electron*>  & thePatElectrons);
-    
-    std::vector<const pat::Jet* > JetSelectorAll(const std::vector<pat::Jet>  & thePatJets,
-                                                        double  v_jet_pt,
-                                                        double  v_jet_eta);
     
     double MT_calc(TLorentzVector Vect, double MET, double MET_Phi);
     double Tau_dz(ROOT::Math::PositionVector3D<ROOT::Math::Cartesian3D<double> >, TLorentzVector, reco::Vertex::Point);

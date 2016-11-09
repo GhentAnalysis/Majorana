@@ -56,7 +56,6 @@
 #include "Majorana/PatAnalyzer/interface/BTagCalibrationStandalone.h"
 
 
-#include "EgammaAnalysis/ElectronTools/interface/EGammaMvaEleEstimatorCSA14.h"
 #include "RecoEgamma/EgammaTools/interface/ConversionTools.h"
 #include "DataFormats/Math/interface/deltaR.h"
 
@@ -139,16 +138,7 @@ private:
     edm::Handle<std::vector<reco::GenParticle>> TheGenParticles;
     
     
-    bool isData;
-    std::string SampleName;
-    //edm::InputTag IT_muon;
-    //edm::InputTag IT_electron;
-    //edm::InputTag IT_tau;
     edm::InputTag IT_tauDiscriminator;
-    //edm::InputTag IT_jet;
-    //edm::InputTag IT_pfmet;
-    //edm::InputTag IT_beamspot;
-    //edm::InputTag IT_hltresults;
     edm::InputTag IT_METFilters;
     
     // MVA values and categories (optional)
@@ -159,7 +149,8 @@ private:
 
     edm::EDGetTokenT<reco::GenParticleCollection>    genparticleToken;
     edm::EDGetTokenT<edm::ValueMap<float>>           electronMvaIdMapToken;
-    edm::EDGetTokenT<edm::ValueMap<float>>           electronCutBasedIdMapToken;
+    edm::EDGetTokenT<edm::ValueMap<float>>           electronCutBasedIdMapTightToken;
+    edm::EDGetTokenT<edm::ValueMap<float>>           electronCutBasedIdMapMediumToken;
     edm::EDGetTokenT<GenEventInfoProduct>            pdfvariablesToken;
     edm::EDGetTokenT<reco::BeamSpot>                 IT_beamspot;
     edm::EDGetTokenT<vector<PileupSummaryInfo>>      PileUpToken; 
@@ -177,7 +168,10 @@ private:
     edm::EDGetTokenT<edm::TriggerResults>            triggerResultsRECOToken;
     edm::EDGetTokenT<pat::PackedTriggerPrescales>    triggerPrescalesToken;
     edm::EDGetTokenT<LHEEventProduct>                IT_externalLHEProducer;
-    
+    bool isData;
+    bool treeForFakeRate;
+    std::string SampleName;
+
 
     edm::Service<TFileService> fs;
     FILE *outfile;
@@ -217,7 +211,6 @@ private:
     
     std::vector<std::string> myManualCatWeigths;
     vector<string> myManualCatWeigthsTrig;
-    EGammaMvaEleEstimatorCSA14* myMVATrig;
     double looseMVA[6][2]; //{{0.35, 0.20, -0.52}, {0.73, 0.57, 0.05}};//{0.8, 1.479, };
     
 
@@ -298,6 +291,8 @@ private:
     double _ptrel[nLeptonsMax];
     double _ptratio[nLeptonsMax];
     double _muonSegmentComp[nLeptonsMax];
+    bool _passedCutBasedIdTight[nLeptonsMax];
+    bool _passedCutBasedIdMedium[nLeptonsMax];
     bool _passedMVA80[nLeptonsMax];
     bool _passedMVA90[nLeptonsMax];
     Int_t _findMatched[nLeptonsMax];
@@ -366,7 +361,6 @@ private:
     bool _isloose[nLeptonsMax];
     bool _ismedium[nLeptonsMax];
     bool _istight[nLeptonsMax];
-    bool _istightID[nLeptonsMax];
     bool _isvetoIDCutBased[nLeptonsMax];
     bool _islooseIDCutBased[nLeptonsMax];
     bool _ismediumIDCutBased[nLeptonsMax];
@@ -437,24 +431,6 @@ private:
     double _momphi[nLeptonsMax];
     double _mometa[nLeptonsMax];
     int _mompdg[nLeptonsMax];
-
-    bool _decayModeFinding[nLeptonsMax];
-    bool _looseMVA_dR03[nLeptonsMax];
-    bool _mediumMVA_dR03[nLeptonsMax];
-
-    //bool _decayModeFindingOldDMs[nLeptonsMax];
-    bool _vlooseMVAold[nLeptonsMax];
-    bool _looseMVAold[nLeptonsMax];
-    bool _mediumMVAold[nLeptonsMax];
-    bool _tightMVAold[nLeptonsMax];
-    bool _vtightMVAold[nLeptonsMax];
-
-    bool _decayModeFindingNewDMs[nLeptonsMax];
-    bool _vlooseMVAnew[nLeptonsMax];
-    bool _looseMVAnew[nLeptonsMax];
-    bool _mediumMVAnew[nLeptonsMax];
-    bool _tightMVAnew[nLeptonsMax];
-    bool _vtightMVAnew[nLeptonsMax];
 
     double _met;
     double _met_phi;

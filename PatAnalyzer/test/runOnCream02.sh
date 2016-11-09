@@ -8,4 +8,4 @@ cd $dir
 source /cvmfs/cms.cern.ch/cmsset_default.sh
 eval `scram runtime -sh`
 
-cmsRun trilepton.py input=$inputFile output=$outputFile events=-1 isData=$isData
+cmsRun trilepton.py input=$inputFile output=$outputFile events=-1 isData=$isData treeForFakeRate=$treeForFakeRate
