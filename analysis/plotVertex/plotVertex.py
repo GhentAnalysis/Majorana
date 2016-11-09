@@ -9,8 +9,8 @@ import Majorana.tools.style  as style
 style.setDefault()
 
 
-def run(inputTree):
-  hist_dxy = ROOT.TH1D("dxy","dxy", 50, -10, 10)
+def getHist(inputTree):
+  hist_dxy = ROOT.TH1D("dxy","dxy", 300, -1.5, 1.5)
 
   # loop over events
   for i in range(inputTree.GetEntries()):
@@ -24,16 +24,24 @@ def run(inputTree):
       else:
         if not inputTree._istight[i]: continue
 
-      hist_dxy.Fill(inputTree._ipPV[i])
+      hist_dxy.Fill(inputTree._ipPV[i], inputTree._weight)
+  return hist_dxy
 
-  if hasattr("ROOT","c1"): del ROOT.c1 
-  c1 = ROOT.TCanvas("c1","c1")
-  c1.cd()
-  hist_dxy.GetXaxis().SetTitle('d_{xy}')
-  hist_dxy.GetYaxis().SetTitle('events')
-  hist_dxy.Draw("HIST")
-  c1.RedrawAxis()
-  c1.Print('dxy.pdf')
-  c1.Print('dxy.png')
+hist_displaced = getHist(sample.getTree('Majorana_M10_ctau10mm'))
+hist_prompt    = getHist(sample.getTree('Majorana_M10'))
 
-run(sample.getTree('Majorana_M10_ctau10mm'))
+for hist in [hist_displaced, hist_prompt]:
+  hist.Scale(1/hist.Integral())
+
+if hasattr("ROOT","c1"): del ROOT.c1 
+c1 = ROOT.TCanvas("c1","c1")
+c1.cd()
+hist_prompt.GetXaxis().SetTitle('d_{xy} [cm]')
+hist_prompt.GetYaxis().SetTitle('1/N dN/dx')
+hist_prompt.SetLineColor(ROOT.kRed)
+hist_prompt.Draw("HIST")
+hist_displaced.Draw("HIST SAME")
+c1.RedrawAxis()
+c1.Print('dxy.pdf')
+c1.Print('dxy.png')
+
