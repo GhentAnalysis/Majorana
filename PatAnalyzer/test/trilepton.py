@@ -3,7 +3,7 @@ import FWCore.ParameterSet.Config as cms
 from RecoTauTag.RecoTau.PFRecoTauQualityCuts_cfi import PFTauQualityCuts
 
 isData     = False
-inputFile  = "file:///user/mvit/public/Majorana/MajoranaNeutrino_trilepton_M-10_5f_NLO/Majorana_trilepton_RunIISpring16MiniAODv2_96.root"
+inputFile  = "file:////pnfs/iihe/cms/ph/sc4/store/mc/RunIISpring16MiniAODv2/WGToLNuG_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8/MINIAODSIM/PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0_ext1-v1/90000/2A2DB2EF-C152-E611-8CB3-D4AE526A0B03.root"
 outputFile = "trilepton.root"
 nEvents    = -1
 

@@ -5,10 +5,10 @@
 
 # Datasets on pnfs, using local submission
 #/pnfs/iihe/cms/ph/sc4/store/mc/RunIISpring16MiniAODv2/WZJToLLLNu_TuneCUETP8M1_13TeV-amcnlo-pythia8/MINIAODSIM/PUSpring16RAWAODSIM_reHLT_80X_mcRun2_asymptotic_v14-v1
-#/pnfs/iihe/cms/ph/sc4/store/mc/RunIISpring16MiniAODv2/TTTo2L2Nu_13TeV-powheg/MINIAODSIM/PUSpr
-#/pnfs/iihe/cms/ph/sc4/store/mc/RunIISpring16MiniAODv2/WZTo3LNu_TuneCUETP8M1_13TeV-amcatnloFXF
-#/pnfs/iihe/cms/ph/sc4/store/mc/RunIISpring16MiniAODv2/WGToLNuG_TuneCUETP8M1_13TeV-amcatnloFXF
-#/pnfs/iihe/cms/ph/sc4/store/mc/RunIISpring16MiniAODv2/ZGTo2LG_TuneCUETP8M1_13TeV-amcatnloFXFX
+#/pnfs/iihe/cms/ph/sc4/store/mc/RunIISpring16MiniAODv2/TTTo2L2Nu_13TeV-powheg/MINIAODSIM/PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0_ext1-v1
+#/pnfs/iihe/cms/ph/sc4/store/mc/RunIISpring16MiniAODv2/WGToLNuG_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8/MINIAODSIM/PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0_ext1-v1
+#/pnfs/iihe/cms/ph/sc4/store/mc/RunIISpring16MiniAODv2/WZTo3LNu_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8/MINIAODSIM/PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1
+#/pnfs/iihe/cms/ph/sc4/store/mc/RunIISpring16MiniAODv2/ZGTo2LG_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8/MINIAODSIM/PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0_ext1-v1
 
 
 
@@ -19,4 +19,4 @@
 #/user/tomc/public/Majorana/MajoranaNeutrino_trilepton_M-20_5f_NLO
 #/user/tomc/public/Majorana/MajoranaNeutrino_trilepton_M-40_5f_NLO
 #/user/tomc/public/Majorana/MajoranaNeutrino_trilepton_M-50_5f_NLO
-#/user/tomc/public/Majorana/MajoranaNeutrino_trilepton_M-60_5f_NLO
+/user/tomc/public/Majorana/MajoranaNeutrino_trilepton_M-60_5f_NLO
