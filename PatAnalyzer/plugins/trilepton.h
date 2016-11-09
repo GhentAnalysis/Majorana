@@ -56,7 +56,6 @@
 #include "Majorana/PatAnalyzer/interface/BTagCalibrationStandalone.h"
 
 
-#include "EgammaAnalysis/ElectronTools/interface/EGammaMvaEleEstimatorCSA14.h"
 #include "RecoEgamma/EgammaTools/interface/ConversionTools.h"
 #include "DataFormats/Math/interface/deltaR.h"
 
@@ -150,7 +149,8 @@ private:
 
     edm::EDGetTokenT<reco::GenParticleCollection>    genparticleToken;
     edm::EDGetTokenT<edm::ValueMap<float>>           electronMvaIdMapToken;
-    edm::EDGetTokenT<edm::ValueMap<float>>           electronCutBasedIdMapToken;
+    edm::EDGetTokenT<edm::ValueMap<float>>           electronCutBasedIdMapTightToken;
+    edm::EDGetTokenT<edm::ValueMap<float>>           electronCutBasedIdMapMediumToken;
     edm::EDGetTokenT<GenEventInfoProduct>            pdfvariablesToken;
     edm::EDGetTokenT<reco::BeamSpot>                 IT_beamspot;
     edm::EDGetTokenT<vector<PileupSummaryInfo>>      PileUpToken; 
@@ -211,7 +211,6 @@ private:
     
     std::vector<std::string> myManualCatWeigths;
     vector<string> myManualCatWeigthsTrig;
-    EGammaMvaEleEstimatorCSA14* myMVATrig;
     double looseMVA[6][2]; //{{0.35, 0.20, -0.52}, {0.73, 0.57, 0.05}};//{0.8, 1.479, };
     
 
@@ -292,6 +291,8 @@ private:
     double _ptrel[nLeptonsMax];
     double _ptratio[nLeptonsMax];
     double _muonSegmentComp[nLeptonsMax];
+    bool _passedCutBasedIdTight[nLeptonsMax];
+    bool _passedCutBasedIdMedium[nLeptonsMax];
     bool _passedMVA80[nLeptonsMax];
     bool _passedMVA90[nLeptonsMax];
     Int_t _findMatched[nLeptonsMax];
@@ -435,20 +436,6 @@ private:
     bool _decayModeFinding[nLeptonsMax];
     bool _looseMVA_dR03[nLeptonsMax];
     bool _mediumMVA_dR03[nLeptonsMax];
-
-    //bool _decayModeFindingOldDMs[nLeptonsMax];
-    bool _vlooseMVAold[nLeptonsMax];
-    bool _looseMVAold[nLeptonsMax];
-    bool _mediumMVAold[nLeptonsMax];
-    bool _tightMVAold[nLeptonsMax];
-    bool _vtightMVAold[nLeptonsMax];
-
-    bool _decayModeFindingNewDMs[nLeptonsMax];
-    bool _vlooseMVAnew[nLeptonsMax];
-    bool _looseMVAnew[nLeptonsMax];
-    bool _mediumMVAnew[nLeptonsMax];
-    bool _tightMVAnew[nLeptonsMax];
-    bool _vtightMVAnew[nLeptonsMax];
 
     double _met;
     double _met_phi;

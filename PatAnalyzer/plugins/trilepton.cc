@@ -47,7 +47,8 @@
 trilepton::trilepton(const edm::ParameterSet & iConfig) :
   genparticleToken(                      consumes<reco::GenParticleCollection>(   iConfig.getParameter<edm::InputTag>("genPartsLabel"))),
   electronMvaIdMapToken(                 consumes<edm::ValueMap<float>>(          iConfig.getParameter<edm::InputTag>("electronMvaIdMap"))),
-  electronCutBasedIdMapToken(            consumes<edm::ValueMap<float>>(          iConfig.getParameter<edm::InputTag>("electronCutBasedIdMap"))),
+  electronCutBasedIdMapTightToken(       consumes<edm::ValueMap<float>>(          iConfig.getParameter<edm::InputTag>("electronCutBasedIdTightMap"))),
+  electronCutBasedIdMapMediumToken(      consumes<edm::ValueMap<float>>(          iConfig.getParameter<edm::InputTag>("electronCutBasedIdMediumMap"))),
   pdfvariablesToken(                     consumes<GenEventInfoProduct>(           iConfig.getParameter<edm::InputTag>("pdfvariablesLabel"))),
   IT_beamspot(                           consumes<reco::BeamSpot>(                iConfig.getParameter<edm::InputTag>("BeamSpotLabel"))),
   PileUpToken(                           consumes<vector<PileupSummaryInfo>>(     iConfig.getParameter<edm::InputTag>("slimmedAddPileupInfoLabel"))),
@@ -253,20 +254,10 @@ void trilepton::beginJob()
     outputTree->Branch("_looseMVA_dR03", &_looseMVA_dR03, "_looseMVA_dR03[_nLeptons]/O");
     outputTree->Branch("_mediumMVA_dR03", &_mediumMVA_dR03, "_mediumMVA_dR03[_nLeptons]/O");
 
-    //outputTree->Branch("_decayModeFindingOldDMs", &_decayModeFindingOldDMs, "_decayModeFindingOldDMs[_nLeptons]/O");
-    outputTree->Branch("_vlooseMVAold", &_vlooseMVAold, "_vlooseMVAold[_nLeptons]/O");
-    outputTree->Branch("_looseMVAold", &_looseMVAold, "_looseMVAold[_nLeptons]/O");
-    outputTree->Branch("_mediumMVAold", &_mediumMVAold, "_mediumMVAold[_nLeptons]/O");
-    outputTree->Branch("_tightMVAold", &_tightMVAold, "_tightMVAold[_nLeptons]/O");
-    outputTree->Branch("_vtightMVAold", &_vtightMVAold, "_vtightMVAold[_nLeptons]/O");
-    
-    outputTree->Branch("_decayModeFindingNewDMs", &_decayModeFindingNewDMs, "_decayModeFindingNewDMs[_nLeptons]/O");
-    outputTree->Branch("_vlooseMVAnew", &_vlooseMVAnew, "_vlooseMVAnew[_nLeptons]/O");
-    outputTree->Branch("_looseMVAnew", &_looseMVAnew, "_looseMVAnew[_nLeptons]/O");
-    outputTree->Branch("_mediumMVAnew", &_mediumMVAnew, "_mediumMVAnew[_nLeptons]/O");
-    outputTree->Branch("_tightMVAnew", &_tightMVAnew, "_tightMVAnew[_nLeptons]/O");
-    outputTree->Branch("_vtightMVAnew", &_vtightMVAnew, "_vtightMVAnew[_nLeptons]/O");
-
+    outputTree->Branch("_passedCutBasedIdTight", &_passedCutBasedIdTight, "_passedCutBasedIdTight[_nLeptons]/O");
+    outputTree->Branch("_passedCutBasedIdMedium", &_passedCutBasedIdMedium, "_passedCutBasedIdMedium[_nLeptons]/O");
+    outputTree->Branch("_passedMVA80", &_passedMVA80, "_passedMVA80[_nLeptons]/O");
+    outputTree->Branch("_passedMVA90", &_passedMVA90, "_passedMVA90[_nLeptons]/O");
  
     outputTree->Branch("_n_PV", &_n_PV, "_n_PV/I");
     outputTree->Branch("_n_MCTruth_PV", &_n_MCTruth_PV, "_n_MCTruth_PV/D");
@@ -296,7 +287,7 @@ void trilepton::beginJob()
     outputTree->Branch("_jetE", &_jetE, "_jetE[_n_Jets]/D");
     outputTree->Branch("_csv", &_csv, "_csv[_n_Jets]/D");
     outputTree->Branch("_jetDeltaR", &_jetDeltaR, "_jetDeltaR[_n_Jets][_nLeptons]/D");
-     outputTree->Branch("_clean", &_clean, "_clean[_n_Jets]/I");
+    outputTree->Branch("_clean", &_clean, "_clean[_n_Jets]/I");
 
     // JEC
     outputTree->Branch("_jecUnc", &_jecUnc, "_jecUnc[_n_Jets]/D");
@@ -324,8 +315,6 @@ void trilepton::beginJob()
     outputTree->Branch("_mchi0", &_mchi0, "_mchi0/D");
     
     outputTree->Branch("_nMajorana", &_nMajorana, "_nMajorana/I");
-    outputTree->Branch("_passedMVA80", &_passedMVA80, "_passedMVA80[_nLeptons]/O");
-    outputTree->Branch("_passedMVA90", &_passedMVA90, "_passedMVA90[_nLeptons]/O");
     outputTree->Branch("_findMatched", &_findMatched, "_findMatched/I");
 
     // trigger
@@ -759,7 +748,8 @@ void trilepton::analyze(const edm::Event& iEvent, const edm::EventSetup& iEventS
     edm::Handle<std::vector<pat::Muon>> muons;                 iEvent.getByToken(IT_muon, muons);
     edm::Handle<edm::View<pat::Electron>> electrons;           iEvent.getByToken(IT_electron, electrons);
     edm::Handle<edm::ValueMap<float>> electronMvaIdMap;        iEvent.getByToken(electronMvaIdMapToken, electronMvaIdMap);
-    edm::Handle<edm::ValueMap<float>> electronCutBasedIdMap;   iEvent.getByToken(electronCutBasedIdMapToken, electronCutBasedIdMap);
+    edm::Handle<edm::ValueMap<float>> electronCutBasedIdMapT;  iEvent.getByToken(electronCutBasedIdMapTightToken, electronCutBasedIdMapT);
+    edm::Handle<edm::ValueMap<float>> electronCutBasedIdMapM;  iEvent.getByToken(electronCutBasedIdMapMediumToken, electronCutBasedIdMapM);
     edm::Handle<std::vector<reco::Conversion>> theConversions; iEvent.getByToken(reducedEgammaToken, theConversions);
     edm::Handle<std::vector<pat::Jet>> thePatJets;             iEvent.getByToken(IT_jet , thePatJets );
     edm::Handle<double> rhoJets;                               iEvent.getByToken(fixedGridRhoFastjetCentralNeutralToken , rhoJets);
@@ -961,9 +951,10 @@ void trilepton::analyze(const edm::Event& iEvent, const edm::EventSetup& iEventS
     for(auto electron = electrons->begin(); electron != electrons->end(); ++electron){
       if (leptonCounter == 10) continue; // This will go terribly wrong when there are about 8-10 muons or more (even though this is an improbable situation)
 
-      _passedMVA80[leptonCounter] =0; // unitialized for muons? probably not a big issue though
-      _passedMVA90[leptonCounter] =0;
-      _findMatched[leptonCounter] =-1;
+      _passedCutBasedIdTight[leptonCounter] = false; // unitialized for muons? probably not a big issue though
+      _passedMVA90[leptonCounter]           = false;
+      _passedMVA80[leptonCounter]           = false;
+      _findMatched[leptonCounter]           = -1;
 
       if(electron->pt() < _minPt1) continue;
       if(abs(electron->eta()) > 2.5) continue;
@@ -972,8 +963,9 @@ void trilepton::analyze(const edm::Event& iEvent, const edm::EventSetup& iEventS
 
       // There will be a new electron MVA soon
       edm::RefToBase<pat::Electron> electronRef(edm::Ref<edm::View<pat::Electron>>(electrons, (electron - electrons->begin())));
-      _mvaValue[leptonCounter] = (*electronMvaIdMap)[electronRef];
-      // bool passCutBasedId = (*electronCutBasedIdMap)[electronRef]; // uncomment this to get the cutbased id
+      _mvaValue[leptonCounter]               = (*electronMvaIdMap)[electronRef];
+      _passedCutBasedIdTight[leptonCounter]  = (*electronCutBasedIdMapT)[electronRef];
+      _passedCutBasedIdMedium[leptonCounter] = (*electronCutBasedIdMapM)[electronRef];
 
       // maybe better implement cut based id though, and/or clean up this MVA cutting part
       int index                   = (electron->pt() > 10 ? 3 : 0) + (abs(electron->eta()) > 1.479 ? 2 : (abs(electron->eta()) > 0.8 ? 1 : 0 ));
