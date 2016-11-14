@@ -1,7 +1,6 @@
 #ifndef STATS_H
 #define STATS_H
 #include "TMath.h"
-using namespace std;
 
 namespace stats{
   double LowBound(int n , int N);

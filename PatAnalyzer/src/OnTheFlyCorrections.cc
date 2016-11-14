@@ -3,8 +3,6 @@
 #include <math.h>
 
 
-using namespace std;
-
 OnTheFlyCorrections::OnTheFlyCorrections(std::string path, std::string gt, bool isdata){
 	JetCorrectorParameters *ResJetPar = new JetCorrectorParameters(edm::FileInPath(path+gt+"_L2L3Residual_AK4PFchs.txt").fullPath());
 	JetCorrectorParameters *L3JetPar  = new JetCorrectorParameters(edm::FileInPath(path+gt+"_L3Absolute_AK4PFchs.txt").fullPath());
@@ -57,12 +55,12 @@ std::vector< float > OnTheFlyCorrections::getCorrPtECorr(float jetpt, float jete
 
 }
 
-float OnTheFlyCorrections::getJetCorrection(float pt, float corr, float eta, float rho, float area, string level = "L3Absolute"){
+float OnTheFlyCorrections::getJetCorrection(float pt, float corr, float eta, float rho, float area, std::string level = "L3Absolute"){
 	// sets the pT back to raw and returns the raw-pT correction factor
 	return getJetCorrectionRawPt(pt/corr, eta, rho, area, level);
 }
 
-float OnTheFlyCorrections::getJetCorrectionRawPt(float rawpt, float eta, float rho, float area, string level = "L3Absolute"){
+float OnTheFlyCorrections::getJetCorrectionRawPt(float rawpt, float eta, float rho, float area, std::string level = "L3Absolute"){
 	// slighly redundant considering we have what we have below, but I think that's what frederic was thinking about
 	fJetCorrector->setJetEta(eta);
 	fJetCorrector->setRho(rho);
@@ -96,14 +94,14 @@ float OnTheFlyCorrections::getJetPtNoResidual(float pt, float eta, float ecorr, 
 	fJetCorrector->setJetA(area);
 	fJetCorrector->setJetPt(rawpt);      // the jets we have in the collection are raw already
 	
-	vector<float> factors = fJetCorrector->getSubCorrections();
-	if(fabs(factors[3] - ecorr) > 0.000001) cout << "OnTheFlyCorrections::getJetPtNoResidual ==> WARNING: Your JECs don't seem to be consistent!" << endl;
+	std::vector<float> factors = fJetCorrector->getSubCorrections();
+	if(fabs(factors[3] - ecorr) > 0.000001) std::cout << "OnTheFlyCorrections::getJetPtNoResidual ==> WARNING: Your JECs don't seem to be consistent!" << std::endl;
 	float l1l2l3scale = factors[2];
 	return rawpt*l1l2l3scale;
 }
 
 std::pair< float, float > 
-OnTheFlyCorrections::getCorrections(float rawpt, float raweta, float rawnomupt, float phi, float emf, float rho, float area, string level) {
+OnTheFlyCorrections::getCorrections(float rawpt, float raweta, float rawnomupt, float phi, float emf, float rho, float area, std::string level) {
   
   std::pair< float, float > corr(0., 0.); // pair with zeroes that gets returned if jet fails a cut
   if (emf > 0.9)       return corr;       // skip jets with EMF > 0.9

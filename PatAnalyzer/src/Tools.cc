@@ -50,7 +50,7 @@ double tools::getActivityAroundLepton(edm::Handle<pat::PackedCandidateCollection
     double iso_ph(0.); double iso_pu(0.);
     double ptThresh(0.5);
     if(ptcl->isElectron()) ptThresh = 0;
-    double r_iso = max(r_iso_min,min(r_iso_max, kt_scale/ptcl->pt()));
+    double r_iso = std::max(r_iso_min,std::min(r_iso_max, kt_scale/ptcl->pt()));
     for (const pat::PackedCandidate &pfc : *pfcands) {
         if (abs(pfc.pdgId())<7) continue;
         
@@ -166,7 +166,7 @@ double tools::getActivityAroundLeptonDB(edm::Handle<pat::PackedCandidateCollecti
     double iso_ph(0.); double iso_pu(0.);
     double ptThresh(0.5);
     if(ptcl->isElectron()) ptThresh = 0;
-    double r_iso = max(r_iso_min,min(r_iso_max, kt_scale/ptcl->pt()));
+    double r_iso = std::max(r_iso_min,std::min(r_iso_max, kt_scale/ptcl->pt()));
     for (const pat::PackedCandidate &pfc : *pfcands) {
         if (abs(pfc.pdgId())<7) continue;
         
@@ -281,7 +281,7 @@ double tools::getPFIsolation(edm::Handle<pat::PackedCandidateCollection> pfcands
     double iso_ph(0.); double iso_pu(0.);
     double ptThresh(0.5);
     if(ptcl->isElectron()) ptThresh = 0;
-    double r_iso = max(r_iso_min,min(r_iso_max, kt_scale/ptcl->pt()));
+    double r_iso = std::max(r_iso_min,std::min(r_iso_max, kt_scale/ptcl->pt()));
     for (const pat::PackedCandidate &pfc : *pfcands) {
         if (abs(pfc.pdgId())<7) continue;
         
@@ -366,7 +366,7 @@ double tools::getPFIsolationDB(edm::Handle<pat::PackedCandidateCollection> pfcan
     double iso_ph(0.); double iso_pu(0.);
     double ptThresh(0.5);
     if(ptcl->isElectron()) ptThresh = 0;
-    double r_iso = max(r_iso_min,min(r_iso_max, kt_scale/ptcl->pt()));
+    double r_iso = std::max(r_iso_min,std::min(r_iso_max, kt_scale/ptcl->pt()));
     for (const pat::PackedCandidate &pfc : *pfcands) {
         if (abs(pfc.pdgId())<7) continue;
         
@@ -716,7 +716,7 @@ std::vector<const pat::Jet* > tools::JetSelector(const std::vector<pat::Jet>  & 
             }
             */
             if(abs(eta) < 3.0)
-                looseJetID = (NHF<0.99 && NEMF<0.99 && NumConst>1) && ((abs(eta)<=2.4 && CHF>0 && CHM>0 && CEMF<0.99) || abs(eta)>2.4); 
+                looseJetID = (NHF<0.99 && NEMF<0.99 && NumConst>1) && ((abs(eta)<=2.4 && CHF>0 && CHM>0 && CEMF<0.99) || std::abs(eta)>2.4); 
             else
                 looseJetID = (NEMF<0.90 && NumNeutralParticles>10);
 
@@ -889,6 +889,16 @@ std::vector<const pat::Jet* > tools::JetSelector(const std::vector<pat::Jet>  & 
         vJets.push_back( &*jet );
     }
     return vJets;
+}
+
+
+bool tools::passMultiIsolation(TString level, double mini_iso, double jetPtRatio, double jetPtRel){
+    if(level == "VL") return mini_iso < 0.25 && (jetPtRatio > 0.67 || jetPtRel > 4.4);
+    if(level == "L")  return mini_iso < 0.20 && (jetPtRatio > 0.69 || jetPtRel > 6.0);
+    if(level == "M")  return mini_iso < 0.16 && (jetPtRatio > 0.76 || jetPtRel > 7.2);
+    if(level == "T")  return mini_iso < 0.12 && (jetPtRatio > 0.80 || jetPtRel > 7.2);
+    if(level == "VT") return mini_iso < 0.09 && (jetPtRatio > 0.84 || jetPtRel > 7.2);
+    return false;
 }
 
 

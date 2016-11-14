@@ -78,8 +78,6 @@
 #include <memory>
 #include <iomanip>
 
-using namespace std;
-
 namespace tools {
     
     struct event_info
@@ -229,6 +227,7 @@ namespace tools {
     
     std::vector<double> RegressionVars(const pat::Jet *jet, float genpt, const pat::Muon* mu);
 
-}  
+    bool passMultiIsolation(TString level, double mini_iso, double jetPtRatio, double jetPtRel);
+}
 
 #endif

@@ -102,8 +102,6 @@
 #include <memory>
 #include <iomanip>
 
-using namespace std;
-
 const int nLeptonsMax = 30;
 const int nLeptonsMax_gen = 30;
 const int nMajo_gen = 20;
@@ -285,9 +283,9 @@ private:
     double _isolationComponents[nLeptonsMax][4];
     double _isolationMC[nLeptonsMax][4]; //all daughters; all visible daughters; all daughters in the cone; all visible daughters in the cone
     double _miniisolation[nLeptonsMax][2];
+    double _multiIsolationVT[nLeptonsMax];
     double _miniisolationCharged[nLeptonsMax][2];
     bool _multiisolation[nLeptonsMax][5];
-    double multiConst[5][3];
     double _ptrel[nLeptonsMax];
     double _ptratio[nLeptonsMax];
     double _muonSegmentComp[nLeptonsMax];
@@ -316,6 +314,8 @@ private:
     bool _isotrigEmulator[nLeptonsMax];
 
     double _mvaValue[nLeptonsMax];
+
+    std::map<TString, std::vector<bool>*> leptonWorkingPoints;
 
     int _origin[nLeptonsMax];
     int _originReduced[nLeptonsMax];

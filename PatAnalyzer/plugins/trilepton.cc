@@ -384,31 +384,10 @@ void trilepton::beginJob()
     looseMVA[4][1] = 0.805013;
     looseMVA[5][1] = 0.358969;
 
-    //multiisolation very loose WP 
-    multiConst[0][0] = 0.25;
-    multiConst[0][1] = 0.67;
-    multiConst[0][2] = 4.4;
-    
-    //multiisolation loose WP 
-    multiConst[1][0] = 0.2;
-    multiConst[1][1] = 0.69;
-    multiConst[1][2] = 6.;
-    
-    //multiisolation medium WP 
-    multiConst[2][0] = 0.16;
-    multiConst[2][1] = 0.76;
-    multiConst[2][2] = 7.2;
-    
-    //multiisolation tight WP 
-    multiConst[3][0] = 0.12;
-    multiConst[3][1] = 0.8;
-    multiConst[3][2] = 7.2;
-    
-    //multiisolation very tight WP 
-    multiConst[4][0] = 0.09;
-    multiConst[4][1] = 0.84;
-    multiConst[4][2] = 7.2;
-    
+    for(TString wp : {"multiIsolationVT","multiIsolationT","multiIsolationM","multiIsolationL","multiIsolationVL"}){
+      leptonWorkingPoints[wp] = new std::vector<bool>();
+      outputTree->Branch(wp, "vector<bool>", leptonWorkingPoints[wp]);
+    }
         
     _nEventsTotal = 0;
     _nEventsFiltered = 0;
@@ -418,7 +397,10 @@ void trilepton::beginJob()
 }
 
 void trilepton::endJob() {
-   
+    for(TString wp : {"VT","T","M","L","VL"}){
+      delete leptonWorkingPoints["multiIsolation" + wp];
+    }
+
     std::cout<<_nEventsTotal<<std::endl;
     std::cout<<_nEventsFiltered<<std::endl;
     
@@ -473,6 +455,9 @@ void trilepton::getTriggerResults(const edm::Event& iEvent, bool isHLT, edm::EDG
 
 void trilepton::analyze(const edm::Event& iEvent, const edm::EventSetup& iEventSetup)
 {
+    for(TString wp : {"multiIsolationVT","multiIsolationT","multiIsolationM","multiIsolationL","multiIsolationVL"}){
+      leptonWorkingPoints[wp]->clear();
+    }
     //bool islepton;
 
     _nZboson = 0;
@@ -887,10 +872,12 @@ void trilepton::analyze(const edm::Event& iEvent, const edm::EventSetup& iEventS
       _isolation[leptonCounter]   = tools::pfRelIso(&*muon,myRhoJECJets);  // should check out this function
       _isolation_absolute[leptonCounter] = tools::pfAbsIso(&*muon);
       
-      _miniisolation[leptonCounter][0] 	      = tools::getPFIsolation(pfcands, &*muon, 0.05, 0.2, 10., false, false, myRhoJets);  // to check 
-      _miniisolation[leptonCounter][1] 	      = tools::getPFIsolation(pfcands, &*muon, 0.05, 0.3, 10., false, false, myRhoJets); // also to check
+      _miniisolation[leptonCounter][0] 	      = tools::getPFIsolation(pfcands, &*muon, 0.05, 0.2, 10., false, false, myRhoJets); // check!!!!!!! effective areas are still wrong 
+      _miniisolation[leptonCounter][1] 	      = tools::getPFIsolation(pfcands, &*muon, 0.05, 0.3, 10., false, false, myRhoJets); // also to check DO NOT USE THIS ONE
       _miniisolationCharged[leptonCounter][0] = tools::getPFIsolation(pfcands, &*muon, 0.05, 0.2, 10., false, true,  myRhoJets); // also to check
-      _miniisolationCharged[leptonCounter][1] = tools::getPFIsolation(pfcands, &*muon, 0.05, 0.3, 10., false, true,  myRhoJets); // also to check
+      _miniisolationCharged[leptonCounter][1] = tools::getPFIsolation(pfcands, &*muon, 0.05, 0.3, 10., false, true,  myRhoJets); // also to check DO NOT USE THIS ONE
+
+
 
       _ipPV[leptonCounter]     = muon->innerTrack()->dxy(PV);
       _ipPVerr[leptonCounter]  = muon->innerTrack()->dxyError();
@@ -920,9 +907,12 @@ void trilepton::analyze(const edm::Event& iEvent, const edm::EventSetup& iEventS
       _lEta[leptonCounter] = muon->eta(); 
       _lPhi[leptonCounter] = muon->phi();
       _lE[leptonCounter]   = muon->energy();
-      
+
       fillCloseJetVars(leptonCounter, PV);
-      
+      for(TString wp : {"VT","T","M","L","VL"}){
+        leptonWorkingPoints["multiIsolation" + wp]->push_back(tools::passMultiIsolation(wp, _miniisolation[leptonCounter][0], _ptratio[leptonCounter], _ptrel[leptonCounter]));
+      }
+
       if(not isData){
 	  const GenParticle* mc = GPM.matchedMC(&*muon);
 	  if(mc!=0){
@@ -1012,7 +1002,11 @@ void trilepton::analyze(const edm::Event& iEvent, const edm::EventSetup& iEventS
 
      
       fillCloseJetVars(leptonCounter, PV);
-      
+
+      for(TString wp : {"VT","T","M","L","VL"}){
+        leptonWorkingPoints["multiIsolation" + wp]->push_back(tools::passMultiIsolation(wp, _miniisolation[leptonCounter][0], _ptratio[leptonCounter], _ptrel[leptonCounter]));
+      }
+
       if (not isData) {
 	_findMatched[leptonCounter]=-1;
 	  const GenParticle* mc = GPM.matchedMC(&*electron);
