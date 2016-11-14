@@ -615,7 +615,7 @@ const GenParticle* GenParticleManager::matchedMC(const pat::Muon *pReco) {
     TLorentzVector Gen1, Gen2;
     if (!pReco) return 0;
     Gen1.SetPtEtaPhiE(pReco->pt(),pReco->eta(),pReco->phi(),pReco->energy());
-    double deltaRreco = 9999.;
+    double deltaRreco = 0.1;
     for(GenParticleCollection::const_reverse_iterator p = _Collection->rbegin() ; p != _Collection->rend() ; p++ ) {
         if (p->status()!=1) continue;
         Gen2.SetPtEtaPhiE(p->pt(),p->eta(),p->phi(),p->energy());
@@ -633,7 +633,7 @@ const GenParticle* GenParticleManager::matchedMC(const pat::Electron *pReco) {
     if (!pReco) return 0;
     TLorentzVector Gen1, Gen2;
     Gen1.SetPtEtaPhiE(pReco->pt(),pReco->eta(),pReco->phi(),pReco->energy());
-    double deltaRreco = 9999.;
+    double deltaRreco = 0.1;
     for(GenParticleCollection::const_reverse_iterator p = _Collection->rbegin() ; p != _Collection->rend() ; p++ ) {
         if (p->status()!=1) continue;
         //if (fabs(p->pdgId())!=11) continue;
@@ -654,7 +654,7 @@ const GenParticle* GenParticleManager::matchedMC(const edm::Ptr<reco::GsfElectro
     if (!pReco) return 0;
     TLorentzVector Gen1, Gen2;
     Gen1.SetPtEtaPhiE(pReco->pt(),pReco->eta(),pReco->phi(),pReco->energy());
-    double deltaRreco = 9999.;
+    double deltaRreco = 0.1;
     for(GenParticleCollection::const_reverse_iterator p = _Collection->rbegin() ; p != _Collection->rend() ; p++ ) {
         if (p->status()!=1) continue;
         //if (fabs(p->pdgId())!=11) continue;
@@ -665,7 +665,7 @@ const GenParticle* GenParticleManager::matchedMC(const edm::Ptr<reco::GsfElectro
             mom = &*p;
             deltaRreco = deltaRcur;
         }
-    
+    	
     }
     return mom;
 }
