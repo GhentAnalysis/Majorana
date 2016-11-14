@@ -1,4 +1,5 @@
 #include "Majorana/PatAnalyzer/interface/Tools.h"
+#include "FWCore/ParameterSet/interface/FileInPath.h"
 
 double tools::getActivityAroundLepton(edm::Handle<pat::PackedCandidateCollection> pfcands,
                       const reco::Candidate* ptcl,
@@ -232,17 +233,17 @@ double tools::getActivityAroundLeptonDB(edm::Handle<pat::PackedCandidateCollecti
     return iso;
 }
 
-double tools::getPFIsolation(edm::Handle<pat::PackedCandidateCollection> pfcands,
-                      const reco::Candidate* ptcl,
-                      double r_iso_min, double r_iso_max, double kt_scale,
-                      bool use_pfweight, bool charged_only,
-                      double myRho) {
+
+
+
+double tools::getPFIsolation(edm::Handle<pat::PackedCandidateCollection> pfcands, const reco::Candidate* ptcl,
+                             double r_iso_min, double r_iso_max, double kt_scale, bool use_pfweight, bool charged_only, double myRho) {
     
-    if (ptcl->pt()<5.) return 99999.;
+    if(ptcl->pt()<5.) return 99999.;
 
     double CorrectedTerm=0.0;
 
-    if(ptcl->isMuon()) {
+    if(ptcl->isMuon()){
 
         double  Aeff[ 5 ] = { 0.0735, 0.0619, 0.0465, 0.0433, 0.0577};
         double etaMuCd = ptcl->eta();
@@ -489,37 +490,38 @@ double tools::pfAbsIso(const pat::Muon *mu)
 }
 
 
+std::map<int, std::vector<tools::effAreaForRange>*> effAreas; 
 
 
-// TODO: clean this up
-double tools::pfRelIso(const pat::Electron *iE, double myRho)
-{
-    double  Aeff[ 7 ] = { 0.1703, 0.1715, 0.1213, 0.1230, 0.1635, 0.1937, 0.2393};
-
-    double CorrectedTerm=0.0;
-    if( TMath::Abs( iE->superCluster()->eta() ) < 1.0                                            )   CorrectedTerm = myRho * Aeff[ 0 ];
-     else if( TMath::Abs( iE->superCluster()->eta() ) > 1.0   && TMath::Abs( iE->superCluster()->eta() ) < 1.479  )   CorrectedTerm = myRho * Aeff[ 1 ];
-     else if( TMath::Abs( iE->superCluster()->eta() ) > 1.479 && TMath::Abs( iE->superCluster()->eta() ) < 2.0    )   CorrectedTerm = myRho * Aeff[ 2 ];
-     else if( TMath::Abs( iE->superCluster()->eta() ) > 2.0   && TMath::Abs( iE->superCluster()->eta() ) < 2.2    )   CorrectedTerm = myRho * Aeff[ 3 ];
-     else if( TMath::Abs( iE->superCluster()->eta() ) > 2.2   && TMath::Abs( iE->superCluster()->eta() ) < 2.3    )   CorrectedTerm = myRho * Aeff[ 4 ];
-     else if( TMath::Abs( iE->superCluster()->eta() ) > 2.3   && TMath::Abs( iE->superCluster()->eta() ) < 2.4    )   CorrectedTerm = myRho * Aeff[ 5 ];
-     else  CorrectedTerm = myRho * Aeff[ 6 ];
-    
-    return (iE->pfIsolationVariables().sumChargedHadronPt + TMath::Max(0.0, iE->pfIsolationVariables().sumNeutralHadronEt + iE->pfIsolationVariables().sumPhotonEt - CorrectedTerm ) )/iE->pt();
+void tools::readEffAreas(std::string fileName, int pdgId){
+  effAreas[pdgId] = new std::vector<tools::effAreaForRange>();
+  std::ifstream file(fileName);
+  std::string line;
+  while(std::getline(file, line)){
+    if(line.find('#') == 0) continue;
+    std::stringstream linestream(line);
+    tools::effAreaForRange ea;
+    linestream >> ea.min >> ea.max >> ea.effArea;
+    effAreas[pdgId]->push_back(ea);
+  } 
 }
-double tools::pfAbsIso(const pat::Electron *iE, double myRho)
-{
-    double  Aeff[ 7 ] = { 0.1703, 0.1715, 0.1213, 0.1230, 0.1635, 0.1937, 0.2393};
 
-    double CorrectedTerm=0.0;
-    if( TMath::Abs( iE->superCluster()->eta() ) < 1.0                                            )   CorrectedTerm = myRho * Aeff[ 0 ];
-     else if( TMath::Abs( iE->superCluster()->eta() ) > 1.0   && TMath::Abs( iE->superCluster()->eta() ) < 1.479  )   CorrectedTerm = myRho * Aeff[ 1 ];
-     else if( TMath::Abs( iE->superCluster()->eta() ) > 1.479 && TMath::Abs( iE->superCluster()->eta() ) < 2.0    )   CorrectedTerm = myRho * Aeff[ 2 ];
-     else if( TMath::Abs( iE->superCluster()->eta() ) > 2.0   && TMath::Abs( iE->superCluster()->eta() ) < 2.2    )   CorrectedTerm = myRho * Aeff[ 3 ];
-     else if( TMath::Abs( iE->superCluster()->eta() ) > 2.2   && TMath::Abs( iE->superCluster()->eta() ) < 2.3    )   CorrectedTerm = myRho * Aeff[ 4 ];
-     else if( TMath::Abs( iE->superCluster()->eta() ) > 2.3   && TMath::Abs( iE->superCluster()->eta() ) < 2.4    )   CorrectedTerm = myRho * Aeff[ 5 ];
-     else  CorrectedTerm = myRho * Aeff[ 6 ];
-    
+double tools::getEffArea(int pdgId, double eta){
+  for(auto ea : *effAreas[pdgId]){
+    if(ea.min < std::abs(eta) and ea.max > std::abs(eta)) return ea.effArea;
+  }
+  return 0;
+}
+
+
+double tools::pfRelIso(const pat::Electron *iE, double myRho){
+    return tools::pfAbsIso(iE, myRho)/iE->pt();
+}
+
+double tools::pfAbsIso(const pat::Electron *iE, double myRho){
+    if(!effAreas[11]) readEffAreas(edm::FileInPath("Majorana/PatAnalyzer/src/effAreaElectrons_cone03_pfNeuHadronsAndPhotons_80X.txt").fullPath(), 11);
+
+    double CorrectedTerm = myRho*getEffArea(11, iE->superCluster()->eta());
     return (iE->pfIsolationVariables().sumChargedHadronPt + TMath::Max(0.0, iE->pfIsolationVariables().sumNeutralHadronEt + iE->pfIsolationVariables().sumPhotonEt - CorrectedTerm ) );
 }
 

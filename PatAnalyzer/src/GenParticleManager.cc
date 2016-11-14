@@ -1,6 +1,5 @@
 #include "Majorana/PatAnalyzer/interface/GenParticleManager.h"
 
-using namespace std;
 const GenParticle* GenParticleManager::getMother(const GenParticle *p)
 {
     

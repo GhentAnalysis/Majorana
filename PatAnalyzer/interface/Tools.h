@@ -228,6 +228,15 @@ namespace tools {
     std::vector<double> RegressionVars(const pat::Jet *jet, float genpt, const pat::Muon* mu);
 
     bool passMultiIsolation(TString level, double mini_iso, double jetPtRatio, double jetPtRel);
+    struct effAreaForRange{
+      double min;
+      double max;
+      double effArea;
+    };
+
+
+    void readEffAreas(std::string fileName, int pdgId);
+    double getEffArea(int pdgId, double eta);
 }
 
 #endif
