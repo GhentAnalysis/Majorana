@@ -141,8 +141,8 @@ namespace tools {
     double pfRelIso(const pat::Electron *el, double myRho);
     double pfAbsIso(const pat::Muon *mu);
     double pfAbsIso(const pat::Electron *el, double myRho);
-    //double pfRelIso(const edm::Ptr<reco::GsfElectron> el, double myRho);
     double pfRelIso(const pat::Muon *mu, double myRho);
+    double pfAbsIso(const pat::Muon *mu, double myRho);
 
     bool triggerEmulator(const pat::Electron *iE);
     bool triggerEmulatorReturned(const pat::Electron *iE);

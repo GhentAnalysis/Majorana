@@ -116,6 +116,11 @@ trilepton::trilepton(const edm::ParameterSet & iConfig) :
 
 void trilepton::beginJob()
 {
+    // Read in effective areas from text files, to be used for lepton isolation calculations
+    tools::readEffAreas(edm::FileInPath("Majorana/PatAnalyzer/src/effAreaElectrons_cone03_pfNeuHadronsAndPhotons_80X.txt").fullPath(), 11);
+    tools::readEffAreas(edm::FileInPath("Majorana/PatAnalyzer/src/effAreaMuons_cone03_pfNeuHadronsAndPhotons_80X.txt").fullPath(), 13);
+
+
     if(treeForFakeRate) outputTree = fs->make<TTree>("fakeRateTree", "fakeRateTree");
     else                outputTree = fs->make<TTree>("trileptonTree","trileptonTree");
     Nvtx = fs->make<TH1F>("N_{vtx}", "Number of vertices;N_{vtx};events / 1"  ,    40, 0., 40.);
@@ -869,7 +874,7 @@ void trilepton::analyze(const edm::Event& iEvent, const edm::EventSetup& iEventS
       // might be preferable to change to vectors instead of arrays because we do not know the length
       _flavors[leptonCounter]     = 1;
       _charges[leptonCounter]     = muon->charge();
-      _isolation[leptonCounter]   = tools::pfRelIso(&*muon,myRhoJECJets);  // should check out this function
+      _isolation[leptonCounter]   = tools::pfRelIso(&*muon,myRhoJECJets);
       _isolation_absolute[leptonCounter] = tools::pfAbsIso(&*muon);
       
       _miniisolation[leptonCounter][0] 	      = tools::getPFIsolation(pfcands, &*muon, 0.05, 0.2, 10., false, false, myRhoJets); // check!!!!!!! effective areas are still wrong 
@@ -1017,7 +1022,6 @@ void trilepton::analyze(const edm::Event& iEvent, const edm::EventSetup& iEventS
 	      _findMatched[leptonCounter]=1;
 	  }
 	  else {
-	      //std::cout<<"No match e"<<std::endl;
 	      _origin[leptonCounter] = -1;
 	      _originReduced[leptonCounter] = -1;
 	      _mompt[leptonCounter] = 0;

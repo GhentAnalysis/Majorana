@@ -1,42 +1,44 @@
 #include "Majorana/PatAnalyzer/interface/Tools.h"
 #include "FWCore/ParameterSet/interface/FileInPath.h"
 
+
+/*
+ * Stuff for reading in and retrieving the effective areas
+ */
+std::map<int, std::vector<tools::effAreaForRange>*> effAreas;
+
+void tools::readEffAreas(std::string fileName, int pdgId){
+  effAreas[pdgId] = new std::vector<tools::effAreaForRange>();
+  std::ifstream file(fileName);
+  std::string line;
+  while(std::getline(file, line)){
+    if(line.find('#') == 0) continue;
+    std::stringstream linestream(line);
+    tools::effAreaForRange ea;
+    linestream >> ea.min >> ea.max >> ea.effArea;
+    effAreas[pdgId]->push_back(ea);
+  }
+}
+
+double tools::getEffArea(int pdgId, double eta){
+  for(auto ea : *effAreas[pdgId]){
+    if(ea.min < std::abs(eta) and ea.max > std::abs(eta)) return ea.effArea;
+  }
+  return 0;
+}
+
+
+
 double tools::getActivityAroundLepton(edm::Handle<pat::PackedCandidateCollection> pfcands,
                       const reco::Candidate* ptcl,
                       double r_iso_min, double r_iso_max, double kt_scale,
                       bool use_pfweight, bool charged_only,
                       double myRho) {
-    
     if (ptcl->pt()<5.) return 99999.;
 
-    double CorrectedTerm=0.0;
-
-    if(ptcl->isMuon()) {
-
-        double  Aeff[ 5 ] = { 0.0735, 0.0619, 0.0465, 0.0433, 0.0577};
-        double etaMuCd = ptcl->eta();
-    
-        if( TMath::Abs( etaMuCd ) < 0.8 ) CorrectedTerm = myRho * Aeff[ 0 ];
-        else if( TMath::Abs( etaMuCd ) < 1.3  )   CorrectedTerm = myRho * Aeff[ 1 ];
-        else if( TMath::Abs( etaMuCd ) < 2.0  )   CorrectedTerm = myRho * Aeff[ 2 ];
-        else if( TMath::Abs( etaMuCd ) < 2.2  )   CorrectedTerm = myRho * Aeff[ 3 ];
-        else  CorrectedTerm = myRho * Aeff[ 4 ];
-    }
-
-    else if(ptcl->isElectron()){
-
-        double  Aeff[ 7 ] = { 0.1752, 0.1862, 0.1411, 0.1534, 0.1903, 0.2243, 0.2687};
-        double etaElCd = dynamic_cast<const pat::Electron *>(ptcl)->superCluster()->eta();
-        if( TMath::Abs( etaElCd ) < 1.0                                            )   CorrectedTerm = myRho * Aeff[ 0 ];
-            else if( TMath::Abs( etaElCd ) > 1.0   && TMath::Abs( etaElCd ) < 1.479  )   CorrectedTerm = myRho * Aeff[ 1 ];
-            else if( TMath::Abs( etaElCd ) > 1.479 && TMath::Abs( etaElCd ) < 2.0    )   CorrectedTerm = myRho * Aeff[ 2 ];
-            else if( TMath::Abs( etaElCd ) > 2.0   && TMath::Abs( etaElCd ) < 2.2    )   CorrectedTerm = myRho * Aeff[ 3 ];
-            else if( TMath::Abs( etaElCd ) > 2.2   && TMath::Abs( etaElCd ) < 2.3    )   CorrectedTerm = myRho * Aeff[ 4 ];
-            else if( TMath::Abs( etaElCd ) > 2.3   && TMath::Abs( etaElCd ) < 2.4    )   CorrectedTerm = myRho * Aeff[ 5 ];
-            else CorrectedTerm = myRho * Aeff[6];
-
-    }
-    
+    double CorrectedTerm = 0;
+    if(ptcl->isMuon())          CorrectedTerm = myRho*getEffArea(13, ptcl->eta());
+    else if(ptcl->isElectron()) CorrectedTerm = myRho*getEffArea(11, dynamic_cast<const pat::Electron*>(ptcl)->superCluster()->eta());
 
     double deadcone_nh(0.), deadcone_ch(0.), deadcone_ph(0.), deadcone_pu(0.);
     if(ptcl->isElectron()) {
@@ -125,34 +127,6 @@ double tools::getActivityAroundLeptonDB(edm::Handle<pat::PackedCandidateCollecti
     
     if (ptcl->pt()<5.) return 99999.;
 
-    /*
-    double CorrectedTerm=0.0;
-
-    if(ptcl->isMuon()) {
-
-        double  Aeff[ 5 ] = { 0.0735, 0.0619, 0.0465, 0.0433, 0.0577};
-    
-        if( TMath::Abs( ptcl->eta() ) < 0.8 ) CorrectedTerm = myRho * Aeff[ 0 ];
-        else if( TMath::Abs( ptcl->eta() ) < 1.3  )   CorrectedTerm = myRho * Aeff[ 1 ];
-        else if( TMath::Abs( ptcl->eta() ) < 2.0  )   CorrectedTerm = myRho * Aeff[ 2 ];
-        else if( TMath::Abs( ptcl->eta() ) < 2.2  )   CorrectedTerm = myRho * Aeff[ 3 ];
-        else  CorrectedTerm = myRho * Aeff[ 4 ];
-    }
-
-    else if(ptcl->isElectron()){
-
-        double  Aeff[ 7 ] = { 0.1752, 0.1862, 0.1411, 0.1534, 0.1903, 0.2243, 0.2687};
-        if( TMath::Abs( ptcl->eta() ) < 1.0                                            )   CorrectedTerm = myRho * Aeff[ 0 ];
-            else if( TMath::Abs( ptcl->eta() ) > 1.0   && TMath::Abs( ptcl->eta() ) < 1.479  )   CorrectedTerm = myRho * Aeff[ 1 ];
-            else if( TMath::Abs( ptcl->eta() ) > 1.479 && TMath::Abs( ptcl->eta() ) < 2.0    )   CorrectedTerm = myRho * Aeff[ 2 ];
-            else if( TMath::Abs( ptcl->eta() ) > 2.0   && TMath::Abs( ptcl->eta() ) < 2.2    )   CorrectedTerm = myRho * Aeff[ 3 ];
-            else if( TMath::Abs( ptcl->eta() ) > 2.2   && TMath::Abs( ptcl->eta() ) < 2.3    )   CorrectedTerm = myRho * Aeff[ 4 ];
-            else if( TMath::Abs( ptcl->eta() ) > 2.3   && TMath::Abs( ptcl->eta() ) < 2.4    )   CorrectedTerm = myRho * Aeff[ 5 ];
-            else CorrectedTerm = myRho * Aeff[6];
-
-    }
-    */
-    
 
     double deadcone_nh(0.), deadcone_ch(0.), deadcone_ph(0.), deadcone_pu(0.);
     if(ptcl->isElectron()) {
@@ -241,33 +215,9 @@ double tools::getPFIsolation(edm::Handle<pat::PackedCandidateCollection> pfcands
     
     if(ptcl->pt()<5.) return 99999.;
 
-    double CorrectedTerm=0.0;
-
-    if(ptcl->isMuon()){
-
-        double  Aeff[ 5 ] = { 0.0735, 0.0619, 0.0465, 0.0433, 0.0577};
-        double etaMuCd = ptcl->eta();
-    
-        if( TMath::Abs( etaMuCd ) < 0.8 ) CorrectedTerm = myRho * Aeff[ 0 ];
-        else if( TMath::Abs( etaMuCd ) < 1.3  )   CorrectedTerm = myRho * Aeff[ 1 ];
-        else if( TMath::Abs( etaMuCd ) < 2.0  )   CorrectedTerm = myRho * Aeff[ 2 ];
-        else if( TMath::Abs( etaMuCd ) < 2.2  )   CorrectedTerm = myRho * Aeff[ 3 ];
-        else  CorrectedTerm = myRho * Aeff[ 4 ];
-    }
-
-    else if(ptcl->isElectron()){
-
-        double  Aeff[ 7 ] = { 0.1752, 0.1862, 0.1411, 0.1534, 0.1903, 0.2243, 0.2687};
-        double etaElCd = dynamic_cast<const pat::Electron *>(ptcl)->superCluster()->eta();
-        if( TMath::Abs( etaElCd ) < 1.0                                            )   CorrectedTerm = myRho * Aeff[ 0 ];
-            else if( TMath::Abs( etaElCd ) > 1.0   && TMath::Abs( etaElCd ) < 1.479  )   CorrectedTerm = myRho * Aeff[ 1 ];
-            else if( TMath::Abs( etaElCd ) > 1.479 && TMath::Abs( etaElCd ) < 2.0    )   CorrectedTerm = myRho * Aeff[ 2 ];
-            else if( TMath::Abs( etaElCd ) > 2.0   && TMath::Abs( etaElCd ) < 2.2    )   CorrectedTerm = myRho * Aeff[ 3 ];
-            else if( TMath::Abs( etaElCd ) > 2.2   && TMath::Abs( etaElCd ) < 2.3    )   CorrectedTerm = myRho * Aeff[ 4 ];
-            else if( TMath::Abs( etaElCd ) > 2.3   && TMath::Abs( etaElCd ) < 2.4    )   CorrectedTerm = myRho * Aeff[ 5 ];
-            else CorrectedTerm = myRho * Aeff[6];
-
-    }
+    double CorrectedTerm = 0;
+    if(ptcl->isMuon())          CorrectedTerm = myRho*getEffArea(13, ptcl->eta());
+    else if(ptcl->isElectron()) CorrectedTerm = myRho*getEffArea(11, dynamic_cast<const pat::Electron*>(ptcl)->superCluster()->eta());
  
     double deadcone_nh(0.), deadcone_ch(0.), deadcone_ph(0.), deadcone_pu(0.);
     if(ptcl->isElectron()) {
@@ -465,87 +415,35 @@ std::vector<const pat::Muon* > tools::effMuonSelector(const std::vector<pat::Muo
 }
 
 
+/*
+ * pfRelIso and pfAbsIso
+ */
 
+double tools::pfRelIso(const pat::Muon *mu){
+    return tools::pfAbsIso(mu)/mu->pt();
+}
 
-//Muon pfRelIso
-double tools::pfRelIso(const pat::Muon *mu)
-{
-	double chargedHadronIso = mu->pfIsolationR03().sumChargedHadronPt;
-    double neutralHadronIso = mu->pfIsolationR03().sumNeutralHadronEt;
-    double photonIso = mu->pfIsolationR03().sumPhotonEt;
+double tools::pfAbsIso(const pat::Muon *mu){
     double beta = mu->pfIsolationR03().sumPUPt;
-    double pfRelIsoMu  = ( chargedHadronIso + TMath::Max ( 0.0 ,neutralHadronIso + photonIso - 0.5 * beta ) )/mu->pt();
-    return pfRelIsoMu;
+    return (mu->pfIsolationR03().sumChargedHadronPt + std::max(0.0, mu->pfIsolationR03().sumNeutralHadronEt + mu->pfIsolationR03().sumPhotonEt - 0.5*beta));
 }
-// Muon absolute isolation
-double tools::pfAbsIso(const pat::Muon *mu)
-{
- 	//******************** absolute isolation 
-	double chargedHadronIso = mu->pfIsolationR03().sumChargedHadronPt;
-    double neutralHadronIso = mu->pfIsolationR03().sumNeutralHadronEt;
-    double photonIso = mu->pfIsolationR03().sumPhotonEt;
-    double beta = mu->pfIsolationR03().sumPUPt;
-    double pfRelIsoMu  = ( chargedHadronIso + TMath::Max ( 0.0 ,neutralHadronIso + photonIso - 0.5 * beta ) );
-    return pfRelIsoMu;
-}
-
-
-std::map<int, std::vector<tools::effAreaForRange>*> effAreas; 
-
-
-void tools::readEffAreas(std::string fileName, int pdgId){
-  effAreas[pdgId] = new std::vector<tools::effAreaForRange>();
-  std::ifstream file(fileName);
-  std::string line;
-  while(std::getline(file, line)){
-    if(line.find('#') == 0) continue;
-    std::stringstream linestream(line);
-    tools::effAreaForRange ea;
-    linestream >> ea.min >> ea.max >> ea.effArea;
-    effAreas[pdgId]->push_back(ea);
-  } 
-}
-
-double tools::getEffArea(int pdgId, double eta){
-  for(auto ea : *effAreas[pdgId]){
-    if(ea.min < std::abs(eta) and ea.max > std::abs(eta)) return ea.effArea;
-  }
-  return 0;
-}
-
 
 double tools::pfRelIso(const pat::Electron *iE, double myRho){
     return tools::pfAbsIso(iE, myRho)/iE->pt();
 }
 
 double tools::pfAbsIso(const pat::Electron *iE, double myRho){
-    if(!effAreas[11]) readEffAreas(edm::FileInPath("Majorana/PatAnalyzer/src/effAreaElectrons_cone03_pfNeuHadronsAndPhotons_80X.txt").fullPath(), 11);
-
     double CorrectedTerm = myRho*getEffArea(11, iE->superCluster()->eta());
-    return (iE->pfIsolationVariables().sumChargedHadronPt + TMath::Max(0.0, iE->pfIsolationVariables().sumNeutralHadronEt + iE->pfIsolationVariables().sumPhotonEt - CorrectedTerm ) );
+    return (iE->pfIsolationVariables().sumChargedHadronPt + std::max(0.0, iE->pfIsolationVariables().sumNeutralHadronEt + iE->pfIsolationVariables().sumPhotonEt - CorrectedTerm));
 }
 
+double tools::pfRelIso(const pat::Muon *mu, double myRho){
+    return tools::pfAbsIso(mu, myRho)/mu->pt();
+}
 
-double tools::pfRelIso(const pat::Muon *mu, double myRho)
-{
-    //double  Aeff[ 5 ] = { 0.0913, 0.0765, 0.0546, 0.0728, 0.1177};
-    double  Aeff[ 5 ] = { 0.0735, 0.0619, 0.0465, 0.0433, 0.0577};
-    double CorrectedTerm=0.0;
-    
-    if( TMath::Abs( mu->eta() ) < 0.8 ) CorrectedTerm = myRho * Aeff[ 0 ];
-    else if( TMath::Abs( mu->eta() ) < 1.3  )   CorrectedTerm = myRho * Aeff[ 1 ];
-    else if( TMath::Abs( mu->eta() ) < 2.0  )   CorrectedTerm = myRho * Aeff[ 2 ];
-    else if( TMath::Abs( mu->eta() ) < 2.2  )   CorrectedTerm = myRho * Aeff[ 3 ];
-    else  CorrectedTerm = myRho * Aeff[ 4 ];
-    
-    double chargedHadronIso = mu->pfIsolationR03().sumChargedHadronPt;
-    double neutralHadronIso = mu->pfIsolationR03().sumNeutralHadronEt;
-    double photonIso = mu->pfIsolationR03().sumPhotonEt;
-    //double beta = mu->pfIsolationR03().sumPUPt;
-    
-    double pfRelIsoE = (chargedHadronIso + TMath::Max(0.0, neutralHadronIso + photonIso - CorrectedTerm ) ) /mu->pt() ;
-    
-    return pfRelIsoE;
+double tools::pfAbsIso(const pat::Muon *mu, double myRho){
+    double CorrectedTerm = myRho*getEffArea(13, mu->eta());
+    return (mu->pfIsolationR03().sumChargedHadronPt + std::max(0.0, mu->pfIsolationR03().sumNeutralHadronEt + mu->pfIsolationR03().sumPhotonEt - CorrectedTerm));
 }
 
 
@@ -1005,9 +903,9 @@ double tools::Mll_calc(TLorentzVector Vect1, TLorentzVector Vect2){
 //ID=#MET+5*(#MT+3*(#Mll+3*#category))
 int tools::srID(double met, double mt, double mll, double channel) {
     if ((channel > 0) && (channel!=4))
-        return TMath::Min(int(met/50),4) + 5*(int(mt>120)+int(mt>160) + 3*(2*int(mll>100) + 3*channel));
+        return std::min(int(met/50),4) + 5*(int(mt>120)+int(mt>160) + 3*(2*int(mll>100) + 3*channel));
     else 
-        return TMath::Min(int(met/50),4) + 5*(int(mt>120)+int(mt>160) + 3*(int(mll>75) + int(mll>105) + 3*channel));
+        return std::min(int(met/50),4) + 5*(int(mt>120)+int(mt>160) + 3*(int(mll>75) + int(mll>105) + 3*channel));
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1238,7 +1136,7 @@ float tools::smear_pt_res(float pt, float genpt, float eta)
         }
 #endif
         float deltapt = (pt - genpt) * res;
-        return TMath::Max(float(0.), genpt + deltapt);
+        return std::max(float(0.), genpt + deltapt);
     }
     return pt;
 }
@@ -1299,10 +1197,10 @@ std::vector<double> tools::RegressionVars(const pat::Jet *jet, float genpt, cons
     } //else
       //  std::cout<<"no info"<<std::endl;
     
-    vars.push_back(TMath::Max(0.,hJet_vtx3dL));
-    vars.push_back(TMath::Max(0.,hJet_vtx3deL));
-    vars.push_back(TMath::Max(0.,hJet_vtxMass));
-    vars.push_back(TMath::Max(0.,hJet_vtxPt));
+    vars.push_back(std::max(0.,hJet_vtx3dL));
+    vars.push_back(std::max(0.,hJet_vtx3deL));
+    vars.push_back(std::max(0.,hJet_vtxMass));
+    vars.push_back(std::max(0.,hJet_vtxPt));
     
     vars.push_back(jet->chargedHadronEnergyFraction() + jet->chargedEmEnergyFraction());
     //vars.push_back(jet->getPFConstituents().size());
