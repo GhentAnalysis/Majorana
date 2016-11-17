@@ -18,5 +18,5 @@ scram b -j 8
 
 
 Output will be found at
-* /pnfs/iihe/cms/store/user/$USER/majorana/<datasetname>/crab_<productionLabel>/*/*/trilepton_X.root (for submissions with crab)
-* /user/$USER/public/majorana/<datasetname>/local_<productionLabel>/trilepton_X.root (for local submissions)
+* /pnfs/iihe/cms/store/user/$USER/majorana/\<datasetname\>/crab_\<productionLabel\>/\*/\*/trilepton_X.root (for submissions with crab)
+* /user/$USER/public/majorana/\<datasetname\>/local_\<productionLabel\>/trilepton_X.root (for local submissions)
