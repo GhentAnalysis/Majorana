@@ -119,8 +119,8 @@ trilepton::trilepton(const edm::ParameterSet & iConfig) :
 void trilepton::beginJob()
 {
     // Read in effective areas from text files, to be used for lepton isolation calculations
-    tools::readEffAreas(edm::FileInPath("Majorana/PatAnalyzer/src/effAreaElectrons_cone03_pfNeuHadronsAndPhotons_80X.txt").fullPath(), 11);
-    tools::readEffAreas(edm::FileInPath("Majorana/PatAnalyzer/src/effAreaMuons_cone03_pfNeuHadronsAndPhotons_80X.txt").fullPath(), 13);
+    tools::readEffAreas(edm::FileInPath("Majorana/PatAnalyzer/data/effAreaElectrons_cone03_pfNeuHadronsAndPhotons_80X.txt").fullPath(), 11);
+    tools::readEffAreas(edm::FileInPath("Majorana/PatAnalyzer/data/effAreaMuons_cone03_pfNeuHadronsAndPhotons_80X.txt").fullPath(), 13);
     tools::initMultiIsoConstants(); // that's the problem when using namespaces instead of classes, you need to have separate init functions
 
     if(treeForFakeRate) outputTree = fs->make<TTree>("fakeRateTree", "fakeRateTree");
