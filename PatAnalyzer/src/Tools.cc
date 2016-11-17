@@ -28,391 +28,61 @@ double tools::getEffArea(int pdgId, double eta){
 }
 
 
+/*
+ * mini isolation
+ */
+double tools::getMiniIsolation(edm::Handle<pat::PackedCandidateCollection> pfcands,
+                        const reco::Candidate* ptcl,
+                        double r_iso_min, double r_iso_max, double kt_scale, double rho,
+                        bool charged_only, bool deltaBeta){
 
-double tools::getActivityAroundLepton(edm::Handle<pat::PackedCandidateCollection> pfcands,
-                      const reco::Candidate* ptcl,
-                      double r_iso_min, double r_iso_max, double kt_scale,
-                      bool use_pfweight, bool charged_only,
-                      double myRho) {
     if (ptcl->pt()<5.) return 99999.;
+
+    double absEta = 0;
+    if(ptcl->isElectron())  absEta = abs(dynamic_cast<const pat::Electron*>(ptcl)->superCluster()->eta());
+    else if(ptcl->isMuon()) absEta = abs(ptcl->eta());
+
+
+    double deadcone_nh(0.), deadcone_ch(0.), deadcone_ph(0.), deadcone_pu(0.);
+    if(ptcl->isElectron() and absEta>1.479){ deadcone_ch = 0.015;  deadcone_pu = 0.015; deadcone_ph = 0.08; deadcone_nh = 0;}
+    else if(ptcl->isMuon())                { deadcone_ch = 0.0001; deadcone_pu = 0.01;  deadcone_ph = 0.01; deadcone_nh = 0.01;}
+
+    double iso_nh(0.); double iso_ch(0.);
+    double iso_ph(0.); double iso_pu(0.);
+    double ptThresh = ptcl->isElectron()? 0. : 0.5;
+
+    double max_pt = kt_scale/r_iso_min;
+    double min_pt = kt_scale/r_iso_max;
+    double r_iso  = kt_scale/std::max(std::min(ptcl->pt(), max_pt), min_pt);
+
+    for(const pat::PackedCandidate &pfc : *pfcands){
+      if(abs(pfc.pdgId())<7) continue;
+
+      double dr = deltaR(pfc, *ptcl);
+      if(dr > r_iso) continue;
+
+      if(pfc.charge()==0){								// Neutral
+        if(pfc.pt()>ptThresh){
+          if(abs(pfc.pdgId())==22 and dr > deadcone_ph)        iso_ph += pfc.pt();	// Photons
+          else if (abs(pfc.pdgId())==130 and dr > deadcone_nh) iso_nh += pfc.pt();	// Neutral hadrons
+        }
+      } else if (pfc.fromPV()>1){
+        if(abs(pfc.pdgId())==211 and dr > deadcone_ch) iso_ch += pfc.pt();		// Charged from PV
+      } else if(pfc.pt()>ptThresh and dr > deadcone_pu) iso_pu += pfc.pt();		// Charged from PU
+    }
 
     double CorrectedTerm = 0;
-    if(ptcl->isMuon())          CorrectedTerm = myRho*getEffArea(13, ptcl->eta());
-    else if(ptcl->isElectron()) CorrectedTerm = myRho*getEffArea(11, dynamic_cast<const pat::Electron*>(ptcl)->superCluster()->eta());
+    if(ptcl->isMuon())          CorrectedTerm = rho*getEffArea(13, ptcl->eta());
+    else if(ptcl->isElectron()) CorrectedTerm = rho*getEffArea(11, dynamic_cast<const pat::Electron*>(ptcl)->superCluster()->eta());
 
-    double deadcone_nh(0.), deadcone_ch(0.), deadcone_ph(0.), deadcone_pu(0.);
-    if(ptcl->isElectron()) {
-        if (fabs(dynamic_cast<const pat::Electron *>(ptcl)->superCluster()->eta())>1.479) {deadcone_ch = 0.015; deadcone_pu = 0.015; deadcone_ph = 0.08;}
-    } else if(ptcl->isMuon()) {
-        deadcone_ch = 0.0001; deadcone_pu = 0.01; deadcone_ph = 0.01;deadcone_nh = 0.01;
-    } else {
-        //deadcone_ch = 0.0001; deadcone_pu = 0.01; deadcone_ph = 0.01;deadcone_nh = 0.01; // maybe use muon cones??
-    }
+    double iso;
+    if(charged_only)   iso = iso_ch;
+    else if(deltaBeta) iso = iso_ch + std::max(0., iso_ph + iso_nh - 0.5*iso_pu);
+    else               iso = iso_ch + std::max(0., iso_ph + iso_nh - CorrectedTerm*(r_iso*r_iso)/(0.3*0.3));
 
-    double iso_nh(0.); double iso_ch(0.);
-    double iso_ph(0.); double iso_pu(0.);
-    double ptThresh(0.5);
-    if(ptcl->isElectron()) ptThresh = 0;
-    double r_iso = std::max(r_iso_min,std::min(r_iso_max, kt_scale/ptcl->pt()));
-    for (const pat::PackedCandidate &pfc : *pfcands) {
-        if (abs(pfc.pdgId())<7) continue;
-        
-        double dr = deltaR(pfc, *ptcl);
-        double drMax = 0.4;
-        if (dr < r_iso) continue;
-        if (dr > drMax) continue;
-        
-        //////////////////  NEUTRALS  /////////////////////////
-        if (pfc.charge()==0){
-            if (pfc.pt()>ptThresh) {
-                double wpf(1.);
-                if (use_pfweight){
-                    double wpv(0.), wpu(0.);
-                    for (const pat::PackedCandidate &jpfc : *pfcands) {
-                        double jdr = deltaR(pfc, jpfc);
-                        if (pfc.charge()!=0 || jdr<0.00001) continue;
-                        double jpt = jpfc.pt();
-                        if (pfc.fromPV()>1) wpv *= jpt/jdr;
-                        else wpu *= jpt/jdr;
-                    }
-                    wpv = log(wpv);
-                    wpu = log(wpu);
-                    wpf = wpv/(wpv+wpu);
-                }
-                /////////// PHOTONS ////////////
-                if (abs(pfc.pdgId())==22) {
-                    if(dr < deadcone_ph) continue;
-                    iso_ph += wpf*pfc.pt();
-                    /////////// NEUTRAL HADRONS ////////////
-                } else if (abs(pfc.pdgId())==130) {
-                    if(dr < deadcone_nh) continue;
-                    iso_nh += wpf*pfc.pt();
-                }
-            }
-            //////////////////  CHARGED from PV  /////////////////////////
-        } else if (pfc.fromPV()>1){
-            if (abs(pfc.pdgId())==211) {
-                if(dr < deadcone_ch) continue;
-                iso_ch += pfc.pt();
-            }
-            //////////////////  CHARGED from PU  /////////////////////////
-        } else {
-            if (pfc.pt()>ptThresh){
-                if(dr < deadcone_pu) continue;
-                iso_pu += pfc.pt();
-            }
-        }
-    }
-    double iso(0.);
-    if (charged_only){
-        iso = iso_ch;
-    } else {
-        iso = iso_ph + iso_nh;
-        iso -= CorrectedTerm/(0.3 * 0.3 / (0.4 * 0.4 - r_iso * r_iso));
-        if (iso>0) 
-            iso += iso_ch;
-        else 
-            iso = iso_ch;
-    }
-    iso = iso/ptcl->pt();
-    
-    return iso;
+    return iso/ptcl->pt();
 }
 
-double tools::getActivityAroundLeptonDB(edm::Handle<pat::PackedCandidateCollection> pfcands,
-                      const reco::Candidate* ptcl,
-                      double r_iso_min, double r_iso_max, double kt_scale,
-                      bool use_pfweight, bool charged_only,
-                      double myRho) {
-    
-    if (ptcl->pt()<5.) return 99999.;
-
-
-    double deadcone_nh(0.), deadcone_ch(0.), deadcone_ph(0.), deadcone_pu(0.);
-    if(ptcl->isElectron()) {
-        if (fabs(dynamic_cast<const pat::Electron *>(ptcl)->superCluster()->eta())>1.479) {deadcone_ch = 0.015; deadcone_pu = 0.015; deadcone_ph = 0.08;}
-    } else if(ptcl->isMuon()) {
-        deadcone_ch = 0.0001; deadcone_pu = 0.01; deadcone_ph = 0.01;deadcone_nh = 0.01;
-    } else {
-        //deadcone_ch = 0.0001; deadcone_pu = 0.01; deadcone_ph = 0.01;deadcone_nh = 0.01; // maybe use muon cones??
-    }
-
-    double iso_nh(0.); double iso_ch(0.);
-    double iso_ph(0.); double iso_pu(0.);
-    double ptThresh(0.5);
-    if(ptcl->isElectron()) ptThresh = 0;
-    double r_iso = std::max(r_iso_min,std::min(r_iso_max, kt_scale/ptcl->pt()));
-    for (const pat::PackedCandidate &pfc : *pfcands) {
-        if (abs(pfc.pdgId())<7) continue;
-        
-        double dr = deltaR(pfc, *ptcl);
-        double drMax = 0.4;
-        if (dr < r_iso) continue;
-        if (dr > drMax) continue;
-        
-        //////////////////  NEUTRALS  /////////////////////////
-        if (pfc.charge()==0){
-            if (pfc.pt()>ptThresh) {
-                double wpf(1.);
-                if (use_pfweight){
-                    double wpv(0.), wpu(0.);
-                    for (const pat::PackedCandidate &jpfc : *pfcands) {
-                        double jdr = deltaR(pfc, jpfc);
-                        if (pfc.charge()!=0 || jdr<0.00001) continue;
-                        double jpt = jpfc.pt();
-                        if (pfc.fromPV()>1) wpv *= jpt/jdr;
-                        else wpu *= jpt/jdr;
-                    }
-                    wpv = log(wpv);
-                    wpu = log(wpu);
-                    wpf = wpv/(wpv+wpu);
-                }
-                /////////// PHOTONS ////////////
-                if (abs(pfc.pdgId())==22) {
-                    if(dr < deadcone_ph) continue;
-                    iso_ph += wpf*pfc.pt();
-                    /////////// NEUTRAL HADRONS ////////////
-                } else if (abs(pfc.pdgId())==130) {
-                    if(dr < deadcone_nh) continue;
-                    iso_nh += wpf*pfc.pt();
-                }
-            }
-            //////////////////  CHARGED from PV  /////////////////////////
-        } else if (pfc.fromPV()>1){
-            if (abs(pfc.pdgId())==211) {
-                if(dr < deadcone_ch) continue;
-                iso_ch += pfc.pt();
-            }
-            //////////////////  CHARGED from PU  /////////////////////////
-        } else {
-            if (pfc.pt()>ptThresh){
-                if(dr < deadcone_pu) continue;
-                iso_pu += pfc.pt();
-            }
-        }
-    }
-    double iso(0.);
-    if (charged_only){
-        iso = iso_ch;
-    } else {
-        iso = iso_ph + iso_nh;
-        iso -= 0.5 * iso_pu;
-        if (iso>0) 
-            iso += iso_ch;
-        else 
-            iso = iso_ch;
-    }
-    iso = iso/ptcl->pt();
-    
-    return iso;
-}
-
-
-
-
-double tools::getPFIsolation(edm::Handle<pat::PackedCandidateCollection> pfcands, const reco::Candidate* ptcl,
-                             double r_iso_min, double r_iso_max, double kt_scale, bool use_pfweight, bool charged_only, double myRho) {
-    
-    if(ptcl->pt()<5.) return 99999.;
-
-    double CorrectedTerm = 0;
-    if(ptcl->isMuon())          CorrectedTerm = myRho*getEffArea(13, ptcl->eta());
-    else if(ptcl->isElectron()) CorrectedTerm = myRho*getEffArea(11, dynamic_cast<const pat::Electron*>(ptcl)->superCluster()->eta());
- 
-    double deadcone_nh(0.), deadcone_ch(0.), deadcone_ph(0.), deadcone_pu(0.);
-    if(ptcl->isElectron()) {
-        if (fabs(dynamic_cast<const pat::Electron *>(ptcl)->superCluster()->eta())>1.479) {deadcone_ch = 0.015; deadcone_pu = 0.015; deadcone_ph = 0.08;}
-    } else if(ptcl->isMuon()) {
-        deadcone_ch = 0.0001; deadcone_pu = 0.01; deadcone_ph = 0.01;deadcone_nh = 0.01;
-    } else {
-        //deadcone_ch = 0.0001; deadcone_pu = 0.01; deadcone_ph = 0.01;deadcone_nh = 0.01; // maybe use muon cones??
-    }
-
-    double iso_nh(0.); double iso_ch(0.);
-    double iso_ph(0.); double iso_pu(0.);
-    double ptThresh(0.5);
-    if(ptcl->isElectron()) ptThresh = 0;
-    double r_iso = std::max(r_iso_min,std::min(r_iso_max, kt_scale/ptcl->pt()));
-    for (const pat::PackedCandidate &pfc : *pfcands) {
-        if (abs(pfc.pdgId())<7) continue;
-        
-        double dr = deltaR(pfc, *ptcl);
-        if (dr > r_iso) continue;
-        
-        //////////////////  NEUTRALS  /////////////////////////
-        if (pfc.charge()==0){
-            if (pfc.pt()>ptThresh) {
-                double wpf(1.);
-                if (use_pfweight){
-                    double wpv(0.), wpu(0.);
-                    for (const pat::PackedCandidate &jpfc : *pfcands) {
-                        double jdr = deltaR(pfc, jpfc);
-                        if (pfc.charge()!=0 || jdr<0.00001) continue;
-                        double jpt = jpfc.pt();
-                        if (pfc.fromPV()>1) wpv *= jpt/jdr;
-                        else wpu *= jpt/jdr;
-                    }
-                    wpv = log(wpv);
-                    wpu = log(wpu);
-                    wpf = wpv/(wpv+wpu);
-                }
-                /////////// PHOTONS ////////////
-                if (abs(pfc.pdgId())==22) {
-                    if(dr < deadcone_ph) continue;
-                    iso_ph += wpf*pfc.pt();
-                    /////////// NEUTRAL HADRONS ////////////
-                } else if (abs(pfc.pdgId())==130) {
-                    if(dr < deadcone_nh) continue;
-                    iso_nh += wpf*pfc.pt();
-                }
-            }
-            //////////////////  CHARGED from PV  /////////////////////////
-        } else if (pfc.fromPV()>1){
-            if (abs(pfc.pdgId())==211) {
-                if(dr < deadcone_ch) continue;
-                iso_ch += pfc.pt();
-            }
-            //////////////////  CHARGED from PU  /////////////////////////
-        } else {
-            if (pfc.pt()>ptThresh){
-                if(dr < deadcone_pu) continue;
-                iso_pu += pfc.pt();
-            }
-        }
-    }
-    double iso(0.);
-    if (charged_only){
-        iso = iso_ch;
-    } else {
-        iso = iso_ph + iso_nh;
-        iso -= CorrectedTerm/(0.3 * 0.3 / (r_iso * r_iso));
-        if (iso>0) 
-            iso += iso_ch;
-        else 
-            iso = iso_ch;
-    }
-    iso = iso/ptcl->pt();
-    
-    return iso;
-}
-
-double tools::getPFIsolationDB(edm::Handle<pat::PackedCandidateCollection> pfcands,
-                      const reco::Candidate* ptcl,
-                      double r_iso_min, double r_iso_max, double kt_scale,
-                      bool use_pfweight, bool charged_only,
-                      double myRho) {
-    
-    if (ptcl->pt()<5.) return 99999.;
-
-    double deadcone_nh(0.), deadcone_ch(0.), deadcone_ph(0.), deadcone_pu(0.);
-    if(ptcl->isElectron()) {
-        if (fabs(dynamic_cast<const pat::Electron *>(ptcl)->superCluster()->eta())>1.479) {deadcone_ch = 0.015; deadcone_pu = 0.015; deadcone_ph = 0.08;}
-    } else if(ptcl->isMuon()) {
-        deadcone_ch = 0.0001; deadcone_pu = 0.01; deadcone_ph = 0.01;deadcone_nh = 0.01;
-    } else {
-        //deadcone_ch = 0.0001; deadcone_pu = 0.01; deadcone_ph = 0.01;deadcone_nh = 0.01; // maybe use muon cones??
-    }
-
-    double iso_nh(0.); double iso_ch(0.);
-    double iso_ph(0.); double iso_pu(0.);
-    double ptThresh(0.5);
-    if(ptcl->isElectron()) ptThresh = 0;
-    double r_iso = std::max(r_iso_min,std::min(r_iso_max, kt_scale/ptcl->pt()));
-    for (const pat::PackedCandidate &pfc : *pfcands) {
-        if (abs(pfc.pdgId())<7) continue;
-        
-        double dr = deltaR(pfc, *ptcl);
-        if (dr > r_iso) continue;
-        
-        //////////////////  NEUTRALS  /////////////////////////
-        if (pfc.charge()==0){
-            if (pfc.pt()>ptThresh) {
-                double wpf(1.);
-                if (use_pfweight){
-                    double wpv(0.), wpu(0.);
-                    for (const pat::PackedCandidate &jpfc : *pfcands) {
-                        double jdr = deltaR(pfc, jpfc);
-                        if (pfc.charge()!=0 || jdr<0.00001) continue;
-                        double jpt = jpfc.pt();
-                        if (pfc.fromPV()>1) wpv *= jpt/jdr;
-                        else wpu *= jpt/jdr;
-                    }
-                    wpv = log(wpv);
-                    wpu = log(wpu);
-                    wpf = wpv/(wpv+wpu);
-                }
-                /////////// PHOTONS ////////////
-                if (abs(pfc.pdgId())==22) {
-                    if(dr < deadcone_ph) continue;
-                    iso_ph += wpf*pfc.pt();
-                    /////////// NEUTRAL HADRONS ////////////
-                } else if (abs(pfc.pdgId())==130) {
-                    if(dr < deadcone_nh) continue;
-                    iso_nh += wpf*pfc.pt();
-                }
-            }
-            //////////////////  CHARGED from PV  /////////////////////////
-        } else if (pfc.fromPV()>1){
-            if (abs(pfc.pdgId())==211) {
-                if(dr < deadcone_ch) continue;
-                iso_ch += pfc.pt();
-            }
-            //////////////////  CHARGED from PU  /////////////////////////
-        } else {
-            if (pfc.pt()>ptThresh){
-                if(dr < deadcone_pu) continue;
-                iso_pu += pfc.pt();
-            }
-        }
-    }
-    double iso(0.);
-    if (charged_only){
-        iso = iso_ch;
-    } else {
-        iso = iso_ph + iso_nh;
-        iso -= 0.5 * iso_pu;
-        if (iso>0) 
-            iso += iso_ch;
-        else 
-            iso = iso_ch;
-    }
-    iso = iso/ptcl->pt();
-    
-    return iso;
-}
-
-std::vector<const pat::Muon* > tools::effMuonSelector(const std::vector<pat::Muon>  & thePatMuons,
-                                                            double v_muon_pt,
-                                                            reco::Vertex::Point PV,
-                                                            double v_muon_d0)
-{
-    double v_muon_eta = 2.4;
-    //double v_muon_dz = 0.1; // 0.1 for sync
-    
-    std::vector<const pat::Muon* > vMuons;
-    for( std::vector<pat::Muon>::const_iterator mu = thePatMuons.begin() ; mu != thePatMuons.end() ; mu++ )
-    {
-        //std::cout << mu->pt() << "\t" << TMath::Abs( mu->eta() ) << "\t" << mu->isGlobalMuon() << "\t" << mu->isPFMuon() << "\t" << mu->isTrackerMuon() << std::endl;
-        if ( mu->pt()  < v_muon_pt ) continue;
-        if ( TMath::Abs( mu->eta() ) > v_muon_eta ) continue;
-        
-        /*
-        if ( !(mu->isGlobalMuon()  || mu->isTrackerMuon()) ) continue;
-        if ( !mu->isPFMuon() ) continue;
-        */
-        
-        const reco::TrackRef innerTrack = mu->innerTrack();
-        //std::cout << innerTrack.isNull() << "\t" << TMath::Abs(innerTrack->dxy(PV)) << "\t" << TMath::Abs(innerTrack->dz(PV)) << std::endl;
-        if( innerTrack.isNull() ) continue;
-        
-        //if(TMath::Abs(innerTrack->dxy(PV)) > v_muon_d0  ) continue;
-        //if(TMath::Abs(innerTrack->dz(PV))   > v_muon_dz  ) continue;
-        
-        vMuons.push_back(&*mu);
-    }
-    
-    return vMuons;
-}
 
 
 /*
@@ -447,7 +117,9 @@ double tools::pfAbsIso(const pat::Muon *mu, double myRho){
 }
 
 
-
+/*
+ * Trigger emulation: NOT YET CHECKED/VERIFIED, probably not up to date
+ */
 bool tools::triggerEmulator(const pat::Electron *iE) {
 
     bool passed = true;
@@ -508,9 +180,9 @@ bool tools::isoTriggerEmulator(const pat::Electron *iE) {
 }
 
 
-
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
+/*
+ * Cut based electron id
+ */
 float tools::dEtaInSeed(const pat::Electron* ele){
   if(ele->superCluster().isNonnull() and ele->superCluster()->seed().isNonnull()) return ele->deltaEtaSuperClusterTrackAtVtx() - ele->superCluster()->eta() + ele->superCluster()->seed()->eta();
   else                                                                            return std::numeric_limits<float>::max();
@@ -546,26 +218,10 @@ bool tools::isTightCutBasedElectronWithoutIsolation(const pat::Electron* ele){
     return true;
 }
 
-//
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-double tools::Tau_dz(ROOT::Math::PositionVector3D<ROOT::Math::Cartesian3D<double> > vtx, TLorentzVector p4, reco::Vertex::Point PV){
-
-    /*
-    std::cout << "Check Tau_dz function" << std::endl;
-    std::cout << vtx.X() << " " << vtx.Y() << " "<< vtx.Z() << std::endl;
-    std::cout << p4.Px() << " " << p4.Py() << " "<< p4.Pz()  << " "<< p4.Pt() << std::endl;
-    std::cout << PV.x() << " " << PV.y() << " "<< PV.z() << std::endl;
-    std::cout << "Check Tau_dz function Happy ending" << std::endl;
-    */
-
-    double dz = (vtx.Z() - PV.z()) - ((vtx.X() - PV.x())*p4.Px()+(vtx.Y()-PV.y())*p4.Py())/ p4.Pt() *  p4.Pz()/ p4.Pt();
-    return dz;
-
-}
-
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/*
+ * jet selector: NOT YET CHECKED
+ */
 std::vector<const pat::Jet* > tools::JetSelector(const std::vector<pat::Jet>  & thePatJets,
                                                  double  v_jet_pt,
                                                  double  v_jet_eta)
@@ -637,8 +293,6 @@ std::vector<const pat::Jet* > tools::JetSelector(const std::vector<pat::Jet>  & 
     return vJets;
 }
 
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 std::vector<const pat::Jet* > tools::JetSelector(const std::vector<pat::Jet>  & thePatJets,
                                                  double  v_jet_pt,
                                                  double  v_jet_eta,
@@ -707,8 +361,6 @@ std::vector<const pat::Jet* > tools::JetSelector(const std::vector<pat::Jet>  & 
     return vJets;
 }
 
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 std::vector<const pat::Jet* > tools::JetSelector(const std::vector<pat::Jet>  & thePatJets,
                                                  double  v_jet_pt,
                                                  double  v_jet_eta,
@@ -792,120 +444,38 @@ std::vector<const pat::Jet* > tools::JetSelector(const std::vector<pat::Jet>  & 
 }
 
 
-bool tools::passMultiIsolation(TString level, double mini_iso, double jetPtRatio, double jetPtRel){
-    if(level == "VL") return mini_iso < 0.25 && (jetPtRatio > 0.67 || jetPtRel > 4.4);
-    if(level == "L")  return mini_iso < 0.20 && (jetPtRatio > 0.69 || jetPtRel > 6.0);
-    if(level == "M")  return mini_iso < 0.16 && (jetPtRatio > 0.76 || jetPtRel > 7.2);
-    if(level == "T")  return mini_iso < 0.12 && (jetPtRatio > 0.80 || jetPtRel > 7.2);
-    if(level == "VT") return mini_iso < 0.09 && (jetPtRatio > 0.84 || jetPtRel > 7.2);
-    return false;
+/*
+ * Definitions for multi-isolation and cone-corrected lepton pt's
+ */
+std::map<TString, std::vector<double>> multiIso;
+void tools::initMultiIsoConstants(){
+  multiIso["VL"] = {0.25, 0.67, 4.4};
+  multiIso["L"]  = {0.20, 0.69, 6.0};
+  multiIso["M"]  = {0.16, 0.76, 7.2};
+  multiIso["T"]  = {0.12, 0.80, 7.2};
+  multiIso["VT"] = {0.09, 0.84, 7.2};
+}
+
+bool tools::passMultiIsolation(TString level, double miniIso, double jetPtRatio, double jetPtRel){
+  return miniIso < multiIso[level][0] and (jetPtRatio > multiIso[level][1] or jetPtRel > multiIso[level][2]);
+}
+
+double tools::leptonConeCorrectedPt(double pt, TString level, double miniIso, double jetPtRatio, double jetPtRel){
+  if (jetPtRel > multiIso[level][2]) return pt*(1+std::max(0., miniIso - multiIso[level][0]));
+  else                               return pt*(std::max(1., multiIso[level][1]/jetPtRatio));
 }
 
 
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-std::vector<const pat::Photon* > tools::PhotonSelector(const std::vector<pat::Photon>  & thePatPhotons,
-                                                 double  v_photon_pt,
-                                                 double  v_photon_eta,
-                                                 std::vector<const pat::Electron*> vElectrons,
-                                                 std::vector<const pat::Muon*> vMuons,
-                                                 std::map<const reco::PFTau*, int> SelectedTaus)
-{
-    bool    bool_photon_id= true;
-    double  v_photon_leptonVetoDR=0.2;
-    
-    std::vector< const pat::Photon* > vJets;
-    
-    for( std::vector<pat::Photon>::const_iterator jet = thePatPhotons.begin(); jet != thePatPhotons.end(); jet++ )
-	{
-        //std::cout<<jet->pt()<<" "<<jet->eta()<<" "<<jet->hadTowOverEm()<<" "<<jet->sigmaIetaIeta()<<std::endl;
-        if( jet->pt() < v_photon_pt )continue;
-        if( TMath::Abs( jet->eta() ) > v_photon_eta) continue;
-        if( bool_photon_id )
-	    {
-            if( jet->hadTowOverEm() >= 0.05 ) continue;
-            if( TMath::Abs(jet->sigmaIetaIeta()) > 0.012 ) continue;
-            if( TMath::Abs( jet->eta() ) < 1.479 )
-            {
-                if( jet->hadTowOverEm() >= 0.05 ) continue;
-                if( TMath::Abs(jet->sigmaIetaIeta()) > 0.034 ) continue;
-            }
-	    }
-        
-        bool vetoJet = false;
-        for(unsigned int i = 0 ; i < vMuons.size() ;i++ )
-        {
-            const pat::Muon *mu = vMuons[i];
-            float dphi = TMath::ACos( TMath::Cos( mu->phi()-jet->phi() ));
-            float deta = mu->eta()-jet->eta();
-            float dr = TMath::Sqrt( dphi*dphi + deta*deta) ;
-            
-            if(dr < v_photon_leptonVetoDR )
-            {
-                vetoJet = true;
-                break;
-            }
-	    }
-        if( vetoJet ) continue;
-        
-        for(unsigned int i = 0 ; i < vElectrons.size() ;i++ )
-        {
-            const pat::Electron *el = vElectrons[i];
-            float dphi = TMath::ACos( TMath::Cos( el->phi()-jet->phi() ) );
-            float deta = el->eta() - jet->eta();
-            float dr = TMath::Sqrt( dphi*dphi + deta*deta );
-            
-            if(dr < v_photon_leptonVetoDR)
-            {
-                vetoJet = true;
-                break;
-            }
-	    }
-        
-        for(std::map<const reco::PFTau*, int >::iterator it = SelectedTaus.begin() ; it != SelectedTaus.end() ;it++ ){
-            
-            const reco::PFTau *itau = it->first;
-            
-            float dphi = TMath::ACos( TMath::Cos( itau->phi()-jet->phi() ) );
-            float deta = itau->eta() - jet->eta();
-            float dr = TMath::Sqrt( dphi*dphi + deta*deta );
-            
-            if(dr < v_photon_leptonVetoDR)
-            {
-                vetoJet = true;
-                break;
-            }
-	    }
-        
-        if( vetoJet ) continue;
-	    
-        
-        vJets.push_back( &*jet );
-    }
-    return vJets;
+/*
+ * Some helper functions
+ */
+double tools::MT_calc(TLorentzVector vect, double met, double met_phi){
+    return sqrt(2*vect.Pt()*met*(1 - (TMath::Cos(vect.Phi() - met_phi))));
 }
 
-
-double tools::MT_calc(TLorentzVector Vect, double MET, double MET_Phi){
-    
-    double MT=sqrt(2* Vect.Pt() * MET * ( 1 - (TMath::Cos(Vect.Phi() - MET_Phi )) ) );
-    
-    return MT;
-}
-
-double tools::Mll_calc(TLorentzVector Vect1, TLorentzVector Vect2){
-    return (Vect1 + Vect2).Mag();
-}
-
-//ID=#MET+5*(#MT+3*(#Mll+3*#category))
-int tools::srID(double met, double mt, double mll, double channel) {
-    if ((channel > 0) && (channel!=4))
-        return std::min(int(met/50),4) + 5*(int(mt>120)+int(mt>160) + 3*(2*int(mll>100) + 3*channel));
-    else 
-        return std::min(int(met/50),4) + 5*(int(mt>120)+int(mt>160) + 3*(int(mll>75) + int(mll>105) + 3*channel));
+double tools::Mll_calc(TLorentzVector v1, TLorentzVector v2){
+    return (v1 + v2).Mag();
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -913,7 +483,7 @@ int tools::srID(double met, double mt, double mll, double channel) {
 
 
 
-
+// Tau functions below not yet used/checked
 //*****************************************************************************************************************************
 //**** Tau Selector ***********************************************************************************************************
 //*****************************************************************************************************************************
@@ -1013,225 +583,3 @@ std::map<const reco::PFTau*, int > tools::TauSelector(edm::Handle<reco::PFTauCol
     }
     return vTaus;
 }
-
-
-bool tools::cleanUp(const pat::Muon* testMu,
-                   std::vector<const pat::Muon* > allMu,
-                   const char* cutName)
-{
-    
-    TLorentzVector TLVec; TLVec.SetPtEtaPhiE( testMu->pt(), testMu->eta(), testMu->phi(), testMu->energy() );
-    TString CutName = cutName;
-
-    for (unsigned int i=0; i!=allMu.size(); ++i) {
-        if (testMu->charge() + allMu[i]->charge() != 0) continue;
-    
-        TLorentzVector P1; P1.SetPtEtaPhiE( allMu[i]->pt(), allMu[i]->eta(), allMu[i]->phi(), allMu[i]->energy() );
-        
-        float Mass = ( P1 + TLVec ).M();
-        if( CutName == "Z" ){
-            if( Mass < 106. && Mass > 76. )  {
-                return true;
-            }
-        }
-        else if( CutName == "gammastar" ){
-            if( Mass < 12. )  {
-                return true;
-            }
-        }
-    }
-    
-    return false;
-}
-
-bool tools::cleanUp(const pat::Electron* testMu,
-                   std::vector<const pat::Electron* > allMu,
-                   const char* cutName)
-{
-    
-    TLorentzVector TLVec; TLVec.SetPtEtaPhiE( testMu->pt(), testMu->eta(), testMu->phi(), testMu->energy() );
-    TString CutName = cutName;
-
-    for (unsigned int i=0; i!=allMu.size(); ++i) {
-        if (testMu->charge() + allMu[i]->charge() != 0) continue;
-        
-        TLorentzVector P1; P1.SetPtEtaPhiE( allMu[i]->pt(), allMu[i]->eta(), allMu[i]->phi(), allMu[i]->energy() );
-        
-        float Mass = ( P1 + TLVec ).M();
-        if( CutName == "Z" ){
-            if( Mass < 106. && Mass > 76. )  {
-                return true;
-            }
-        }
-        else if( CutName == "gammastar" ){
-            if( Mass < 12. )  {
-                return true;
-            }
-        }
-    }
-    
-    return false;
-}
-
-
-
-double tools::JER (double eta) {
-
-    double feta = fabs(eta);
-    double scf = 1;
-    if (feta < 0.5)
-        scf = 1.052;
-    else if (feta < 1.1)
-        scf = 1.057;
-    else if (feta < 1.7)
-        scf = 1.096;
-    else if (feta < 2.3)
-        scf = 1.134;
-    else scf = 1.288;
-    
-    return scf;
-}
-
-float tools::quadsum(float a, float b) {
-    return sqrt(a*a+b*b);
-}
-
-//______________________________________________________________________________
-#define JERSUMMER11
-float tools::smear_pt_res(float pt, float genpt, float eta)
-{
-    eta = fabs(eta);
-    if (genpt>15. && (fabs(pt - genpt) / pt)<0.5) {  // limit the effect to the core
-        double res    = 1.0;
-        //double resErr = 0.0;
-#ifdef JERSUMMER11
-        // from https://twiki.cern.ch/twiki/bin/view/CMS/JetResolution
-        if (eta <= 0.5) {
-            res    = 1.052;
-            //resErr = quadsum(0.012, 0.062);
-        } else if (0.5 < eta && eta <= 1.1) {
-            res    = 1.057;
-            //resErr = quadsum(0.012, 0.062);
-        } else if (1.1 < eta && eta <= 1.7) {
-            res    = 1.096;
-            //resErr = quadsum(0.017, 0.063);
-        } else if (1.7 < eta && eta <= 2.3) {
-            res    = 1.134;
-            //resErr = quadsum(0.035, 0.087);
-        } else {
-            res    = 1.288;
-            //resErr = quadsum(0.127, 0.155);
-        }
-#else
-        // from VHbb analysis
-        if (eta <= 1.1) {
-            res    = 1.05;
-            //resErr = 0.05;
-        } else if (1.1 < eta && eta <= 2.5) {
-            res    = 1.10;
-            //resErr = 0.10;
-        } else {
-            res    = 1.30;
-            //resErr = 0.20;
-        }
-#endif
-        float deltapt = (pt - genpt) * res;
-        return std::max(float(0.), genpt + deltapt);
-    }
-    return pt;
-}
-
-//______________________________________________________________________________
-#include "TLorentzVector.h"
-double tools::evalEt(double pt, double eta, double phi, double e)
-{
-    TLorentzVector j;
-    j.SetPtEtaPhiE(pt, eta, phi, e);
-    return j.Et();
-}
-
-double tools::evalMt(double pt, double eta, double phi, double e)
-{
-    TLorentzVector j;
-    j.SetPtEtaPhiE(pt, eta, phi, e);
-    return j.Mt();
-}
-
-std::vector<double> tools::RegressionVars(const pat::Jet *jet, float genpt, const pat::Muon* mu) {
-    std::vector<double> vars;
-    
-    vars.push_back(smear_pt_res((jet->correctedP4("Uncorrected")).Pt(), genpt, jet->eta()));
-    vars.push_back(jet->pt());
-    vars.push_back(evalEt(jet->pt(), jet->eta(), jet->phi(), jet->energy()));
-    vars.push_back(evalMt(jet->pt(), jet->eta(), jet->phi(), jet->energy()));
-    
-    double hJet_ptLeadTrack = 0;
-    const reco::TrackRefVector &tracks =  jet->associatedTracks();
-    for (unsigned int k=0; k!= tracks.size(); ++k) {
-        if(tracks[k]->pt() > hJet_ptLeadTrack)
-            hJet_ptLeadTrack = tracks[k]->pt();
-    }
-    vars.push_back(hJet_ptLeadTrack);
-    
-    double hJet_vtx3dL = 0;
-    double hJet_vtx3deL = 0;
-    double hJet_vtxMass = 0;
-    double hJet_vtxPt = 0;
-    
-    const reco::SecondaryVertexTagInfo* scdVtx = jet->tagInfoSecondaryVertex("secondaryVertex");
-    
-    if (scdVtx) {
-        //std::cout<<"Vertetx info: "<<scdVtx->nVertices()<<std::endl;
-        if (scdVtx->nVertices()) {
-            const reco::Vertex &sv1 = scdVtx->secondaryVertex(0);
-            if (!sv1.isFake()) {
-                Measurement1D distance1 = scdVtx->flightDistance(0, true);
-                hJet_vtx3dL = distance1.value();
-                hJet_vtx3deL = distance1.error();
-                
-                math::XYZTLorentzVectorD p4vtx = sv1.p4();
-                hJet_vtxMass = p4vtx.M();
-                hJet_vtxPt = p4vtx.Pt();
-            }
-        }
-    } //else
-      //  std::cout<<"no info"<<std::endl;
-    
-    vars.push_back(std::max(0.,hJet_vtx3dL));
-    vars.push_back(std::max(0.,hJet_vtx3deL));
-    vars.push_back(std::max(0.,hJet_vtxMass));
-    vars.push_back(std::max(0.,hJet_vtxPt));
-    
-    vars.push_back(jet->chargedHadronEnergyFraction() + jet->chargedEmEnergyFraction());
-    //vars.push_back(jet->getPFConstituents().size());
-    vars.push_back(jet->numberOfDaughters());
-    
-    vars.push_back(0.); //JECUnc in the main file
-    
-    TLorentzVector pJet; pJet.SetPtEtaPhiE( jet->pt(), jet->eta(), jet->phi(), jet->energy() );
-    TLorentzVector pLep; pLep.SetPtEtaPhiE( mu->pt(), mu->eta(), mu->phi(), mu->energy() );
-    vars.push_back(pLep.Perp(pJet.Vect()));
-    vars.push_back(mu->pt());
-    vars.push_back(pLep.DeltaR(pJet));
-    
-    /*values[0] = "breg_rawptJER := smear_pt_res(hJet_ptRaw, hJet_genPt, hJet_eta)";
-    values[1] = "breg_pt := hJet_pt";
-    values[2] = "breg_et := evalEt(hJet_pt, hJet_eta, hJet_phi, hJet_e)";
-    values[3] = "breg_mt := evalMt(hJet_pt, hJet_eta, hJet_phi, hJet_e)";
-    values[4] = "breg_leadtrackpt := hJet_ptLeadTrack";
-    values[5] = "breg_vtx3dL := max(0,hJet_vtx3dL)";
-    values[6] = "breg_vtx3deL := max(0,hJet_vtx3deL)";
-    values[7] = "breg_vtxMass := max(0,hJet_vtxMass)";
-    values[8] = "breg_vtxPt := max(0,hJet_vtxPt)";
-    values[9] = "breg_cef := hJet_cef";
-    values[10] = "breg_ntot := hJet_nconstituents";
-    values[11] = "breg_eJEC := hJet_JECUnc";
-    values[12] = "breg_softlepptrel := max(0,hJet_SoftLeptptRel*(hJet_SoftLeptIdlooseMu==1 || hJet_SoftLeptId95==1))";
-    values[13] = "breg_softleppt := max(0,hJet_SoftLeptPt*(hJet_SoftLeptIdlooseMu==1 || hJet_SoftLeptId95==1))";
-    values[14] = "breg_softlepdR := max(0,hJet_SoftLeptdR*(hJet_SoftLeptIdlooseMu==1 || hJet_SoftLeptId95==1))";
-    values[15] = "breg_evt_rho25 := rho25";*/
-    
-    return vars;
-    
-}
-

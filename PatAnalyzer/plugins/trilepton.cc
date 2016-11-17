@@ -109,7 +109,9 @@ trilepton::trilepton(const edm::ParameterSet & iConfig) :
                       "HLT_IsoTkMu22", "HLT_Mu45_eta2p1",													// mu partially off
                       "HLT_Ele32_WPTight_Gsf", "HLT_Ele32_eta2p1_WPTight_Gsf", "HLT_Ele30_WPTight_Gsf", "HLT_Ele30_eta2p1_WPTight_Gsf", 			// e
                       "HLT_Ele27_WPTight_Gsf", "HLT_Ele27_eta2p1_WPTight_Gsf", "HLT_Ele27_eta2p1_WPLoose_Gsf", "HLT_Ele25_eta2p1_WPTight_Gsf",
-                      "HLT_Ele25_WPTight_Gsf"};															// e partially off
+                      "HLT_Ele25_WPTight_Gsf",															// e partially off
+                      "HLT_Ele8_CaloIdM_TrackIdM_PFJet30","HLT_Ele12_CaloIdM_TrackIdM_PFJet30",									// e + PF jet (for fake rate measurment)
+                      "HLT_Ele8_CaloIdM_TrackIdM_IsoVL_PFJet30","HLT_Ele12_CaloIdM_TrackIdM_IsoVL_PFJet30"};
     filtersToSave  = {"Flag_HBHENoiseFilter", "Flag_HBHENoiseIsoFilter", "Flag_EcalDeadCellTriggerPrimitiveFilter", "Flag_goodVertices", "Flag_eeBadScFilter", "Flag_globalTightHalo2016Filter"};
 }
 
@@ -119,7 +121,7 @@ void trilepton::beginJob()
     // Read in effective areas from text files, to be used for lepton isolation calculations
     tools::readEffAreas(edm::FileInPath("Majorana/PatAnalyzer/src/effAreaElectrons_cone03_pfNeuHadronsAndPhotons_80X.txt").fullPath(), 11);
     tools::readEffAreas(edm::FileInPath("Majorana/PatAnalyzer/src/effAreaMuons_cone03_pfNeuHadronsAndPhotons_80X.txt").fullPath(), 13);
-
+    tools::initMultiIsoConstants(); // that's the problem when using namespaces instead of classes, you need to have separate init functions
 
     if(treeForFakeRate) outputTree = fs->make<TTree>("fakeRateTree", "fakeRateTree");
     else                outputTree = fs->make<TTree>("trileptonTree","trileptonTree");
@@ -201,11 +203,8 @@ void trilepton::beginJob()
     outputTree->Branch("_charges", &_charges, "_charges[_nLeptons]/D");
     outputTree->Branch("_isolation", &_isolation, "_isolation[_nLeptons]/D");
     outputTree->Branch("_isolation_absolute", &_isolation_absolute, "_isolation_absolute[_nLeptons]/D");
-    //outputTree->Branch("_isolationComponents", &_isolationComponents, "_isolationComponents[4][6]/D");
-    //outputTree->Branch("_isolationMC", &_isolationMC, "_isolationMC[4][6]/D");
-    outputTree->Branch("_miniisolation", &_miniisolation, "_miniisolation[_nLeptons][2]/D");
-    outputTree->Branch("_miniisolationCharged", &_miniisolationCharged, "_miniisolationCharged[_nLeptons][2]/D");
-    outputTree->Branch("_multiisolation", &_multiisolation, "_multiisolation[_nLeptons][5]/O");
+    outputTree->Branch("_miniisolation", &_miniisolation, "_miniisolation[_nLeptons]/D");
+    outputTree->Branch("_miniisolationCharged", &_miniisolationCharged, "_miniisolationCharged[_nLeptons]/D");
     outputTree->Branch("_ptrel", &_ptrel, "_ptrel[_nLeptons]/D");
     outputTree->Branch("_ptratio", &_ptratio, "_ptratio[_nLeptons]/D");
     outputTree->Branch("_muonSegmentComp", &_muonSegmentComp, "_muonSegmentComp[_nLeptons]/D");
@@ -294,7 +293,6 @@ void trilepton::beginJob()
     outputTree->Branch("_jetPtUp", &_jetPtUp, "_jetPtUp[_n_Jets]/D");
     outputTree->Branch("_jetPtDown", &_jetPtDown, "_jetPtDown[_n_Jets]/D");
 
-    // JER
     outputTree->Branch("_matchedjetPt", &_matchedjetPt, "_matchedjetPt[_n_Jets]/D");
     outputTree->Branch("_matchedjetEta", &_matchedjetEta, "_matchedjetEta[_n_Jets]/D");
     outputTree->Branch("_matchedjetPhi", &_matchedjetPhi, "_matchedjetPhi[_n_Jets]/D");
@@ -389,9 +387,11 @@ void trilepton::beginJob()
     looseMVA[4][1] = 0.805013;
     looseMVA[5][1] = 0.358969;
 
-    for(TString wp : {"multiIsolationVT","multiIsolationT","multiIsolationM","multiIsolationL","multiIsolationVL"}){
-      leptonWorkingPoints[wp] = new std::vector<bool>();
-      outputTree->Branch(wp, "vector<bool>", leptonWorkingPoints[wp]);
+    for(TString wp : {"VT","T","M","L","VL"}){
+      leptonWorkingPoints["multiIsolation" + wp] = new std::vector<bool>();
+      leptonConeCorrectedPt[wp]                  = new std::vector<double>();
+      outputTree->Branch("multiIsolation" + wp,        "vector<bool>",   leptonWorkingPoints["multiIsolation" + wp]);
+      outputTree->Branch("leptonConeCorrectedPt" + wp, "vector<double>", leptonConeCorrectedPt[wp]);
     }
         
     _nEventsTotal = 0;
@@ -404,6 +404,7 @@ void trilepton::beginJob()
 void trilepton::endJob() {
     for(TString wp : {"VT","T","M","L","VL"}){
       delete leptonWorkingPoints["multiIsolation" + wp];
+      delete leptonConeCorrectedPt[wp];
     }
 
     std::cout<<_nEventsTotal<<std::endl;
@@ -460,8 +461,9 @@ void trilepton::getTriggerResults(const edm::Event& iEvent, bool isHLT, edm::EDG
 
 void trilepton::analyze(const edm::Event& iEvent, const edm::EventSetup& iEventSetup)
 {
-    for(TString wp : {"multiIsolationVT","multiIsolationT","multiIsolationM","multiIsolationL","multiIsolationVL"}){
-      leptonWorkingPoints[wp]->clear();
+    for(TString wp : {"VT","T","M","L","VL"}){
+      leptonWorkingPoints["multiIsolation" + wp]->clear();
+      leptonConeCorrectedPt[wp]->clear();
     }
     //bool islepton;
 
@@ -869,20 +871,19 @@ void trilepton::analyze(const edm::Event& iEvent, const edm::EventSetup& iEventS
       //if(abs(muon->innerTrack()->dxy(PV)) > _looseD0Mu) continue;
       //if(abs(muon->innerTrack()->dz(PV)) > 0.1  ) 	continue;
 
+      double relIso = tools::pfRelIso(&*muon,myRhoJECJets);
+      if(relIso > 1) continue;
+
       if (leptonCounter == 10) continue;  // using arrays, so do not store more than 10 muons, they are sorted in pt anyway
 
       // might be preferable to change to vectors instead of arrays because we do not know the length
       _flavors[leptonCounter]     = 1;
       _charges[leptonCounter]     = muon->charge();
-      _isolation[leptonCounter]   = tools::pfRelIso(&*muon,myRhoJECJets);
+      _isolation[leptonCounter]   = relIso;
       _isolation_absolute[leptonCounter] = tools::pfAbsIso(&*muon);
       
-      _miniisolation[leptonCounter][0] 	      = tools::getPFIsolation(pfcands, &*muon, 0.05, 0.2, 10., false, false, myRhoJets); // check!!!!!!! effective areas are still wrong 
-      _miniisolation[leptonCounter][1] 	      = tools::getPFIsolation(pfcands, &*muon, 0.05, 0.3, 10., false, false, myRhoJets); // also to check DO NOT USE THIS ONE
-      _miniisolationCharged[leptonCounter][0] = tools::getPFIsolation(pfcands, &*muon, 0.05, 0.2, 10., false, true,  myRhoJets); // also to check
-      _miniisolationCharged[leptonCounter][1] = tools::getPFIsolation(pfcands, &*muon, 0.05, 0.3, 10., false, true,  myRhoJets); // also to check DO NOT USE THIS ONE
-
-
+      _miniisolation[leptonCounter] 	   = tools::getMiniIsolation(pfcands, &*muon, 0.05, 0.2, 10., myRhoJets, false);
+      _miniisolationCharged[leptonCounter] = tools::getMiniIsolation(pfcands, &*muon, 0.05, 0.2, 10., myRhoJets, false);
 
       _ipPV[leptonCounter]     = muon->innerTrack()->dxy(PV);
       _ipPVerr[leptonCounter]  = muon->innerTrack()->dxyError();
@@ -915,7 +916,8 @@ void trilepton::analyze(const edm::Event& iEvent, const edm::EventSetup& iEventS
 
       fillCloseJetVars(leptonCounter, PV);
       for(TString wp : {"VT","T","M","L","VL"}){
-        leptonWorkingPoints["multiIsolation" + wp]->push_back(tools::passMultiIsolation(wp, _miniisolation[leptonCounter][0], _ptratio[leptonCounter], _ptrel[leptonCounter]));
+        leptonWorkingPoints["multiIsolation" + wp]->push_back(tools::passMultiIsolation(wp, _miniisolation[leptonCounter], _ptratio[leptonCounter], _ptrel[leptonCounter]));
+        leptonConeCorrectedPt[wp]->push_back(tools::leptonConeCorrectedPt(_lPt[leptonCounter], wp, _miniisolation[leptonCounter], _ptratio[leptonCounter], _ptrel[leptonCounter]));
       }
 
       if(not isData){
@@ -951,6 +953,8 @@ void trilepton::analyze(const edm::Event& iEvent, const edm::EventSetup& iEventS
       if(!electron->gsfTrack().isNonnull()) continue;
       if(!tools::isLooseCutBasedElectronWithoutIsolation(&*electron)) continue; //only store those passing the loose cut based id, without isolation requirement
 
+      double relIso = tools::pfRelIso(&*electron, myRhoJECJets);
+      if(relIso > 1) continue;
       // There will be a new electron MVA soon
       edm::RefToBase<pat::Electron> electronRef(edm::Ref<edm::View<pat::Electron>>(electrons, (electron - electrons->begin())));
       _mvaValue[leptonCounter]               = (*electronMvaIdMap)[electronRef];
@@ -966,7 +970,7 @@ void trilepton::analyze(const edm::Event& iEvent, const edm::EventSetup& iEventS
 
       _flavors[leptonCounter]            = 0;
       _charges[leptonCounter]            = electron->charge();
-      _isolation[leptonCounter]          = tools::pfRelIso(&*electron, myRhoJECJets);
+      _isolation[leptonCounter]          = relIso;
       _isolation_absolute[leptonCounter] = tools::pfAbsIso(&*electron, myRhoJECJets);
 
       _ipPV[leptonCounter]  = electron->gsfTrack()->dxy(PV);
@@ -975,10 +979,8 @@ void trilepton::analyze(const edm::Event& iEvent, const edm::EventSetup& iEventS
       //if(abs(_ipPV[leptonCounter]) > 0.05) continue;
       //if(abs(_ipZPV[leptonCounter]) > 0.1) continue;
       
-      _miniisolation[leptonCounter][0]        = tools::getPFIsolation(pfcands, &*electron, 0.05, 0.2, 10., false, false, myRhoJets);
-      _miniisolation[leptonCounter][1]        = tools::getPFIsolation(pfcands, &*electron, 0.05, 0.3, 10., false, false, myRhoJets);
-      _miniisolationCharged[leptonCounter][0] = tools::getPFIsolation(pfcands, &*electron, 0.05, 0.2, 10., false, true, myRhoJets);
-      _miniisolationCharged[leptonCounter][1] = tools::getPFIsolation(pfcands, &*electron, 0.05, 0.3, 10., false, true, myRhoJets);
+      _miniisolation[leptonCounter]        = tools::getMiniIsolation(pfcands, &*electron, 0.05, 0.2, 10., myRhoJets, false);
+      _miniisolationCharged[leptonCounter] = tools::getMiniIsolation(pfcands, &*electron, 0.05, 0.2, 10., myRhoJets, false);
 
       _chargeConst[leptonCounter]      = electron->isGsfCtfScPixChargeConsistent();
       _vtxFitConversion[leptonCounter] = ConversionTools::hasMatchedConversion(reco::GsfElectron (*&*electron), theConversions, BS);
@@ -1009,7 +1011,8 @@ void trilepton::analyze(const edm::Event& iEvent, const edm::EventSetup& iEventS
       fillCloseJetVars(leptonCounter, PV);
 
       for(TString wp : {"VT","T","M","L","VL"}){
-        leptonWorkingPoints["multiIsolation" + wp]->push_back(tools::passMultiIsolation(wp, _miniisolation[leptonCounter][0], _ptratio[leptonCounter], _ptrel[leptonCounter]));
+        leptonWorkingPoints["multiIsolation" + wp]->push_back(tools::passMultiIsolation(wp, _miniisolation[leptonCounter], _ptratio[leptonCounter], _ptrel[leptonCounter]));
+        leptonConeCorrectedPt[wp]->push_back(tools::leptonConeCorrectedPt(_lPt[leptonCounter], wp, _miniisolation[leptonCounter], _ptratio[leptonCounter], _ptrel[leptonCounter]));
       }
 
       if (not isData) {
@@ -1121,7 +1124,7 @@ void trilepton::analyze(const edm::Event& iEvent, const edm::EventSetup& iEventS
     // Here we make the decision on what to save
     if(treeForFakeRate){
       if(_nLeptons != 1)       return;
-      if(_n_Jets < 1)          return;				// For fake rate tree: exactly 1 lepton + at least 1 jet
+      if(_n_Jets < 1)          return;				// For fake rate tree: exactly 1 loose lepton + at least 1 jet
       if(_jetPt[0] < 30)       return;				// with deltaR(j, l) > 1 (back-to-back)
       if(_jetDeltaR[0][0] < 1) return;
     } else {
@@ -1314,20 +1317,8 @@ void trilepton::fillCloseJetVars(const int leptonCounter, Vertex::Point PV) {
         _ptratio[leptonCounter] = 1.;
         _closeIndex[leptonCounter] = -1;
     }   
-
-           
-
-    //std::cout << "Info about closest jet -> Pt: " << _closeJetPtAll[leptonCounter] << std::endl;  
-                 
-    /*
-    for (int mi=0; mi!=5; ++mi) {
-        if (_miniisolation[leptonCounter][0] < multiConst[mi][0] && ((_ptratio[leptonCounter] > multiConst[mi][1]) || (_ptrel[leptonCounter] > multiConst[mi][2])) )
-            _multiisolation[leptonCounter][mi] = true;
-        else
-            _multiisolation[leptonCounter][mi] = false;
-    }
-    */
 }
+
 
 void trilepton::matchCloseJet(const int leptonCounter) {
     double minDeltaR3 = 9999;

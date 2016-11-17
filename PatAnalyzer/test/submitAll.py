@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 import os, glob, sys
 
-productionLabel = 'trilepton_7_11_16'		                                				# Label to keep track of the tuple versio
+productionLabel = 'fakeRate_v1'		                                				# Label to keep track of the tuple versio
 outDir          = '/user/' + os.environ['USER'] + '/public/majorana'					# Output directory in case of local submission
 datasets        = [dataset.strip() for dataset in open(sys.argv[1])]					# Get list of datasets from file given as first argument
 datasets        = [dataset for dataset in datasets if dataset and not dataset.startswith('#')]		# Clean empty and comment lines
@@ -10,14 +10,13 @@ for dataset in datasets:
   if dataset.startswith('FAKERATE:'):
     outputName      = 'fakeRate'
     treeForFakeRate = True
-    dataset         = dataset.split(':')[-1]
+    dataset         = dataset.split(':')[-1].split()[0]
   else:
     outputName      = 'trilepton'
     treeForFakeRate = False
 
   if 'pnfs' in dataset or 'user' in dataset:
     if 'pnfs' in dataset: datasetName = dataset.split('/MINIAOD')[0].split('/')[-1]
-    #if 'pnfs' in dataset: datasetName = dataset.split('/')[-1]
     else:                 datasetName = dataset.split('/')[-1]
 
     i = 0

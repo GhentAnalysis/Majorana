@@ -282,10 +282,9 @@ private:
     double _isolation_absolute[nLeptonsMax];
     double _isolationComponents[nLeptonsMax][4];
     double _isolationMC[nLeptonsMax][4]; //all daughters; all visible daughters; all daughters in the cone; all visible daughters in the cone
-    double _miniisolation[nLeptonsMax][2];
+    double _miniisolation[nLeptonsMax];
     double _multiIsolationVT[nLeptonsMax];
-    double _miniisolationCharged[nLeptonsMax][2];
-    bool _multiisolation[nLeptonsMax][5];
+    double _miniisolationCharged[nLeptonsMax];
     double _ptrel[nLeptonsMax];
     double _ptratio[nLeptonsMax];
     double _muonSegmentComp[nLeptonsMax];
@@ -315,7 +314,8 @@ private:
 
     double _mvaValue[nLeptonsMax];
 
-    std::map<TString, std::vector<bool>*> leptonWorkingPoints;
+    std::map<TString, std::vector<bool>*>   leptonWorkingPoints;
+    std::map<TString, std::vector<double>*> leptonConeCorrectedPt;
 
     int _origin[nLeptonsMax];
     int _originReduced[nLeptonsMax];
