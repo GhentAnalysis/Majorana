@@ -285,7 +285,6 @@ void trilepton::beginJob()
     outputTree->Branch("_jetFlavour", &_jetFlavour, "_jetFlavour[_n_Jets]/I");
     outputTree->Branch("_jetE", &_jetE, "_jetE[_n_Jets]/D");
     outputTree->Branch("_csv", &_csv, "_csv[_n_Jets]/D");
-    outputTree->Branch("_jetDeltaR", &_jetDeltaR, "_jetDeltaR[_n_Jets][_nLeptons]/D");
     outputTree->Branch("_clean", &_clean, "_clean[_n_Jets]/I");
 
     // JEC
