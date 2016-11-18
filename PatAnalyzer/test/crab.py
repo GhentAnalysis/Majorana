@@ -11,12 +11,12 @@ treeForFakeRate = os.environ['CRAB_TREEFORFAKERATE']
 config = Configuration()
 config.section_('General')
 config.General.transferLogs = True
-config.General.requestName  = productionLabel
-config.General.workArea     = os.path.join('crab', productionLabel, dataset.split('/')[1])
+config.General.requestName  = dataset.split('/')[2] + '_' + productionLabel
+config.General.workArea     = os.path.join('crab', productionLabel, dataset.split('/')[1] + dataset.split('/')[2])
 
 config.section_('JobType')
 config.JobType.psetName                = 'trilepton.py'
-config.JobType.pyCfgParams             = (['isData=True'] if not 'SIM' in dataset else []) + (['treeForFakeRate=True'] if treeForFakeRate else [])
+config.JobType.pyCfgParams             = (['isData=True'] if not 'SIM' in dataset else []) + (['treeForFakeRate=True'] if treeForFakeRate else []) + ['events=-1']
 config.JobType.pluginName              = 'analysis'
 config.JobType.outputFiles             = ['trilepton.root' if treeForFakeRate=='False' else 'fakeRate.root']
 config.JobType.allowUndistributedCMSSW = True 

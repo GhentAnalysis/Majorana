@@ -1,16 +1,16 @@
 #!/usr/bin/env python
 import os, glob, sys
 
-productionLabel = 'fakeRate_v1'		                                				# Label to keep track of the tuple versio
-outDir          = '/user/' + os.environ['USER'] + '/public/majorana'					# Output directory in case of local submission
-datasets        = [dataset.strip() for dataset in open(sys.argv[1])]					# Get list of datasets from file given as first argument
-datasets        = [dataset for dataset in datasets if dataset and not dataset.startswith('#')]		# Clean empty and comment lines
+productionLabel = 'fakeRate_v3'		                                					# Label to keep track of the tuple versio
+outDir          = '/user/' + os.environ['USER'] + '/public/majorana'						# Output directory in case of local submission
+datasets        = [dataset.strip() for dataset in open(sys.argv[1])]						# Get list of datasets from file given as first argument
+datasets        = [dataset.split()[0] for dataset in datasets if dataset and not dataset.startswith('#')]	# Clean empty and comment lines
 
 for dataset in datasets:
   if dataset.startswith('FAKERATE:'):
     outputName      = 'fakeRate'
     treeForFakeRate = True
-    dataset         = dataset.split(':')[-1].split()[0]
+    dataset         = dataset.split(':')[-1]
   else:
     outputName      = 'trilepton'
     treeForFakeRate = False
@@ -32,7 +32,7 @@ for dataset in datasets:
         except: pass
       
       print 'Submitting ' + inputFile + ' to cream02:'
-      args  = 'dir=' + dir + ',inputFile=' + inputFile + ',outputFile=' + outputFile
+      args  = 'dir=' + dir + ',inputFile=' + inputFile + ',outputFile=' + outputFile + ',events=-1'
       args += ',isData='          + ('True' if 'Run2016' in dataset else 'False')
       args += ',treeForFakeRate=' + ('True' if treeForFakeRate      else 'False')
       os.system('qsub -v ' + args + ' -q localgrid@cream02 -o ' + logFile + ' -e ' + logFile + ' -l walltime=' + wallTime + ' runOnCream02.sh')
