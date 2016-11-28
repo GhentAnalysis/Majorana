@@ -139,16 +139,12 @@ private:
     edm::InputTag IT_tauDiscriminator;
     edm::InputTag IT_METFilters;
     
-    // MVA values and categories (optional)
-    edm::EDGetTokenT<edm::ValueMap<bool>> eleVetoIdMapToken;
-    edm::EDGetTokenT<edm::ValueMap<bool>> eleLooseIdMapToken;
-    edm::EDGetTokenT<edm::ValueMap<bool>> eleMediumIdMapToken;
-    edm::EDGetTokenT<edm::ValueMap<bool>> eleTightIdMapToken;
-
     edm::EDGetTokenT<reco::GenParticleCollection>    genparticleToken;
     edm::EDGetTokenT<edm::ValueMap<float>>           electronMvaIdMapToken;
-    edm::EDGetTokenT<edm::ValueMap<float>>           electronCutBasedIdMapTightToken;
-    edm::EDGetTokenT<edm::ValueMap<float>>           electronCutBasedIdMapMediumToken;
+    edm::EDGetTokenT<edm::ValueMap<bool>>  	     electronMvaIdMap80Token;
+    edm::EDGetTokenT<edm::ValueMap<bool>>  	     electronMvaIdMap90Token;
+    edm::EDGetTokenT<edm::ValueMap<bool>>            electronCutBasedIdMapTightToken;
+    edm::EDGetTokenT<edm::ValueMap<bool>>            electronCutBasedIdMapMediumToken;
     edm::EDGetTokenT<GenEventInfoProduct>            pdfvariablesToken;
     edm::EDGetTokenT<reco::BeamSpot>                 IT_beamspot;
     edm::EDGetTokenT<vector<PileupSummaryInfo>>      PileUpToken; 
@@ -209,7 +205,6 @@ private:
     
     std::vector<std::string> myManualCatWeigths;
     vector<string> myManualCatWeigthsTrig;
-    double looseMVA[6][2]; //{{0.35, 0.20, -0.52}, {0.73, 0.57, 0.05}};//{0.8, 1.479, };
     
 
     
@@ -228,7 +223,7 @@ private:
     int _jetFlavour[nJetsMax];
     bool _bTagged[nJetsMax];
     double _csv[nJetsMax];
-    double _jetDeltaR[nJetsMax][6];
+    double _jetDeltaR[nJetsMax][nLeptonsMax];
 
     double _weight;
     double _LHEweight[111];

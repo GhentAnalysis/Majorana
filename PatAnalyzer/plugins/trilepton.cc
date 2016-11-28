@@ -47,8 +47,10 @@
 trilepton::trilepton(const edm::ParameterSet & iConfig) :
   genparticleToken(                      consumes<reco::GenParticleCollection>(   iConfig.getParameter<edm::InputTag>("genPartsLabel"))),
   electronMvaIdMapToken(                 consumes<edm::ValueMap<float>>(          iConfig.getParameter<edm::InputTag>("electronMvaIdMap"))),
-  electronCutBasedIdMapTightToken(       consumes<edm::ValueMap<float>>(          iConfig.getParameter<edm::InputTag>("electronCutBasedIdTightMap"))),
-  electronCutBasedIdMapMediumToken(      consumes<edm::ValueMap<float>>(          iConfig.getParameter<edm::InputTag>("electronCutBasedIdMediumMap"))),
+  electronMvaIdMap80Token(               consumes<edm::ValueMap<bool>>(           iConfig.getParameter<edm::InputTag>("electronMvaId80Map"))),
+  electronMvaIdMap90Token(               consumes<edm::ValueMap<bool>>(           iConfig.getParameter<edm::InputTag>("electronMvaId90Map"))),
+  electronCutBasedIdMapTightToken(       consumes<edm::ValueMap<bool>>(           iConfig.getParameter<edm::InputTag>("electronCutBasedIdTightMap"))),
+  electronCutBasedIdMapMediumToken(      consumes<edm::ValueMap<bool>>(           iConfig.getParameter<edm::InputTag>("electronCutBasedIdMediumMap"))),
   pdfvariablesToken(                     consumes<GenEventInfoProduct>(           iConfig.getParameter<edm::InputTag>("pdfvariablesLabel"))),
   IT_beamspot(                           consumes<reco::BeamSpot>(                iConfig.getParameter<edm::InputTag>("BeamSpotLabel"))),
   PileUpToken(                           consumes<vector<PileupSummaryInfo>>(     iConfig.getParameter<edm::InputTag>("slimmedAddPileupInfoLabel"))),
@@ -370,22 +372,6 @@ void trilepton::beginJob()
 
     jecUnc = new JetCorrectionUncertainty(edm::FileInPath("Majorana/PatAnalyzer/data/Spring16_25nsV6_MC_Uncertainty_AK4PFchs.txt").fullPath());
     
-    //these workingpoints will be replaced by new electron MVA
-    //80 % eff
-    looseMVA[0][0] = 0.287435;
-    looseMVA[1][0] = 0.221846;
-    looseMVA[2][0] = -0.303263;
-    looseMVA[3][0] = 0.967083;
-    looseMVA[4][0] = 0.929117;
-    looseMVA[5][0] = 0.726311;
-    //90 % eff
-    looseMVA[0][1] = -0.083313;
-    looseMVA[1][1] = -0.235222;
-    looseMVA[2][1] = -0.67099;
-    looseMVA[3][1] = 0.913286;
-    looseMVA[4][1] = 0.805013;
-    looseMVA[5][1] = 0.358969;
-
     for(TString wp : {"VT","T","M","L","VL"}){
       leptonWorkingPoints["multiIsolation" + wp] = new std::vector<bool>();
       leptonConeCorrectedPt[wp]                  = new std::vector<double>();
@@ -734,8 +720,10 @@ void trilepton::analyze(const edm::Event& iEvent, const edm::EventSetup& iEventS
     edm::Handle<std::vector<pat::Muon>> muons;                 iEvent.getByToken(IT_muon, muons);
     edm::Handle<edm::View<pat::Electron>> electrons;           iEvent.getByToken(IT_electron, electrons);
     edm::Handle<edm::ValueMap<float>> electronMvaIdMap;        iEvent.getByToken(electronMvaIdMapToken, electronMvaIdMap);
-    edm::Handle<edm::ValueMap<float>> electronCutBasedIdMapT;  iEvent.getByToken(electronCutBasedIdMapTightToken, electronCutBasedIdMapT);
-    edm::Handle<edm::ValueMap<float>> electronCutBasedIdMapM;  iEvent.getByToken(electronCutBasedIdMapMediumToken, electronCutBasedIdMapM);
+    edm::Handle<edm::ValueMap<bool>> electronMvaIdMap90;       iEvent.getByToken(electronMvaIdMap90Token, electronMvaIdMap90);
+    edm::Handle<edm::ValueMap<bool>> electronMvaIdMap80;       iEvent.getByToken(electronMvaIdMap80Token, electronMvaIdMap80);
+    edm::Handle<edm::ValueMap<bool>> electronCutBasedIdMapT;   iEvent.getByToken(electronCutBasedIdMapTightToken, electronCutBasedIdMapT);
+    edm::Handle<edm::ValueMap<bool>> electronCutBasedIdMapM;   iEvent.getByToken(electronCutBasedIdMapMediumToken, electronCutBasedIdMapM);
     edm::Handle<std::vector<reco::Conversion>> theConversions; iEvent.getByToken(reducedEgammaToken, theConversions);
     edm::Handle<std::vector<pat::Jet>> thePatJets;             iEvent.getByToken(IT_jet , thePatJets );
     edm::Handle<double> rhoJets;                               iEvent.getByToken(fixedGridRhoFastjetCentralNeutralToken , rhoJets);
@@ -959,13 +947,9 @@ void trilepton::analyze(const edm::Event& iEvent, const edm::EventSetup& iEventS
       _mvaValue[leptonCounter]               = (*electronMvaIdMap)[electronRef];
       _passedCutBasedIdTight[leptonCounter]  = (*electronCutBasedIdMapT)[electronRef];
       _passedCutBasedIdMedium[leptonCounter] = (*electronCutBasedIdMapM)[electronRef];
+      _passedMVA80[leptonCounter]            = (*electronMvaIdMap80)[electronRef];
+      _passedMVA90[leptonCounter]            = (*electronMvaIdMap90)[electronRef];
       //bool crossCheckTight = tools::isTightCutBasedElectronWithoutIsolation(&*electron, false) and tools::pfRelIso(&*electron, myRhoJECJets) < (electron->isEB() ? 0.0588 : 0.0571);
-
-
-      // maybe better implement cut based id though, and/or clean up this MVA cutting part
-      int index                   = (electron->pt() > 10 ? 3 : 0) + (abs(electron->eta()) > 1.479 ? 2 : (abs(electron->eta()) > 0.8 ? 1 : 0 ));
-      _passedMVA80[leptonCounter] = _mvaValue[leptonCounter]> looseMVA[index][0];
-      _passedMVA90[leptonCounter] = _mvaValue[leptonCounter]> looseMVA[index][1];
 
       _flavors[leptonCounter]            = 0;
       _charges[leptonCounter]            = electron->charge();
