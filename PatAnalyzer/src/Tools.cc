@@ -606,7 +606,7 @@ std::map<const reco::PFTau*, int > tools::TauSelector(edm::Handle<reco::PFTauCol
             }
         }
         if (!Remove)
-            vTaus.insert(std::pair<const reco::PFTau*, int >(&((*PFTaus)[i]), i));
+            vTaus.insert(std::pair<const reco::PFTau*,   int >(&((*PFTaus)[i]), i));
     }
     return vTaus;
 }
