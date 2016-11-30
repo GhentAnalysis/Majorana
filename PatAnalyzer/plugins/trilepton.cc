@@ -77,7 +77,7 @@ trilepton::trilepton(const edm::ParameterSet & iConfig) :
   _relIsoCutMuloose(999.), //0.5
   _chargeConsistency(true),
   _minPt0(5),
-  _minPt1(5.),
+  _minPt1(10.),
   _tightD0Mu(0.05),
   _tightD0E(0.05),
   _looseD0Mu(0.05), // 0.05 for sync   // Not sure if this was some temporary change?
@@ -853,13 +853,16 @@ void trilepton::analyze(const edm::Event& iEvent, const edm::EventSetup& iEventS
       if(muon->pt() < _minPt0)   continue;
       if(abs(muon->eta()) > 2.5) continue;
       if(!muon->isLooseMuon())   continue;  // Store only loose muons, see https://twiki.cern.ch/twiki/bin/viewauth/CMS/SWGuideMuonIdRun2
-     
+      bool goodGlb      = muon->isGlobalMuon() and muon->globalTrack()->normalizedChi2() < 3 and muon->combinedQuality().chi2LocalPosition < 12 and muon->combinedQuality().trkKink < 20;
+      bool isMedium     = muon->isLooseMuon() and muon->innerTrack()->validFraction() > 0.49 and muon->segmentCompatibility() >= (goodGlb ? 0.303 : 0.451); // temporary ICHEP recommendation	    
+      if (!isMedium) continue;   
+	      
       if(muon->innerTrack().isNull()) 			continue;  // Store only when we have an innertrack
       //if(abs(muon->innerTrack()->dxy(PV)) > _looseD0Mu) continue;
       //if(abs(muon->innerTrack()->dz(PV)) > 0.1  ) 	continue;
 
       double relIso = tools::pfRelIso(&*muon,myRhoJECJets);
-      if(relIso > 1) continue;
+      if(relIso > 0.6) continue; // loose selection for FR
 
       if (leptonCounter == 10) continue;  // using arrays, so do not store more than 10 muons, they are sorted in pt anyway
 
@@ -880,8 +883,8 @@ void trilepton::analyze(const edm::Event& iEvent, const edm::EventSetup& iEventS
       _3dIPerr[leptonCounter]  = muon->edB(pat::Muon::PV3D);
       _3dIPsig[leptonCounter]  = fabs(_3dIP[leptonCounter]/_3dIPerr[leptonCounter]);
      
-      bool goodGlb      = muon->isGlobalMuon() and muon->globalTrack()->normalizedChi2() < 3 and muon->combinedQuality().chi2LocalPosition < 12 and muon->combinedQuality().trkKink < 20;
-      bool isMedium     = muon->isLooseMuon() and muon->innerTrack()->validFraction() > 0.49 and muon->segmentCompatibility() >= (goodGlb ? 0.303 : 0.451); // temporary ICHEP recommendation
+      //bool goodGlb      = muon->isGlobalMuon() and muon->globalTrack()->normalizedChi2() < 3 and muon->combinedQuality().chi2LocalPosition < 12 and muon->combinedQuality().trkKink < 20;
+      //bool isMedium     = muon->isLooseMuon() and muon->innerTrack()->validFraction() > 0.49 and muon->segmentCompatibility() >= (goodGlb ? 0.303 : 0.451); // temporary ICHEP recommendation
 //    bool isMedium     = muon->isMediumMuon();  // default definition with  muon->innerTrack()->validFraction() > 0.8 instead
  
       _muonSegmentComp[leptonCounter] = muon->segmentCompatibility(); // do we really use this variable in our trees? should be enough to select loose or medium
@@ -938,10 +941,11 @@ void trilepton::analyze(const edm::Event& iEvent, const edm::EventSetup& iEventS
       if(electron->pt() < _minPt1) continue;
       if(abs(electron->eta()) > 2.5) continue;
       if(!electron->gsfTrack().isNonnull()) continue;
-      if(!tools::isLooseCutBasedElectronWithoutIsolation(&*electron)) continue; //only store those passing the loose cut based id, without isolation requirement
+      //if(!tools::isLooseCutBasedElectronWithoutIsolation(&*electron)) continue; //only store those passing the loose cut based id, without isolation requirement
 
       double relIso = tools::pfRelIso(&*electron, myRhoJECJets);
-      if(relIso > 1) continue;
+      	    
+      if(relIso > 0.6) continue;
       // There will be a new electron MVA soon
       edm::RefToBase<pat::Electron> electronRef(edm::Ref<edm::View<pat::Electron>>(electrons, (electron - electrons->begin())));
       _mvaValue[leptonCounter]               = (*electronMvaIdMap)[electronRef];
@@ -949,6 +953,10 @@ void trilepton::analyze(const edm::Event& iEvent, const edm::EventSetup& iEventS
       _passedCutBasedIdMedium[leptonCounter] = (*electronCutBasedIdMapM)[electronRef];
       _passedMVA80[leptonCounter]            = (*electronMvaIdMap80)[electronRef];
       _passedMVA90[leptonCounter]            = (*electronMvaIdMap90)[electronRef];
+	    
+	    
+      bool MVAlooseFR = tools::passed_loose_MVA_FR(&*electron, _mvaValue[leptonCounter]);	    
+      if (!MVAlooseFR) continue;
       //bool crossCheckTight = tools::isTightCutBasedElectronWithoutIsolation(&*electron, false) and tools::pfRelIso(&*electron, myRhoJECJets) < (electron->isEB() ? 0.0588 : 0.0571);
 
       _flavors[leptonCounter]            = 0;
