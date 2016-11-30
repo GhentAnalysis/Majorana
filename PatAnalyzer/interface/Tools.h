@@ -98,6 +98,7 @@ namespace tools {
     bool isoTriggerEmulator(const pat::Electron *iE);
     
     float dEtaInSeed(const pat::Electron* ele);
+    bool passed_loose_MVA_FR(const pat::Electron* iE, double mvaValue);
     bool isLooseCutBasedElectronWithoutIsolation(const pat::Electron* ele);
     bool isTightCutBasedElectronWithoutIsolation(const pat::Electron* ele);
     
