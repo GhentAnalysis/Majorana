@@ -188,6 +188,33 @@ float tools::dEtaInSeed(const pat::Electron* ele){
   else                                                                            return std::numeric_limits<float>::max();
 }
 
+bool tools::passed_loose_MVA_FR(const pat::Electron* iE, double mvaValue){
+	
+	bool passedMVA_loose = false;
+	if(iE->pt() > 10 && iE->pt() < 20){//selection 5<pt<10
+		passedMVA_loose = false;
+		if (TMath::Abs(iE->eta()) < 0.8 ) {
+		    passedMVA_loose = mvaValue > -0.86;
+		} else if (TMath::Abs(iE->eta()) < 1.479 ) {
+		    passedMVA_loose = mvaValue > -0.85;
+		} else {
+		    passedMVA_loose = mvaValue > -0.81;
+		}
+	}//end //selection 5<pt<10
+
+	if (iE->pt()>=20  ){
+		passedMVA_loose = false;
+		if (TMath::Abs(iE->eta()) < 0.8 ) {
+		    passedMVA_loose = mvaValue > -0.96;
+		} else if (TMath::Abs(iE->eta()) < 1.479 ) {
+		    passedMVA_loose = mvaValue > -0.96;
+		} else {
+		    passedMVA_loose = mvaValue > -0.95;
+		}
+	}// end 10 pt
+	return passedMVA_loose;
+}
+
 bool tools::isLooseCutBasedElectronWithoutIsolation(const pat::Electron* ele){
     if(not (ele->isEB() or ele->isEE())) return false;
 
