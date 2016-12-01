@@ -123,26 +123,26 @@ double tools::pfAbsIso(const pat::Muon *mu, double myRho){
 bool tools::triggerEmulator(const pat::Electron *iE) {
 
     bool passed = true;
-    //if( TMath::Abs(1.0/iE->ecalEnergy() - iE->eSuperClusterOverP()/iE->ecalEnergy()) > 0.01 ) passed = false;
-    if( TMath::Abs(1.0/iE->correctedEcalEnergy() - iE->eSuperClusterOverP()/iE->correctedEcalEnergy()) > 0.01 ) passed = false;
+    //if( std::abs(1.0/iE->ecalEnergy() - iE->eSuperClusterOverP()/iE->ecalEnergy()) > 0.01 ) passed = false;
+    if( std::abs(1.0/iE->correctedEcalEnergy() - iE->eSuperClusterOverP()/iE->correctedEcalEnergy()) > 0.01 ) passed = false;
                 
-    else if( TMath::Abs(iE->superCluster()->eta()) < 1.479  ) {
-         if( TMath::Abs(iE->deltaPhiSuperClusterTrackAtVtx()) > 0.04  ) passed = false;
-         else if( TMath::Abs(iE->deltaEtaSuperClusterTrackAtVtx()) > 0.01 ) passed = false;
-         //else if( TMath::Abs(iE->full5x5_sigmaIetaIeta()) > 0.011 ) passed = false;
+    else if( std::abs(iE->superCluster()->eta()) < 1.479  ) {
+         if( std::abs(iE->deltaPhiSuperClusterTrackAtVtx()) > 0.04  ) passed = false;
+         else if( std::abs(iE->deltaEtaSuperClusterTrackAtVtx()) > 0.01 ) passed = false;
+         //else if( std::abs(iE->full5x5_sigmaIetaIeta()) > 0.011 ) passed = false;
          else if( iE->full5x5_sigmaIetaIeta() > 0.011 ) passed = false;
-         //else if( TMath::Abs(iE->hadronicOverEm())  > 0.08  ) passed = false;
-         //else if( TMath::Abs(iE->hcalOverEcal())  > 0.08  ) passed = false;
+         //else if( std::abs(iE->hadronicOverEm())  > 0.08  ) passed = false;
+         //else if( std::abs(iE->hcalOverEcal())  > 0.08  ) passed = false;
          else if( iE->hcalOverEcal()  > 0.08  ) passed = false;
     }
 
     else {
-         if( TMath::Abs(iE->deltaPhiSuperClusterTrackAtVtx()) > 0.08 ) passed = false;
-         else if( TMath::Abs(iE->deltaEtaSuperClusterTrackAtVtx()) > 0.01 ) passed = false;
-         //else if( TMath::Abs(iE->full5x5_sigmaIetaIeta()) > 0.031 ) passed = false;
+         if( std::abs(iE->deltaPhiSuperClusterTrackAtVtx()) > 0.08 ) passed = false;
+         else if( std::abs(iE->deltaEtaSuperClusterTrackAtVtx()) > 0.01 ) passed = false;
+         //else if( std::abs(iE->full5x5_sigmaIetaIeta()) > 0.031 ) passed = false;
          else if( iE->full5x5_sigmaIetaIeta() > 0.031 ) passed = false;
-         //else if( TMath::Abs(iE->hadronicOverEm()) > 0.08 ) passed = false;
-         //else if( TMath::Abs(iE->hcalOverEcal())  > 0.08  ) passed = false;
+         //else if( std::abs(iE->hadronicOverEm()) > 0.08 ) passed = false;
+         //else if( std::abs(iE->hcalOverEcal())  > 0.08  ) passed = false;
          else if( iE->hcalOverEcal()  > 0.08  ) passed = false;
     }
                         
@@ -189,30 +189,15 @@ float tools::dEtaInSeed(const pat::Electron* ele){
 }
 
 bool tools::passed_loose_MVA_FR(const pat::Electron* iE, double mvaValue){
-	
-	bool passedMVA_loose = false;
-	if(iE->pt() > 10 && iE->pt() < 20){//selection 5<pt<10
-		passedMVA_loose = false;
-		if (TMath::Abs(iE->eta()) < 0.8 ) {
-		    passedMVA_loose = mvaValue > -0.86;
-		} else if (TMath::Abs(iE->eta()) < 1.479 ) {
-		    passedMVA_loose = mvaValue > -0.85;
-		} else {
-		    passedMVA_loose = mvaValue > -0.81;
-		}
-	}//end //selection 5<pt<10
-
-	if (iE->pt()>=20  ){
-		passedMVA_loose = false;
-		if (TMath::Abs(iE->eta()) < 0.8 ) {
-		    passedMVA_loose = mvaValue > -0.96;
-		} else if (TMath::Abs(iE->eta()) < 1.479 ) {
-		    passedMVA_loose = mvaValue > -0.96;
-		} else {
-		    passedMVA_loose = mvaValue > -0.95;
-		}
-	}// end 10 pt
-	return passedMVA_loose;
+    if(iE->pt() > 10 && iE->pt() < 20){
+	if(std::abs(iE->eta()) < 0.8)         return mvaValue > -0.86;
+	else if (std::abs(iE->eta()) < 1.479) return mvaValue > -0.85;
+	else                                  return mvaValue > -0.81;
+    } else if (iE->pt()>=20){
+	if (std::abs(iE->eta()) < 0.8)        return mvaValue > -0.96;
+	else if (std::abs(iE->eta()) < 1.479) return mvaValue > -0.96;
+	else                                  return mvaValue > -0.95;
+    } else return false
 }
 
 bool tools::isLooseCutBasedElectronWithoutIsolation(const pat::Electron* ele){
@@ -262,7 +247,7 @@ std::vector<const pat::Jet* > tools::JetSelector(const std::vector<pat::Jet>  & 
 	{
         //std::cout << "Jet Pt: " << jet->pt() << std::endl;
         if( jet->pt() < v_jet_pt )continue;
-        if( TMath::Abs( jet->eta() ) > v_jet_eta) continue;
+        if( std::abs( jet->eta() ) > v_jet_eta) continue;
 
         double eta = jet->eta();
 
@@ -291,7 +276,7 @@ std::vector<const pat::Jet* > tools::JetSelector(const std::vector<pat::Jet>  & 
             if(  jet->muonEnergyFraction() >=0.8 ) continue;
 
 
-            if( TMath::Abs( jet->eta() ) < 2.4 )
+            if( std::abs( jet->eta() ) < 2.4 )
             {
                 if( jet->chargedHadronEnergyFraction() == 0. ) continue;
                 if( jet->chargedEmEnergyFraction() >= 0.99 ) continue;
@@ -336,13 +321,13 @@ std::vector<const pat::Jet* > tools::JetSelector(const std::vector<pat::Jet>  & 
 	{
         
         if( jet->pt() < v_jet_pt )continue;
-        if( TMath::Abs( jet->eta() ) > v_jet_eta) continue;
+        if( std::abs( jet->eta() ) > v_jet_eta) continue;
         if( bool_jet_id )
 	    {
             if( jet->neutralHadronEnergyFraction() >= 0.99 ) continue;
             if( jet->neutralEmEnergyFraction() >= 0.99 ) continue;
             if( ( jet->neutralHadronMultiplicity() + jet->chargedHadronMultiplicity() ) < 2 ) continue;
-            if( TMath::Abs( jet->eta() ) < 2.4 )
+            if( std::abs( jet->eta() ) < 2.4 )
             {
                 if( jet->chargedHadronEnergyFraction() == 0. ) continue;
                 if( jet->chargedEmEnergyFraction() >= 0.99 ) continue;
@@ -403,13 +388,13 @@ std::vector<const pat::Jet* > tools::JetSelector(const std::vector<pat::Jet>  & 
     for( std::vector<pat::Jet>::const_iterator jet = thePatJets.begin(); jet != thePatJets.end(); jet++ )
 	{
         if( jet->pt() < v_jet_pt )continue;
-        if( TMath::Abs( jet->eta() ) > v_jet_eta) continue;
+        if( std::abs( jet->eta() ) > v_jet_eta) continue;
         if( bool_jet_id )
 	    {
             if( jet->neutralHadronEnergyFraction() >= 0.99 ) continue;
             if( jet->neutralEmEnergyFraction() >= 0.99 ) continue;
             if( ( jet->neutralHadronMultiplicity() + jet->chargedHadronMultiplicity() ) < 2 ) continue;
-            if( TMath::Abs( jet->eta() ) < 2.4 )
+            if( std::abs( jet->eta() ) < 2.4 )
             {
                 if( jet->chargedHadronEnergyFraction() == 0. ) continue;
                 if( jet->chargedEmEnergyFraction() >= 0.99 ) continue;
@@ -532,7 +517,7 @@ std::map<const reco::PFTau*, int > tools::TauSelector(edm::Handle<reco::PFTauCol
         
         //std::cout<<"eta cut"<<std::endl;
         
-        if(TMath::Abs((*PFTaus)[i].eta())>v_tau_eta) continue;
+        if(std::abs((*PFTaus)[i].eta())>v_tau_eta) continue;
         
         reco::PFTauRef tauCandidate(PFTaus, i);
         //std::cout<<"electron discr."<<std::endl;
@@ -571,7 +556,7 @@ std::map<const reco::PFTau*, int > tools::TauSelector(edm::Handle<reco::PFTauCol
         
         //std::cout<<"eta cut"<<std::endl;
         
-        if(TMath::Abs((*PFTaus)[i].eta())>v_tau_eta) continue;
+        if(std::abs((*PFTaus)[i].eta())>v_tau_eta) continue;
         
         reco::PFTauRef tauCandidate(PFTaus, i);
         //std::cout<<"electron discr."<<std::endl;
