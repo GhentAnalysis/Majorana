@@ -374,8 +374,11 @@ void trilepton::beginJob()
     
     for(TString wp : {"VT","T","M","L","VL"}){
       leptonWorkingPoints["multiIsolation" + wp] = new std::vector<bool>();
+      outputTree->Branch("multiIsolation" + wp, "vector<bool>", leptonWorkingPoints["multiIsolation" + wp]);
+    }
+
+    for(TString wp : {"VT","T","M","L","VL","RelIso04","MiniIso04"}){
       leptonConeCorrectedPt[wp]                  = new std::vector<double>();
-      outputTree->Branch("multiIsolation" + wp,        "vector<bool>",   leptonWorkingPoints["multiIsolation" + wp]);
       outputTree->Branch("leptonConeCorrectedPt" + wp, "vector<double>", leptonConeCorrectedPt[wp]);
     }
         
@@ -387,10 +390,8 @@ void trilepton::beginJob()
 }
 
 void trilepton::endJob() {
-    for(TString wp : {"VT","T","M","L","VL"}){
-      delete leptonWorkingPoints["multiIsolation" + wp];
-      delete leptonConeCorrectedPt[wp];
-    }
+    for(TString wp : {"VT","T","M","L","VL"})			     delete leptonWorkingPoints["multiIsolation" + wp];
+    for(TString wp : {"VT","T","M","L","VL","RelIso04","MiniIso04"}) delete leptonConeCorrectedPt[wp];
 
     std::cout<<_nEventsTotal<<std::endl;
     std::cout<<_nEventsFiltered<<std::endl;
@@ -446,11 +447,8 @@ void trilepton::getTriggerResults(const edm::Event& iEvent, bool isHLT, edm::EDG
 
 void trilepton::analyze(const edm::Event& iEvent, const edm::EventSetup& iEventSetup)
 {
-    for(TString wp : {"VT","T","M","L","VL"}){
-      leptonWorkingPoints["multiIsolation" + wp]->clear();
-      leptonConeCorrectedPt[wp]->clear();
-    }
-    //bool islepton;
+    for(TString wp : {"VT","T","M","L","VL"})                        leptonWorkingPoints["multiIsolation" + wp]->clear();
+    for(TString wp : {"VT","T","M","L","VL","RelIso04","MiniIso04"}) leptonConeCorrectedPt[wp]->clear();
 
     _nZboson = 0;
 
@@ -909,6 +907,8 @@ void trilepton::analyze(const edm::Event& iEvent, const edm::EventSetup& iEventS
         leptonWorkingPoints["multiIsolation" + wp]->push_back(tools::passMultiIsolation(wp, _miniisolation[leptonCounter], _ptratio[leptonCounter], _ptrel[leptonCounter]));
         leptonConeCorrectedPt[wp]->push_back(tools::leptonConeCorrectedPt(_lPt[leptonCounter], wp, _miniisolation[leptonCounter], _ptratio[leptonCounter], _ptrel[leptonCounter]));
       }
+      leptonConeCorrectedPt["MiniIso04"]->push_back(tools::leptonConeCorrectedPt(_lPt[leptonCounter], "MiniIso04", _miniisolation[leptonCounter], 0, 0));
+      leptonConeCorrectedPt["RelIso04"]->push_back(tools::leptonConeCorrectedPt(_lPt[leptonCounter], "RelIso04", _isolation[leptonCounter], 0, 0));
 
       if(not isData){
 	  const GenParticle* mc = GPM.matchedMC(&*muon);
@@ -1005,6 +1005,8 @@ void trilepton::analyze(const edm::Event& iEvent, const edm::EventSetup& iEventS
         leptonWorkingPoints["multiIsolation" + wp]->push_back(tools::passMultiIsolation(wp, _miniisolation[leptonCounter], _ptratio[leptonCounter], _ptrel[leptonCounter]));
         leptonConeCorrectedPt[wp]->push_back(tools::leptonConeCorrectedPt(_lPt[leptonCounter], wp, _miniisolation[leptonCounter], _ptratio[leptonCounter], _ptrel[leptonCounter]));
       }
+      leptonConeCorrectedPt["MiniIso04"]->push_back(tools::leptonConeCorrectedPt(_lPt[leptonCounter], "MiniIso04", _miniisolation[leptonCounter], 0, 0));
+      leptonConeCorrectedPt["RelIso04"]->push_back(tools::leptonConeCorrectedPt(_lPt[leptonCounter], "RelIso04", _isolation[leptonCounter], 0, 0));
 
       if (not isData) {
 	_findMatched[leptonCounter]=-1;

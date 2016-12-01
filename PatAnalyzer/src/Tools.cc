@@ -197,7 +197,7 @@ bool tools::passed_loose_MVA_FR(const pat::Electron* iE, double mvaValue){
 	if (std::abs(iE->eta()) < 0.8)        return mvaValue > -0.96;
 	else if (std::abs(iE->eta()) < 1.479) return mvaValue > -0.96;
 	else                                  return mvaValue > -0.95;
-    } else return false
+    } else return false;
 }
 
 bool tools::isLooseCutBasedElectronWithoutIsolation(const pat::Electron* ele){
@@ -473,6 +473,7 @@ bool tools::passMultiIsolation(TString level, double miniIso, double jetPtRatio,
 }
 
 double tools::leptonConeCorrectedPt(double pt, TString level, double miniIso, double jetPtRatio, double jetPtRel){
+  if (level.Contains("Iso04"))       return pt*(1+std::max(0., miniIso - 0.4));
   if (jetPtRel > multiIso[level][2]) return pt*(1+std::max(0., miniIso - multiIso[level][0]));
   else                               return pt*(std::max(1., multiIso[level][1]/jetPtRatio));
 }
