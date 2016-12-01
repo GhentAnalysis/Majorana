@@ -19,11 +19,12 @@ config.JobType.psetName                = 'trilepton.py'
 config.JobType.pyCfgParams             = (['isData=True'] if not 'SIM' in dataset else []) + (['treeForFakeRate=True'] if treeForFakeRate else []) + ['events=-1']
 config.JobType.pluginName              = 'analysis'
 config.JobType.outputFiles             = ['trilepton.root' if treeForFakeRate=='False' else 'fakeRate.root']
+config.JobType.sendExternalFolder      = True
 config.JobType.allowUndistributedCMSSW = True 
 
 config.section_('Data')
 config.Data.inputDataset               = dataset
-config.Data.unitsPerJob                = 1000
+config.Data.unitsPerJob                = 300
 config.Data.splitting                  = 'LumiBased'
 config.Data.outLFNDirBase              = '/store/user/' + os.environ['USER'] + '/majorana/'
 config.Data.publication                = False
