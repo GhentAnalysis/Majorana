@@ -101,6 +101,9 @@ namespace tools {
     bool passed_loose_MVA_FR(const pat::Electron* iE, double mvaValue);
     bool isLooseCutBasedElectronWithoutIsolation(const pat::Electron* ele);
     bool isTightCutBasedElectronWithoutIsolation(const pat::Electron* ele);
+
+    float slidingCut(float pt, float low, float high);
+    bool passed_loose_MVA_FR_slidingCut(const pat::Electron* iE, double mvaValue);
     
     std::vector<const pat::Jet* > EMJetSelector(const std::vector<pat::Jet>  & thePatJets,
                                               double  value_jet_et,

@@ -200,6 +200,17 @@ bool tools::passed_loose_MVA_FR(const pat::Electron* iE, double mvaValue){
     } else return false;
 }
 
+float tools::slidingCut(float pt, float low, float high){
+  float slope = (high - low)/10.;
+  return std::min(low, std::max(high, - slope*(pt-15)));
+}
+
+bool tools::passed_loose_MVA_FR_slidingCut(const pat::Electron* iE, double mvaValue){
+    if(std::abs(iE->eta()) < 0.8)         return slidingCut(iE->pt(), -0.86, -0.96);
+    else if (std::abs(iE->eta()) < 1.479) return slidingCut(iE->pt(), -0.85, -0.96);
+    else                                  return slidingCut(iE->pt(), -0.81, -0.95);
+}
+
 bool tools::isLooseCutBasedElectronWithoutIsolation(const pat::Electron* ele){
     if(not (ele->isEB() or ele->isEE())) return false;
 
