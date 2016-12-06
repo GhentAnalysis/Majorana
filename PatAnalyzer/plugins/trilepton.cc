@@ -956,7 +956,7 @@ void trilepton::analyze(const edm::Event& iEvent, const edm::EventSetup& iEventS
 	    
 	    
       bool MVAlooseFR = tools::passed_loose_MVA_FR_slidingCut(&*electron, _mvaValue[leptonCounter]);	    
-      if (!MVAlooseFR) continue;
+      //if (!MVAlooseFR) continue;
       //bool crossCheckTight = tools::isTightCutBasedElectronWithoutIsolation(&*electron, false) and tools::pfRelIso(&*electron, myRhoJECJets) < (electron->isEB() ? 0.0588 : 0.0571);
 
       _flavors[leptonCounter]            = 0;
