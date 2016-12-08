@@ -1042,7 +1042,7 @@ void trilepton::analyze(const edm::Event& iEvent, const edm::EventSetup& iEventS
       cout<<"after matching   ---->  "<<endl;
 	    cout<<"origin: "<<_origin[leptonCounter]<<endl;
 	    cout<<"reduced: "<<_originReduced[leptonCounter]<<endl;
-cout<<"RECO: ("<<_charge[leptonCounter]<<","<<_flavors[leptonCounter]<<" "<<_lPt[leptonCounter]<<" "<< _lEta[leptonCounter] <<" "<< _lPhi[leptonCounter] <<" "<<_lE[leptonCounter]  <<" mom info: "<< _mompdg[leptonCounter]<<" "<<_mompt[leptonCounter]<<endl;
+cout<<"RECO: ("<<_charges[leptonCounter]<<","<<_flavors[leptonCounter]<<" "<<_lPt[leptonCounter]<<" "<< _lEta[leptonCounter] <<" "<< _lPhi[leptonCounter] <<" "<<_lE[leptonCounter]  <<" mom info: "<< _mompdg[leptonCounter]<<" "<<_mompt[leptonCounter]<<endl;
 cout<<"Gen matched: "<<_lpdgmc[leptonCounter]<<" "<<_lPtmc[leptonCounter]<<" "<< _lEtamc[leptonCounter] <<" "<< _lPhimc[leptonCounter] <<" "<<_lEmc[leptonCounter]  <<" mom info: "<< _mompdg[leptonCounter]<<" "<<_mompt[leptonCounter]<<endl;
 
       leptonCounter++;
