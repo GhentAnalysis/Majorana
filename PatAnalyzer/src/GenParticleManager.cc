@@ -618,7 +618,7 @@ const GenParticle* GenParticleManager::matchedMC(const pat::Muon *pReco) {
     double deltaRreco = 0.1;
     for(GenParticleCollection::const_reverse_iterator p = _Collection->rbegin() ; p != _Collection->rend() ; p++ ) {
         if (p->status()!=1) continue;
-	   // if (TMath::Abs(p->pdgId() ) !=13 || TMath::Abs(p->pdgId() ) !=22) continue; 
+	   if (TMath::Abs(p->pdgId() ) !=13 ) continue; 
 	   // if (TMath::Abs(p->pt() - pReco->pt()) > 5) continue;
         Gen2.SetPtEtaPhiE(p->pt(),p->eta(),p->phi(),p->energy());
         double deltaRcur = Gen1.DeltaR(Gen2);
@@ -640,7 +640,7 @@ const GenParticle* GenParticleManager::matchedMC(const pat::Electron *pReco) {
     double deltaRreco = 0.1;
     for(GenParticleCollection::const_reverse_iterator p = _Collection->rbegin() ; p != _Collection->rend() ; p++ ) {
         if (p->status()!=1) continue;
-        //if (fabs(p->pdgId())!=11) continue;
+        if (fabs(p->pdgId())!=11) continue;
         Gen2.SetPtEtaPhiE(p->pt(),p->eta(),p->phi(),p->energy());
         double deltaRcur = Gen1.DeltaR(Gen2);
 	    	    	cout<<deltaRcur<<"  ///////////////////////////electron: with pt: "<<pReco->pt()<<"  "<<p->charge()<<" "<<pReco->charge()<<" "<<p->pdgId()<<"  vs  "<<pReco->pdgId()<<endl;
@@ -663,7 +663,7 @@ const GenParticle* GenParticleManager::matchedMC(const edm::Ptr<reco::GsfElectro
     double deltaRreco = 0.1;
     for(GenParticleCollection::const_reverse_iterator p = _Collection->rbegin() ; p != _Collection->rend() ; p++ ) {
         if (p->status()!=1) continue;
-        //if (fabs(p->pdgId())!=11) continue;
+        if (fabs(p->pdgId())!=11) continue;
         Gen2.SetPtEtaPhiE(p->pt(),p->eta(),p->phi(),p->energy());
         double deltaRcur = Gen1.DeltaR(Gen2);
         //if (deltaRcur < deltaRreco && fabs(pReco->pt() - p->pt())/p->pt() < 0.2) {
