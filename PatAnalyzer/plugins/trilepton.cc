@@ -1148,7 +1148,10 @@ cout<<"Gen matched: "<<_lpdgmc[leptonCounter]<<" "<<_lPtmc[leptonCounter]<<" "<<
     } else {
       if(_nLeptons < 3) return;
     }
-
+	cout<< "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"<<endl;
+	cout<< "  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%  "<<endl;
+	cout<< "    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%  "<<endl;
+	cout<< "        %%%%%%%%%%%%%%%%%%%%"<<endl;
     outputTree->Fill();
 }
 
@@ -1302,7 +1305,7 @@ void trilepton::fillCloseJetVars(const int leptonCounter, Vertex::Point PV) {
            _closeIndex[leptonCounter] = k;
 
            int trackSelectionMult = 0;
-           cout << "jet closest pt candidate: " << pJet.Pt() << endl;
+           //cout << "jet closest pt candidate: " << pJet.Pt() << endl;
            //if(_closeIndex[leptonCounter] != -1){
            for(int unsigned it=0; it!=SelectedJetsAll[_closeIndex[leptonCounter]]->numberOfDaughters(); ++it) {
              const pat::PackedCandidate * icand = dynamic_cast<const pat::PackedCandidate *> (SelectedJetsAll[_closeIndex[leptonCounter]]->daughter(it));
@@ -1316,7 +1319,7 @@ void trilepton::fillCloseJetVars(const int leptonCounter, Vertex::Point PV) {
                 cout << "track pt: " << trk.pt() << endl;
                 */
            }
-           cout << "trackMultiplicity: " << trackSelectionMult << endl;
+           //cout << "trackMultiplicity: " << trackSelectionMult << endl;
            //}
 
          _trackSelectionMultiplicity[leptonCounter] = trackSelectionMult;
