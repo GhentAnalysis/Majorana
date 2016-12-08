@@ -468,8 +468,9 @@ void trilepton::analyze(const edm::Event& iEvent, const edm::EventSetup& iEventS
             vGenNPMuons = GPM.filterByStatus(GPM.getNonPromptMuons(),1);
             vGenNPElectrons = GPM.filterByStatus(GPM.getNonPromptElectrons(),1);
 	    vGenMajorana = GPM.filterByStatus(GPM.getMajorana(),1);
-            //std::cout<<"*************"<<std::endl;
-            
+            std::cout<<"********************************************************************"<<std::endl;
+                        std::cout<<"********************************************************************"<<std::endl;
+		
             TLorentzVector Gen0;
             Gen0.SetPtEtaPhiE( 0, 0, 0, 0);
             _genqpt = 0;
@@ -937,6 +938,13 @@ void trilepton::analyze(const edm::Event& iEvent, const edm::EventSetup& iEventS
 	      _mompdg[leptonCounter] = 0;
 	  }
         }
+	    cout<<"----------------------------  MUON after matching    ---->  "<<endl;
+	    cout<<"origin: "<<_origin[leptonCounter]<<endl;
+	    cout<<"reduced: "<<_originReduced[leptonCounter]<<endl;
+cout<<"RECO: ("<<_charges[leptonCounter]<<","<<_flavors[leptonCounter]<<") "<<_lPt[leptonCounter]<<" "<< _lEta[leptonCounter] <<" "<< _lPhi[leptonCounter] <<" "<<_lE[leptonCounter]  <<" mom info: "<< _mompdg[leptonCounter]<<" "<<_mompt[leptonCounter]<<endl;
+cout<<"Gen matched: "<<_lpdgmc[leptonCounter]<<" "<<_lPtmc[leptonCounter]<<" "<< _lEtamc[leptonCounter] <<" "<< _lPhimc[leptonCounter] <<" "<<_lEmc[leptonCounter]  <<" mom info: "<< _mompdg[leptonCounter]<<" "<<_mompt[leptonCounter]<<endl;
+
+
         
         leptonCounter++;
     }
@@ -1039,10 +1047,10 @@ void trilepton::analyze(const edm::Event& iEvent, const edm::EventSetup& iEventS
 	      _findMatched[leptonCounter]=0;
 	  }
       }
-      cout<<"after matching   ---->  "<<endl;
+      cout<<"----------------------------  ELECTRON after matching    ---->  "<<endl;
 	    cout<<"origin: "<<_origin[leptonCounter]<<endl;
 	    cout<<"reduced: "<<_originReduced[leptonCounter]<<endl;
-cout<<"RECO: ("<<_charges[leptonCounter]<<","<<_flavors[leptonCounter]<<" "<<_lPt[leptonCounter]<<" "<< _lEta[leptonCounter] <<" "<< _lPhi[leptonCounter] <<" "<<_lE[leptonCounter]  <<" mom info: "<< _mompdg[leptonCounter]<<" "<<_mompt[leptonCounter]<<endl;
+cout<<"RECO: ("<<_charges[leptonCounter]<<","<<_flavors[leptonCounter]<<") "<<_lPt[leptonCounter]<<" "<< _lEta[leptonCounter] <<" "<< _lPhi[leptonCounter] <<" "<<_lE[leptonCounter]  <<" mom info: "<< _mompdg[leptonCounter]<<" "<<_mompt[leptonCounter]<<endl;
 cout<<"Gen matched: "<<_lpdgmc[leptonCounter]<<" "<<_lPtmc[leptonCounter]<<" "<< _lEtamc[leptonCounter] <<" "<< _lPhimc[leptonCounter] <<" "<<_lEmc[leptonCounter]  <<" mom info: "<< _mompdg[leptonCounter]<<" "<<_mompt[leptonCounter]<<endl;
 
       leptonCounter++;
