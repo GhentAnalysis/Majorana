@@ -478,12 +478,12 @@ void trilepton::analyze(const edm::Event& iEvent, const edm::EventSetup& iEventS
             for(GenParticleCollection::const_reverse_iterator p = TheGenParticles->rbegin() ; p != TheGenParticles->rend() ; p++ )
             {
                 int id = abs(p->pdgId());
-                /*
+                
                 if(p->status() == 1){
                     const GenParticle *mom = GPM.getMother(&*p);
                     cout << id << " " << p->pt() << " " << abs(mom->pdgId()) << endl;
                 }
-                */
+                
 		if(id == 9900012) _nMajorana++;
                 if(id == 23)
                     _nZboson++;
@@ -616,7 +616,6 @@ void trilepton::analyze(const edm::Event& iEvent, const edm::EventSetup& iEventS
 	      else if(id == 9900012){
 		//cout<<"N status:::::::::::::::::::::::::::::::::::::::: "<<p->status()<<endl;
 		//if(p->status() == 1){
-		  cout<<"ppppppppppppppppppp========================>>>>>"<<endl;
 		  _gen_majoPt[nMajo] = p->pt();
 		  _gen_majoE[nMajo] = p->energy();
 		  _gen_majoEta[nMajo] = p->eta();
@@ -637,7 +636,20 @@ void trilepton::analyze(const edm::Event& iEvent, const edm::EventSetup& iEventS
 	    _gen_nW= nw;
 	}
     }
-
+	cout << "~~~~~~~~~~~~~~~~~~~~~~~~~~ ALL GENERATOR LEPTONS ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" << endl;
+    cout << "number of leptons : " << _gen_nL << endl;
+    for(int i = 0; i < _gen_nL; ++i){
+      cout << "+++++++++++++++++++++++++++" << endl;
+      cout << "lepton number : " << i << endl;
+      if(_gen_flavors[i] == 0 && _gen_charges[i] < 0) cout << "flavor :  e-" << endl;
+      else if(_gen_flavors[i] == 0 && _gen_charges[i] > 0) cout << "flavor : e+" << endl;
+      else if(_gen_flavors[i] == 1 && _gen_charges[i] < 0) cout << "flavor : mu-" << endl;
+      else cout << "flavor : mu+" << endl;
+      cout << "+++++++++++++++++++++++++++" << endl;
+      }
+	
+	
+	
     getTriggerResults(iEvent, true,  triggerResultsHLTToken,  triggersToSave);
     getTriggerResults(iEvent, false, triggerResultsRECOToken, filtersToSave);
     firstEvent_ = false;
@@ -1027,8 +1039,12 @@ void trilepton::analyze(const edm::Event& iEvent, const edm::EventSetup& iEventS
 	      _findMatched[leptonCounter]=0;
 	  }
       }
-      
-    
+      cout<<"after matching   ---->  "<<endl;
+	    cout<<"origin: "<<_origin[leptonCounter]<<endl;
+	    cout<<"reduced: "<<_originReduced[leptonCounter]<<endl;
+cout<<"RECO: ("<<_charge[leptonCounter]<<","<<_flavors[leptonCounter]<<" "<<_lPt[leptonCounter]<<" "<< _lEta[leptonCounter] <<" "<< _lPhi[leptonCounter] <<" "<<_lE[leptonCounter]  <<" mom info: "<< _mompdg[leptonCounter]<<" "<<_mompt[leptonCounter]<<endl;
+cout<<"Gen matched: "<<_lpdgmc[leptonCounter]<<" "<<_lPtmc[leptonCounter]<<" "<< _lEtamc[leptonCounter] <<" "<< _lPhimc[leptonCounter] <<" "<<_lEmc[leptonCounter]  <<" mom info: "<< _mompdg[leptonCounter]<<" "<<_mompt[leptonCounter]<<endl;
+
       leptonCounter++;
       
     }
