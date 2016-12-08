@@ -638,6 +638,7 @@ const GenParticle* GenParticleManager::matchedMC(const pat::Electron *pReco) {
     double deltaRreco = 0.1;
     for(GenParticleCollection::const_reverse_iterator p = _Collection->rbegin() ; p != _Collection->rend() ; p++ ) {
         if (p->status()!=1) continue;
+	    cout<<"///////////////////////////"<<p->pdgId()<<"  vs  "<<pReco->pdgId()<<endl;
 	     if (TMath::Abs(p->pdgId() ) !=11 || TMath::Abs(p->pdgId() ) !=22) continue; 
 	    //if (TMath::Abs(p->pt() - pReco->pt()) > 5) continue;
         //if (fabs(p->pdgId())!=11) continue;
