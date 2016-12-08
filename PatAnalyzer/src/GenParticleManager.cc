@@ -613,10 +613,13 @@ const GenParticle* GenParticleManager::matchedMC(const pat::Muon *pReco) {
     const GenParticle* mom = 0;
     TLorentzVector Gen1, Gen2;
     if (!pReco) return 0;
+	
     Gen1.SetPtEtaPhiE(pReco->pt(),pReco->eta(),pReco->phi(),pReco->energy());
     double deltaRreco = 0.1;
     for(GenParticleCollection::const_reverse_iterator p = _Collection->rbegin() ; p != _Collection->rend() ; p++ ) {
         if (p->status()!=1) continue;
+	    if (TMath::Abs(p->pdgId() ) !=13 || TMath::Abs(p->pdgId() ) !=22) continue; 
+	    if (TMath::Abs(p->pt() - pReco->pt()) > 5) continue;
         Gen2.SetPtEtaPhiE(p->pt(),p->eta(),p->phi(),p->energy());
         double deltaRcur = Gen1.DeltaR(Gen2);
         if (deltaRcur < deltaRreco) {
@@ -635,6 +638,8 @@ const GenParticle* GenParticleManager::matchedMC(const pat::Electron *pReco) {
     double deltaRreco = 0.1;
     for(GenParticleCollection::const_reverse_iterator p = _Collection->rbegin() ; p != _Collection->rend() ; p++ ) {
         if (p->status()!=1) continue;
+	     if (TMath::Abs(p->pdgId() ) !=11 || TMath::Abs(p->pdgId() ) !=22) continue; 
+	    if (TMath::Abs(p->pt() - pReco->pt()) > 5) continue;
         //if (fabs(p->pdgId())!=11) continue;
         Gen2.SetPtEtaPhiE(p->pt(),p->eta(),p->phi(),p->energy());
         double deltaRcur = Gen1.DeltaR(Gen2);
