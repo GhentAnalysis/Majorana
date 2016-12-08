@@ -621,8 +621,9 @@ const GenParticle* GenParticleManager::matchedMC(const pat::Muon *pReco) {
 	   // if (TMath::Abs(p->pdgId() ) !=13 || TMath::Abs(p->pdgId() ) !=22) continue; 
 	   // if (TMath::Abs(p->pt() - pReco->pt()) > 5) continue;
         Gen2.SetPtEtaPhiE(p->pt(),p->eta(),p->phi(),p->energy());
-	 cout<<"///////////////////////////muon: with pt: "<<pReco->pt()<<"  "<<p->pdgId()<<"  vs  "<<pReco->pdgId()<<endl;
         double deltaRcur = Gen1.DeltaR(Gen2);
+	    	cout<<deltaRcur<<"  ///////////////////////////muon: with pt: "<<pReco->pt()<<"  "<<p->charge()<<" "<<pReco->charge()<<" "<<p->pdgId()<<"  vs  "<<pReco->pdgId()<<endl;
+
         if (deltaRcur < deltaRreco) {
             mom = &*p;
             deltaRreco = deltaRcur;
@@ -641,7 +642,7 @@ const GenParticle* GenParticleManager::matchedMC(const pat::Electron *pReco) {
         if (p->status()!=1) continue;
         //if (fabs(p->pdgId())!=11) continue;
         Gen2.SetPtEtaPhiE(p->pt(),p->eta(),p->phi(),p->energy());
-	cout<<"///////////////////////////muon: with pt: "<<pReco->pt()<<"  "<<p->pdgId()<<"  vs  "<<pReco->pdgId()<<endl;
+	    	cout<<deltaRcur<<"  ///////////////////////////electron: with pt: "<<pReco->pt()<<"  "<<p->charge()<<" "<<pReco->charge()<<" "<<p->pdgId()<<"  vs  "<<pReco->pdgId()<<endl;
         double deltaRcur = Gen1.DeltaR(Gen2);
         //if (deltaRcur < deltaRreco && fabs(pReco->pt() - p->pt())/p->pt() < 0.2) {
         if (deltaRcur < deltaRreco) {
