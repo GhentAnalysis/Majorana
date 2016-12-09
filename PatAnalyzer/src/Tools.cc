@@ -168,7 +168,7 @@ bool tools::triggerEmulatorReturned(const pat::Electron *iE) {
 }
 
 
-bool tools::isoTriggerEmulator(const pat::Electron *iE) {
+/*bool tools::isoTriggerEmulator(const pat::Electron *iE) {
 
     bool passed = true;
             
@@ -178,7 +178,7 @@ bool tools::isoTriggerEmulator(const pat::Electron *iE) {
     else if (iE->ecalPFClusterIso()/iE->pt() > 0.45) passed = false;
                         
      return passed;
-}
+}*/
 
 
 /*
