@@ -255,11 +255,13 @@ void trilepton::beginJob()
     outputTree->Branch("_vtxFitConversion", &_vtxFitConversion, "_vtxFitConversion[_nLeptons]/O");
 
     outputTree->Branch("_mvaValue", &_mvaValue, "_mvaValue[_nLeptons]/D");
+    outputTree->Branch("_mvaValue_HZZ", &_mvaValue_HZZ, "_mvaValue_HZZ[_nLeptons]/D");
 
     outputTree->Branch("_passedCutBasedIdTight", &_passedCutBasedIdTight, "_passedCutBasedIdTight[_nLeptons]/O");
     outputTree->Branch("_passedCutBasedIdMedium", &_passedCutBasedIdMedium, "_passedCutBasedIdMedium[_nLeptons]/O");
     outputTree->Branch("_passedMVA80", &_passedMVA80, "_passedMVA80[_nLeptons]/O");
     outputTree->Branch("_passedMVA90", &_passedMVA90, "_passedMVA90[_nLeptons]/O");
+    outputTree->Branch("_passedMVA_SUSY", &_passedMVA_SUSY, "_passedMVA_SUSY[_nLeptons][3]/O");	
  
     outputTree->Branch("_n_PV", &_n_PV, "_n_PV/I");
     outputTree->Branch("_n_MCTruth_PV", &_n_MCTruth_PV, "_n_MCTruth_PV/D");
@@ -871,8 +873,8 @@ void trilepton::analyze(const edm::Event& iEvent, const edm::EventSetup& iEventS
       if (!isMedium) continue;   
 	      
       if(muon->innerTrack().isNull()) 			continue;  // Store only when we have an innertrack
-      //if(abs(muon->innerTrack()->dxy(PV)) > _looseD0Mu) continue;
-      //if(abs(muon->innerTrack()->dz(PV)) > 0.1  ) 	continue;
+      if(abs(muon->innerTrack()->dxy(PV)) > 0.05) continue;
+      if(abs(muon->innerTrack()->dz(PV)) > 0.1  ) 	continue;
 
       double relIso = tools::pfRelIso(&*muon,myRhoJECJets);
       if(relIso > 0.6) continue; // loose selection for FR
@@ -963,6 +965,10 @@ cout<<"Gen matched: "<<_lpdgmc[leptonCounter]<<" "<<_lPtmc[leptonCounter]<<" "<<
       if(electron->pt() < _minPt1) continue;
       if(abs(electron->eta()) > 2.5) continue;
       if(!electron->gsfTrack().isNonnull()) continue;
+      if( TMath::Abs(gsfTrack->dxy(PV)) > 0.05  )  continue;
+      if( TMath::Abs(gsfTrack->dz(PV)) > 0.1  ) continue;
+    
+	    
       //if(!tools::isLooseCutBasedElectronWithoutIsolation(&*electron)) continue; //only store those passing the loose cut based id, without isolation requirement
 
       double relIso = tools::pfRelIso(&*electron, myRhoJECJets);
@@ -975,6 +981,33 @@ cout<<"Gen matched: "<<_lpdgmc[leptonCounter]<<" "<<_lPtmc[leptonCounter]<<" "<<
       _passedCutBasedIdMedium[leptonCounter] = (*electronCutBasedIdMapM)[electronRef];
       _passedMVA80[leptonCounter]            = (*electronMvaIdMap80)[electronRef];
       _passedMVA90[leptonCounter]            = (*electronMvaIdMap90)[electronRef];
+	    
+      const double MVA_cuts_pt15[3][3] = {{-0.86, -0.85, -0.81}, {-0.86, -0.85, -0.81}, {0.77, 0.56, 0.48}};
+      const double MVA_cuts_pt25[3][3] = {{-0.96, -0.96, -0.95}, {-0.86, -0.85, -0.81}, {0.52, 0.11, -0.01}};
+      const double MVA_cuts_pt5HZZ[3] = {-0.3, -0.36, -0.63};	    
+	    
+      _mvaValue_HZZ[leptonCounter] = (*mvaValues_HZZ)[electronRef];    
+      _passedMVA_SUSY[leptonCounter][0] = false;
+      _passedMVA_SUSY[leptonCounter][1] = false;
+      _passedMVA_SUSY[leptonCounter][2] = false;
+	    
+       int eta = -1;
+         if(TMath::Abs(iE->eta()) < 0.8 ) {
+           eta = 0;
+         } else if(TMath::Abs(iE->eta()) < 1.479 ) {
+           eta = 1;
+         } else{
+           eta = 2;
+         }
+      if(iE->pt() > 10){ 
+          for(unsigned wp = 0; wp < 3; ++wp){
+       _passedMVA_SUSY[leptonCounter][wp] = _mvaValue[leptonCounter] >  std::min( MVA_cuts_pt15[wp][eta], std::max(MVA_cuts_pt25[wp][eta] , MVA_cuts_pt15[wp][eta] + (MVA_cuts_pt25[wp][eta] - MVA_cuts_pt15[wp][eta])*0.1 *(iE->pt()-15) ) );
+       }
+     } else{
+     _passedMVA_SUSY[leptonCounter][0] = _mvaValue_HZZ[leptonCounter]  >  MVA_cuts_pt5HZZ[eta];
+     _passedMVA_SUSY[leptonCounter][1] = false;
+     _passedMVA_SUSY[leptonCounter][2] = false;
+     }	    
 	    
 	    
       bool MVAlooseFR = tools::passed_loose_MVA_FR_slidingCut(&*electron, _mvaValue[leptonCounter]);	    
@@ -1006,6 +1039,8 @@ cout<<"Gen matched: "<<_lpdgmc[leptonCounter]<<" "<<_lPtmc[leptonCounter]<<" "<<
       _3dIPerr[leptonCounter] = electron->edB(pat::Electron::PV3D);
       _3dIPsig[leptonCounter] = fabs(_3dIP[leptonCounter]/_3dIPerr[leptonCounter]);
 
+      if( _vtxFitConversion[leptonCounter] )  continue;
+      if (_hitsNumber[leptonCounter] > 0) continue;   
      
       //if(_isolation[leptonCounter] > 1) continue;
       //if(_3dIPsig[leptonCounter] > 4) continue;
