@@ -734,7 +734,7 @@ void trilepton::analyze(const edm::Event& iEvent, const edm::EventSetup& iEventS
     edm::Handle<std::vector<pat::Muon>> muons;                 iEvent.getByToken(IT_muon, muons);
     edm::Handle<edm::View<pat::Electron>> electrons;           iEvent.getByToken(IT_electron, electrons);
     edm::Handle<edm::ValueMap<float>> electronMvaIdMap;        iEvent.getByToken(electronMvaIdMapToken, electronMvaIdMap);
-    edm::Handle<edm::ValueMap<float>> electronMvaIdHZZ;        iEvent.getByToken(mvaValuesMapToken_HZZ_, electronMvaIdHZZ);
+    edm::Handle<edm::ValueMap<float>> electronMvaIdHZZ;        iEvent.getByToken(mvaValuesMapToken_HZZ, electronMvaIdHZZ);
     edm::Handle<edm::ValueMap<bool>> electronMvaIdMap90;       iEvent.getByToken(electronMvaIdMap90Token, electronMvaIdMap90);
     edm::Handle<edm::ValueMap<bool>> electronMvaIdMap80;       iEvent.getByToken(electronMvaIdMap80Token, electronMvaIdMap80);
     edm::Handle<edm::ValueMap<bool>> electronCutBasedIdMapT;   iEvent.getByToken(electronCutBasedIdMapTightToken, electronCutBasedIdMapT);
@@ -1001,7 +1001,7 @@ cout<<"Gen matched: "<<_lpdgmc[leptonCounter]<<" "<<_lPtmc[leptonCounter]<<" "<<
          }
       if(electron->pt() > 10){ 
           for(unsigned wp = 0; wp < 3; ++wp){
-       _passedMVA_SUSY[leptonCounter][wp] = _mvaValue[leptonCounter] >  std::min( MVA_cuts_pt15[wp][eta], std::max(MVA_cuts_pt25[wp][eta] , MVA_cuts_pt15[wp][eta] + (MVA_cuts_pt25[wp][eta] - MVA_cuts_pt15[wp][eta])*0.1 *(iE->pt()-15) ) );
+       _passedMVA_SUSY[leptonCounter][wp] = _mvaValue[leptonCounter] >  std::min( MVA_cuts_pt15[wp][eta], std::max(MVA_cuts_pt25[wp][eta] , MVA_cuts_pt15[wp][eta] + (MVA_cuts_pt25[wp][eta] - MVA_cuts_pt15[wp][eta])*0.1 *(electron->pt()-15) ) );
        }
      } else{
      _passedMVA_SUSY[leptonCounter][0] = _mvaValue_HZZ[leptonCounter]  >  MVA_cuts_pt5HZZ[eta];
