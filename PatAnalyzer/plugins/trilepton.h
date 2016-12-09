@@ -309,7 +309,9 @@ private:
     bool _isotrigEmulator[nLeptonsMax];
 
     double _mvaValue[nLeptonsMax];
+    double _mvaValue_HZZ[nLeptonsMax];
 
+    
     std::map<TString, std::vector<bool>*>   leptonWorkingPoints;
     std::map<TString, std::vector<double>*> leptonConeCorrectedPt;
 
