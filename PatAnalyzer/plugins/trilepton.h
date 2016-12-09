@@ -287,6 +287,7 @@ private:
     bool _passedCutBasedIdMedium[nLeptonsMax];
     bool _passedMVA80[nLeptonsMax];
     bool _passedMVA90[nLeptonsMax];
+    bool _passedMVA_SUSY[nLeptonsMax][3];
     Int_t _findMatched[nLeptonsMax];
     
 
