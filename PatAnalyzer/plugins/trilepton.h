@@ -141,9 +141,9 @@ private:
     
     edm::EDGetTokenT<reco::GenParticleCollection>    genparticleToken;
     edm::EDGetTokenT<edm::ValueMap<float>>           electronMvaIdMapToken;
-    edm::EDGetTokenT<edm::ValueMap<float>>           mvaValuesMapToken_HZZ;
-    edm::EDGetTokenT<edm::ValueMap<bool>>  	     electronMvaIdMap80Token;
-    edm::EDGetTokenT<edm::ValueMap<bool>>  	     electronMvaIdMap90Token;
+    edm::EDGetTokenT<edm::ValueMap<float> >          mvaValuesMapToken_HZZ_;
+    edm::EDGetTokenT<edm::ValueMap<bool>>  	         electronMvaIdMap80Token;
+    edm::EDGetTokenT<edm::ValueMap<bool>>  	         electronMvaIdMap90Token;
     edm::EDGetTokenT<edm::ValueMap<bool>>            electronCutBasedIdMapTightToken;
     edm::EDGetTokenT<edm::ValueMap<bool>>            electronCutBasedIdMapMediumToken;
     edm::EDGetTokenT<GenEventInfoProduct>            pdfvariablesToken;
