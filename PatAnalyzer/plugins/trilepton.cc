@@ -732,6 +732,7 @@ void trilepton::analyze(const edm::Event& iEvent, const edm::EventSetup& iEventS
     edm::Handle<std::vector<pat::Muon>> muons;                 iEvent.getByToken(IT_muon, muons);
     edm::Handle<edm::View<pat::Electron>> electrons;           iEvent.getByToken(IT_electron, electrons);
     edm::Handle<edm::ValueMap<float>> electronMvaIdMap;        iEvent.getByToken(electronMvaIdMapToken, electronMvaIdMap);
+    edm::Handle<edm::ValueMap<float>> electronMvaIdHHZ;        iEvent.getByToken(mvaValuesMapToken_HZ, electronMvaIdHHZ);
     edm::Handle<edm::ValueMap<bool>> electronMvaIdMap90;       iEvent.getByToken(electronMvaIdMap90Token, electronMvaIdMap90);
     edm::Handle<edm::ValueMap<bool>> electronMvaIdMap80;       iEvent.getByToken(electronMvaIdMap80Token, electronMvaIdMap80);
     edm::Handle<edm::ValueMap<bool>> electronCutBasedIdMapT;   iEvent.getByToken(electronCutBasedIdMapTightToken, electronCutBasedIdMapT);
