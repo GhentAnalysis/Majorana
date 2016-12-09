@@ -46,6 +46,7 @@
 
 trilepton::trilepton(const edm::ParameterSet & iConfig) :
   genparticleToken(                      consumes<reco::GenParticleCollection>(   iConfig.getParameter<edm::InputTag>("genPartsLabel"))),
+  mvaValuesMapToken_HZZ_(                consumes<edm::ValueMap<float> >(         iConfig.getParameter<edm::InputTag>("mvaValuesMap_HZZ"))),
   electronMvaIdMapToken(                 consumes<edm::ValueMap<float>>(          iConfig.getParameter<edm::InputTag>("electronMvaIdMap"))),
   electronMvaIdMap80Token(               consumes<edm::ValueMap<bool>>(           iConfig.getParameter<edm::InputTag>("electronMvaId80Map"))),
   electronMvaIdMap90Token(               consumes<edm::ValueMap<bool>>(           iConfig.getParameter<edm::InputTag>("electronMvaId90Map"))),
