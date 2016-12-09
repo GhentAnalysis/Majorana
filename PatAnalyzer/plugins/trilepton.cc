@@ -734,7 +734,7 @@ void trilepton::analyze(const edm::Event& iEvent, const edm::EventSetup& iEventS
     edm::Handle<std::vector<pat::Muon>> muons;                 iEvent.getByToken(IT_muon, muons);
     edm::Handle<edm::View<pat::Electron>> electrons;           iEvent.getByToken(IT_electron, electrons);
     edm::Handle<edm::ValueMap<float>> electronMvaIdMap;        iEvent.getByToken(electronMvaIdMapToken, electronMvaIdMap);
-    edm::Handle<edm::ValueMap<float>> electronMvaIdHHZ;        iEvent.getByToken(mvaValuesMapToken_HZ, electronMvaIdHHZ);
+    edm::Handle<edm::ValueMap<float>> electronMvaIdHZZ;        iEvent.getByToken(mvaValuesMapToken_HZZ_, electronMvaIdHZZ);
     edm::Handle<edm::ValueMap<bool>> electronMvaIdMap90;       iEvent.getByToken(electronMvaIdMap90Token, electronMvaIdMap90);
     edm::Handle<edm::ValueMap<bool>> electronMvaIdMap80;       iEvent.getByToken(electronMvaIdMap80Token, electronMvaIdMap80);
     edm::Handle<edm::ValueMap<bool>> electronCutBasedIdMapT;   iEvent.getByToken(electronCutBasedIdMapTightToken, electronCutBasedIdMapT);
@@ -965,8 +965,8 @@ cout<<"Gen matched: "<<_lpdgmc[leptonCounter]<<" "<<_lPtmc[leptonCounter]<<" "<<
       if(electron->pt() < _minPt1) continue;
       if(abs(electron->eta()) > 2.5) continue;
       if(!electron->gsfTrack().isNonnull()) continue;
-      if( TMath::Abs(gsfTrack->dxy(PV)) > 0.05  )  continue;
-      if( TMath::Abs(gsfTrack->dz(PV)) > 0.1  ) continue;
+      //if( TMath::Abs(gsfTrack->dxy(PV)) > 0.05  )  continue;
+      //if( TMath::Abs(gsfTrack->dz(PV)) > 0.1  ) continue;
     
 	    
       //if(!tools::isLooseCutBasedElectronWithoutIsolation(&*electron)) continue; //only store those passing the loose cut based id, without isolation requirement
@@ -992,14 +992,14 @@ cout<<"Gen matched: "<<_lpdgmc[leptonCounter]<<" "<<_lPtmc[leptonCounter]<<" "<<
       _passedMVA_SUSY[leptonCounter][2] = false;
 	    
        int eta = -1;
-         if(TMath::Abs(iE->eta()) < 0.8 ) {
+         if(TMath::Abs(electron->eta()) < 0.8 ) {
            eta = 0;
-         } else if(TMath::Abs(iE->eta()) < 1.479 ) {
+         } else if(TMath::Abs(electron->eta()) < 1.479 ) {
            eta = 1;
          } else{
            eta = 2;
          }
-      if(iE->pt() > 10){ 
+      if(electron->pt() > 10){ 
           for(unsigned wp = 0; wp < 3; ++wp){
        _passedMVA_SUSY[leptonCounter][wp] = _mvaValue[leptonCounter] >  std::min( MVA_cuts_pt15[wp][eta], std::max(MVA_cuts_pt25[wp][eta] , MVA_cuts_pt15[wp][eta] + (MVA_cuts_pt25[wp][eta] - MVA_cuts_pt15[wp][eta])*0.1 *(iE->pt()-15) ) );
        }
@@ -1022,8 +1022,8 @@ cout<<"Gen matched: "<<_lpdgmc[leptonCounter]<<" "<<_lPtmc[leptonCounter]<<" "<<
       _ipPV[leptonCounter]  = electron->gsfTrack()->dxy(PV);
       _ipZPV[leptonCounter] = electron->gsfTrack()->dz(PV);
 
-      //if(abs(_ipPV[leptonCounter]) > 0.05) continue;
-      //if(abs(_ipZPV[leptonCounter]) > 0.1) continue;
+      if(abs(_ipPV[leptonCounter]) > 0.05) continue;
+      if(abs(_ipZPV[leptonCounter]) > 0.1) continue;
       
       _miniisolation[leptonCounter]        = tools::getMiniIsolation(pfcands, &*electron, 0.05, 0.2, 10., myRhoJets, false);
       _miniisolationCharged[leptonCounter] = tools::getMiniIsolation(pfcands, &*electron, 0.05, 0.2, 10., myRhoJets, false);
