@@ -46,7 +46,7 @@
 
 trilepton::trilepton(const edm::ParameterSet & iConfig) :
   genparticleToken(                      consumes<reco::GenParticleCollection>(   iConfig.getParameter<edm::InputTag>("genPartsLabel"))),
-  mvaValuesMapToken_HZZ_(                consumes<edm::ValueMap<float> >(         iConfig.getParameter<edm::InputTag>("mvaValuesMap_HZZ"))),
+  mvaValuesMapToken_HZZ(                consumes<edm::ValueMap<float> >(         iConfig.getParameter<edm::InputTag>("mvaValuesMap_HZZ"))),
   electronMvaIdMapToken(                 consumes<edm::ValueMap<float>>(          iConfig.getParameter<edm::InputTag>("electronMvaIdMap"))),
   electronMvaIdMap80Token(               consumes<edm::ValueMap<bool>>(           iConfig.getParameter<edm::InputTag>("electronMvaId80Map"))),
   electronMvaIdMap90Token(               consumes<edm::ValueMap<bool>>(           iConfig.getParameter<edm::InputTag>("electronMvaId90Map"))),
@@ -986,7 +986,7 @@ cout<<"Gen matched: "<<_lpdgmc[leptonCounter]<<" "<<_lPtmc[leptonCounter]<<" "<<
       const double MVA_cuts_pt25[3][3] = {{-0.96, -0.96, -0.95}, {-0.86, -0.85, -0.81}, {0.52, 0.11, -0.01}};
       const double MVA_cuts_pt5HZZ[3] = {-0.3, -0.36, -0.63};	    
 	    
-      _mvaValue_HZZ[leptonCounter] = (*mvaValues_HZZ)[electronRef];    
+      _mvaValue_HZZ[leptonCounter] = (*electronMvaIdHZZ)[electronRef];    
       _passedMVA_SUSY[leptonCounter][0] = false;
       _passedMVA_SUSY[leptonCounter][1] = false;
       _passedMVA_SUSY[leptonCounter][2] = false;
