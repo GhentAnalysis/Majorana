@@ -46,7 +46,7 @@
 
 trilepton::trilepton(const edm::ParameterSet & iConfig) :
   genparticleToken(                      consumes<reco::GenParticleCollection>(   iConfig.getParameter<edm::InputTag>("genPartsLabel"))),
-  mvaValuesMapToken_HZZ(                consumes<edm::ValueMap<float> >(         iConfig.getParameter<edm::InputTag>("mvaValuesMap_HZZ"))),
+  mvaValuesMapToken_HZZ_(                consumes<edm::ValueMap<float> >(         iConfig.getParameter<edm::InputTag>("mvaValuesMap_HZZ"))),
   electronMvaIdMapToken(                 consumes<edm::ValueMap<float>>(          iConfig.getParameter<edm::InputTag>("electronMvaIdMap"))),
   electronMvaIdMap80Token(               consumes<edm::ValueMap<bool>>(           iConfig.getParameter<edm::InputTag>("electronMvaId80Map"))),
   electronMvaIdMap90Token(               consumes<edm::ValueMap<bool>>(           iConfig.getParameter<edm::InputTag>("electronMvaId90Map"))),
@@ -734,7 +734,7 @@ void trilepton::analyze(const edm::Event& iEvent, const edm::EventSetup& iEventS
     edm::Handle<std::vector<pat::Muon>> muons;                 iEvent.getByToken(IT_muon, muons);
     edm::Handle<edm::View<pat::Electron>> electrons;           iEvent.getByToken(IT_electron, electrons);
     edm::Handle<edm::ValueMap<float>> electronMvaIdMap;        iEvent.getByToken(electronMvaIdMapToken, electronMvaIdMap);
-    edm::Handle<edm::ValueMap<float>> electronMvaIdHZZ;        iEvent.getByToken(mvaValuesMapToken_HZZ, electronMvaIdHZZ);
+    edm::Handle<edm::ValueMap<float>> electronMvaIdHZZ;        iEvent.getByToken(mvaValuesMapToken_HZZ_, electronMvaIdHZZ);
     edm::Handle<edm::ValueMap<bool>> electronMvaIdMap90;       iEvent.getByToken(electronMvaIdMap90Token, electronMvaIdMap90);
     edm::Handle<edm::ValueMap<bool>> electronMvaIdMap80;       iEvent.getByToken(electronMvaIdMap80Token, electronMvaIdMap80);
     edm::Handle<edm::ValueMap<bool>> electronCutBasedIdMapT;   iEvent.getByToken(electronCutBasedIdMapTightToken, electronCutBasedIdMapT);
