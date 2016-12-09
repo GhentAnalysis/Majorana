@@ -121,31 +121,32 @@ double tools::pfAbsIso(const pat::Muon *mu, double myRho){
  * Trigger emulation: NOT YET CHECKED/VERIFIED, probably not up to date
  */
 bool tools::triggerEmulator(const pat::Electron *iE) {
-
+    
     bool passed = true;
-    //if( std::abs(1.0/iE->ecalEnergy() - iE->eSuperClusterOverP()/iE->ecalEnergy()) > 0.01 ) passed = false;
-    if( std::abs(1.0/iE->correctedEcalEnergy() - iE->eSuperClusterOverP()/iE->correctedEcalEnergy()) > 0.01 ) passed = false;
-                
-    else if( std::abs(iE->superCluster()->eta()) < 1.479  ) {
-         if( std::abs(iE->deltaPhiSuperClusterTrackAtVtx()) > 0.04  ) passed = false;
-         else if( std::abs(iE->deltaEtaSuperClusterTrackAtVtx()) > 0.01 ) passed = false;
-         //else if( std::abs(iE->full5x5_sigmaIetaIeta()) > 0.011 ) passed = false;
-         else if( iE->full5x5_sigmaIetaIeta() > 0.011 ) passed = false;
-         //else if( std::abs(iE->hadronicOverEm())  > 0.08  ) passed = false;
-         //else if( std::abs(iE->hcalOverEcal())  > 0.08  ) passed = false;
-         else if( iE->hcalOverEcal()  > 0.08  ) passed = false;
-    }
 
-    else {
-         if( std::abs(iE->deltaPhiSuperClusterTrackAtVtx()) > 0.08 ) passed = false;
-         else if( std::abs(iE->deltaEtaSuperClusterTrackAtVtx()) > 0.01 ) passed = false;
-         //else if( std::abs(iE->full5x5_sigmaIetaIeta()) > 0.031 ) passed = false;
-         else if( iE->full5x5_sigmaIetaIeta() > 0.031 ) passed = false;
-         //else if( std::abs(iE->hadronicOverEm()) > 0.08 ) passed = false;
-         //else if( std::abs(iE->hcalOverEcal())  > 0.08  ) passed = false;
-         else if( iE->hcalOverEcal()  > 0.08  ) passed = false;
-    }
-                        
+    double etasc = TMath::Abs(iE->superCluster()->eta());
+    
+    if (TMath::Abs(iE->hadronicOverEm()) >=(0.10-0.03*(etasc>1.479))) passed = false;
+    if (TMath::Abs(iE->deltaEtaSuperClusterTrackAtVtx()) >= (0.01-0.002*(etasc>1.479))) passed = false;
+    if (TMath::Abs(iE->deltaPhiSuperClusterTrackAtVtx()) >= (0.04+0.03*(etasc>1.479))) passed = false;
+    double eInvMinusPInv = 1.0/iE->ecalEnergy() - iE->eSuperClusterOverP()/iE->ecalEnergy();
+    
+    if (eInvMinusPInv<=-0.05) passed = false;
+    if (eInvMinusPInv>=(0.01-0.005*(abs(etasc)>1.479))) passed = false;
+    if (TMath::Abs(iE->full5x5_sigmaIetaIeta()) >= (0.011+0.019*(etasc>1.479)))passed = false;
+
+    return passed;
+}
+
+bool tools::isoTriggerEmulator(const pat::Electron *iE) {
+    
+    bool passed = true;
+    
+    //if (iE->pfIsolationVariables().sumChargedHadronPt/iE->pt() > 0.2) passed = false;
+    if (iE->dr03TkSumPt()/iE->pt() > 0.2) passed = false;
+    else if (iE->hcalPFClusterIso()/iE->pt() > 0.25) passed = false;
+    else if (iE->ecalPFClusterIso()/iE->pt() > 0.45) passed = false;
+    
     return passed;
 }
 
