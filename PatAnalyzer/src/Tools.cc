@@ -39,8 +39,8 @@ double tools::getMiniIsolation(edm::Handle<pat::PackedCandidateCollection> pfcan
     if (ptcl->pt()<5.) return 99999.;
 
     double absEta = 0;
-    if(ptcl->isElectron())  absEta = abs(dynamic_cast<const pat::Electron*>(ptcl)->superCluster()->eta());
-    else if(ptcl->isMuon()) absEta = abs(ptcl->eta());
+    if(ptcl->isElectron())  absEta = std::abs(dynamic_cast<const pat::Electron*>(ptcl)->superCluster()->eta());
+    else if(ptcl->isMuon()) absEta = std::abs(ptcl->eta());
 
 
     double deadcone_nh(0.), deadcone_ch(0.), deadcone_ph(0.), deadcone_pu(0.);
@@ -56,18 +56,18 @@ double tools::getMiniIsolation(edm::Handle<pat::PackedCandidateCollection> pfcan
     double r_iso  = kt_scale/std::max(std::min(ptcl->pt(), max_pt), min_pt);
 
     for(const pat::PackedCandidate &pfc : *pfcands){
-      if(abs(pfc.pdgId())<7) continue;
+      if(std::abs(pfc.pdgId())<7) continue;
 
       double dr = deltaR(pfc, *ptcl);
       if(dr > r_iso) continue;
 
       if(pfc.charge()==0){								// Neutral
         if(pfc.pt()>ptThresh){
-          if(abs(pfc.pdgId())==22 and dr > deadcone_ph)        iso_ph += pfc.pt();	// Photons
-          else if (abs(pfc.pdgId())==130 and dr > deadcone_nh) iso_nh += pfc.pt();	// Neutral hadrons
+          if(std::abs(pfc.pdgId())==22 and dr > deadcone_ph)        iso_ph += pfc.pt();	// Photons
+          else if (std::abs(pfc.pdgId())==130 and dr > deadcone_nh) iso_nh += pfc.pt();	// Neutral hadrons
         }
       } else if (pfc.fromPV()>1){
-        if(abs(pfc.pdgId())==211 and dr > deadcone_ch) iso_ch += pfc.pt();		// Charged from PV
+        if(std::abs(pfc.pdgId())==211 and dr > deadcone_ch) iso_ch += pfc.pt();		// Charged from PV
       } else if(pfc.pt()>ptThresh and dr > deadcone_pu) iso_pu += pfc.pt();		// Charged from PU
     }
 
@@ -132,7 +132,7 @@ bool tools::triggerEmulator(const pat::Electron *iE) {
     double eInvMinusPInv = 1.0/iE->ecalEnergy() - iE->eSuperClusterOverP()/iE->ecalEnergy();
     
     if (eInvMinusPInv<=-0.05) passed = false;
-    if (eInvMinusPInv>=(0.01-0.005*(abs(etasc)>1.479))) passed = false;
+    if (eInvMinusPInv>=(0.01-0.005*(std::abs(etasc)>1.479))) passed = false;
     if (TMath::Abs(iE->full5x5_sigmaIetaIeta()) >= (0.011+0.019*(etasc>1.479)))passed = false;
 
     return passed;
@@ -217,13 +217,13 @@ bool tools::isLooseCutBasedElectronWithoutIsolation(const pat::Electron* ele){
 
     float eInvMinusPInv = std::abs(1.0 - ele->eSuperClusterOverP())/ele->ecalEnergy();
 
-    if(ele->full5x5_sigmaIetaIeta()               >= (ele->isEB() ? 0.11    : 0.0314 ))       return false;
-    if(abs(dEtaInSeed(ele))                       >= (ele->isEB() ? 0.00477 : 0.00868))       return false;
-    if(abs(ele->deltaPhiSuperClusterTrackAtVtx()) >= (ele->isEB() ? 0.222   : 0.213  ))       return false;
-    if(ele->hadronicOverEm()                      >= (ele->isEB() ? 0.298   : 0.101  ))       return false;
-    if(eInvMinusPInv                              >= (ele->isEB() ? 0.241   : 0.14   ))       return false;
-    if(ele->gsfTrack()->hitPattern().numberOfHits(reco::HitPattern::MISSING_INNER_HITS) >  1) return false;
-    if(not ele->passConversionVeto())                                                         return false;
+    if(ele->full5x5_sigmaIetaIeta()                    >= (ele->isEB() ? 0.11    : 0.0314 ))       return false;
+    if(std::abs(dEtaInSeed(ele))                       >= (ele->isEB() ? 0.00477 : 0.00868))       return false;
+    if(std::abs(ele->deltaPhiSuperClusterTrackAtVtx()) >= (ele->isEB() ? 0.222   : 0.213  ))       return false;
+    if(ele->hadronicOverEm()                           >= (ele->isEB() ? 0.298   : 0.101  ))       return false;
+    if(eInvMinusPInv                                   >= (ele->isEB() ? 0.241   : 0.14   ))       return false;
+    if(ele->gsfTrack()->hitPattern().numberOfHits(reco::HitPattern::MISSING_INNER_HITS) >  1)      return false;
+    if(not ele->passConversionVeto())                                                              return false;
     return true;
 }
 
@@ -232,13 +232,13 @@ bool tools::isTightCutBasedElectronWithoutIsolation(const pat::Electron* ele){
     if(not (ele->isEB() or ele->isEE())) return false;
 
     float eInvMinusPInv = std::abs(1.0 - ele->eSuperClusterOverP())/ele->ecalEnergy();
-    if(ele->full5x5_sigmaIetaIeta()               >= (ele->isEB() ? 0.00998 : 0.0292))        return false;
-    if(abs(dEtaInSeed(ele))                       >= (ele->isEB() ? 0.00308 : 0.00605))       return false;
-    if(abs(ele->deltaPhiSuperClusterTrackAtVtx()) >= (ele->isEB() ? 0.0816  : 0.0394))        return false;
-    if(ele->hadronicOverEm()                      >= (ele->isEB() ? 0.0414  : 0.0641))        return false;
-    if(eInvMinusPInv                              >= (ele->isEB() ? 0.0129  : 0.0129))        return false;
-    if(ele->gsfTrack()->hitPattern().numberOfHits(reco::HitPattern::MISSING_INNER_HITS) >  1) return false;
-    if(not ele->passConversionVeto())                                                         return false;
+    if(ele->full5x5_sigmaIetaIeta()                    >= (ele->isEB() ? 0.00998 : 0.0292))        return false;
+    if(std::abs(dEtaInSeed(ele))                       >= (ele->isEB() ? 0.00308 : 0.00605))       return false;
+    if(std::abs(ele->deltaPhiSuperClusterTrackAtVtx()) >= (ele->isEB() ? 0.0816  : 0.0394))        return false;
+    if(ele->hadronicOverEm()                           >= (ele->isEB() ? 0.0414  : 0.0641))        return false;
+    if(eInvMinusPInv                                   >= (ele->isEB() ? 0.0129  : 0.0129))        return false;
+    if(ele->gsfTrack()->hitPattern().numberOfHits(reco::HitPattern::MISSING_INNER_HITS) >  1)      return false;
+    if(not ele->passConversionVeto())                                                              return false;
     return true;
 }
 
@@ -295,8 +295,8 @@ std::vector<const pat::Jet* > tools::JetSelector(const std::vector<pat::Jet>  & 
                 if( jet->chargedMultiplicity() == 0 ) continue;
             }
             */
-            if(abs(eta) < 3.0)
-                looseJetID = (NHF<0.99 && NEMF<0.99 && NumConst>1) && ((abs(eta)<=2.4 && CHF>0 && CHM>0 && CEMF<0.99) || std::abs(eta)>2.4); 
+            if(std::abs(eta) < 3.0)
+                looseJetID = (NHF<0.99 && NEMF<0.99 && NumConst>1) && ((std::abs(eta)<=2.4 && CHF>0 && CHM>0 && CEMF<0.99) || std::abs(eta)>2.4); 
             else
                 looseJetID = (NEMF<0.90 && NumNeutralParticles>10);
 

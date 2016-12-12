@@ -481,11 +481,11 @@ void trilepton::analyze(const edm::Event& iEvent, const edm::EventSetup& iEventS
             cout << "Particle ids in the event" << endl;
             for(GenParticleCollection::const_reverse_iterator p = TheGenParticles->rbegin() ; p != TheGenParticles->rend() ; p++ )
             {
-                int id = abs(p->pdgId());
+                int id = std::abs(p->pdgId());
                 
                 if(p->status() == 1){
                     const GenParticle *mom = GPM.getMother(&*p);
-                    cout << id << " " << p->pt() << " " << abs(mom->pdgId()) << endl;
+                    cout << id << " " << p->pt() << " " << std::abs(mom->pdgId()) << endl;
                 }
                 
 		if(id == 9900012) _nMajorana++;
@@ -519,7 +519,7 @@ void trilepton::analyze(const edm::Event& iEvent, const edm::EventSetup& iEventS
 	    for(GenParticleCollection::const_reverse_iterator p = TheGenParticles->rbegin() ; p != TheGenParticles->rend() ; ++p ){
 	      //if(nL > 10 || nPh > 10 || nNu > 10) break;
 	      if(p->status() == 0) continue;								//status 0 contains no useful information and should be skipped
-	      unsigned id = abs(p->pdgId());
+	      unsigned id = std::abs(p->pdgId());
 	      const reco::GenStatusFlags StatusFlags;
 	      //MCTruthHelper::fillGenStatusFlags(*p,StatusFlags);
 	      //if( id == 11 || id ==13 || id == 15){
@@ -865,16 +865,16 @@ void trilepton::analyze(const edm::Event& iEvent, const edm::EventSetup& iEventS
     int leptonCounter = 0;
  
     for(auto muon = muons->begin(); muon != muons->end(); ++muon){
-      if(muon->pt() < _minPt0)   continue;
-      if(abs(muon->eta()) > 2.5) continue;
-      if(!muon->isLooseMuon())   continue;  // Store only loose muons, see https://twiki.cern.ch/twiki/bin/viewauth/CMS/SWGuideMuonIdRun2
+      if(muon->pt() < _minPt0)        continue;
+      if(std::abs(muon->eta()) > 2.5) continue;
+      if(!muon->isLooseMuon())        continue;  // Store only loose muons, see https://twiki.cern.ch/twiki/bin/viewauth/CMS/SWGuideMuonIdRun2
       bool goodGlb      = muon->isGlobalMuon() and muon->globalTrack()->normalizedChi2() < 3 and muon->combinedQuality().chi2LocalPosition < 12 and muon->combinedQuality().trkKink < 20;
       bool isMedium     = muon->isLooseMuon() and muon->innerTrack()->validFraction() > 0.49 and muon->segmentCompatibility() >= (goodGlb ? 0.303 : 0.451); // temporary ICHEP recommendation	    
       if (!isMedium) continue;   
 	      
-      if(muon->innerTrack().isNull()) 			continue;  // Store only when we have an innertrack
-      if(abs(muon->innerTrack()->dxy(PV)) > 0.05) continue;
-      if(abs(muon->innerTrack()->dz(PV)) > 0.1  ) 	continue;
+      if(muon->innerTrack().isNull()) 		       continue;  // Store only when we have an innertrack
+      if(std::abs(muon->innerTrack()->dxy(PV)) > 0.05) continue;
+      if(std::abs(muon->innerTrack()->dz(PV)) > 0.1  ) continue;
 
       double relIso = tools::pfRelIso(&*muon,myRhoJECJets);
       if(relIso > 0.6) continue; // loose selection for FR
@@ -931,7 +931,7 @@ void trilepton::analyze(const edm::Event& iEvent, const edm::EventSetup& iEventS
 	  const GenParticle* mc = GPM.matchedMC(&*muon);
 	  if(mc!=0){
 	      fillMCVars(mc, leptonCounter);
-	      _ipPVmc[leptonCounter] = abs(muon->innerTrack()->dxy(PVmc));
+	      _ipPVmc[leptonCounter] = std::abs(muon->innerTrack()->dxy(PVmc));
 	  } else {
 	      _origin[leptonCounter] = -1;
 	      _originReduced[leptonCounter] = -1;
@@ -962,8 +962,8 @@ cout<<"Gen matched: "<<_lpdgmc[leptonCounter]<<" "<<_lPtmc[leptonCounter]<<" "<<
       _passedMVA80[leptonCounter]           = false;
       _findMatched[leptonCounter]           = -1;
 
-      if(electron->pt() < _minPt1) continue;
-      if(abs(electron->eta()) > 2.5) continue;
+      if(electron->pt() < _minPt1)          continue;
+      if(std::abs(electron->eta()) > 2.5)   continue;
       if(!electron->gsfTrack().isNonnull()) continue;
       //if( TMath::Abs(gsfTrack->dxy(PV)) > 0.05  )  continue;
       //if( TMath::Abs(gsfTrack->dz(PV)) > 0.1  ) continue;
@@ -1022,8 +1022,8 @@ cout<<"Gen matched: "<<_lpdgmc[leptonCounter]<<" "<<_lPtmc[leptonCounter]<<" "<<
       _ipPV[leptonCounter]  = electron->gsfTrack()->dxy(PV);
       _ipZPV[leptonCounter] = electron->gsfTrack()->dz(PV);
 
-      if(abs(_ipPV[leptonCounter]) > 0.05) continue;
-      if(abs(_ipZPV[leptonCounter]) > 0.1) continue;
+      if(std::abs(_ipPV[leptonCounter]) > 0.05) continue;
+      if(std::abs(_ipZPV[leptonCounter]) > 0.1) continue;
       
       _miniisolation[leptonCounter]        = tools::getMiniIsolation(pfcands, &*electron, 0.05, 0.2, 10., myRhoJets, false);
       _miniisolationCharged[leptonCounter] = tools::getMiniIsolation(pfcands, &*electron, 0.05, 0.2, 10., myRhoJets, false);
@@ -1071,7 +1071,7 @@ cout<<"Gen matched: "<<_lpdgmc[leptonCounter]<<" "<<_lPtmc[leptonCounter]<<" "<<
 	  if ( mc!=0 ) {
 	      fillMCVars(mc, leptonCounter);
 	      //Vertex::Point PVmc = mcMom->vertex();
-	      _ipPVmc[leptonCounter] = abs(electron->gsfTrack()->dxy(PVmc));
+	      _ipPVmc[leptonCounter] = std::abs(electron->gsfTrack()->dxy(PVmc));
 	      _findMatched[leptonCounter]=1;
 	  }
 	  else {
@@ -1391,7 +1391,7 @@ void trilepton::matchCloseJet(const int leptonCounter) {
     
 
         for(GenParticleCollection::const_reverse_iterator p = TheGenParticles->rbegin() ; p != TheGenParticles->rend() ; p++ ) {
-            int id = abs(p->pdgId());
+            int id = std::abs(p->pdgId());
         
             if ((id > 0 && id < 6) || (id == 21) || (id == 22)) {
              if (p->status() != 2) {
@@ -1446,7 +1446,7 @@ void trilepton::fillIsoMCVars(const int leptonCounter) {
         _isolationMC[leptonCounter][2] = 0;
         _isolationMC[leptonCounter][3] = 0;
         for(GenParticleCollection::const_reverse_iterator p = TheGenParticles->rbegin() ; p != TheGenParticles->rend() ; p++ ) {
-            //int id = abs(p->pdgId());
+            //int id = std::abs(p->pdgId());
             if (p->status() == 1) {
                 TLorentzVector pmc; pmc.SetPtEtaPhiM( p->pt(), p->eta(), p->phi(), p->mass() );
                 double ang = ((TLorentzVector *)_leptonP4->At(leptonCounter))->DeltaR( pmc );
