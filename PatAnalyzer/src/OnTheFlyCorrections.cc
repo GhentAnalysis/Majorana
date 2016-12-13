@@ -4,55 +4,39 @@
 
 
 OnTheFlyCorrections::OnTheFlyCorrections(std::string path, std::string gt, bool isdata){
-	JetCorrectorParameters *ResJetPar = new JetCorrectorParameters(edm::FileInPath(path+gt+"_L2L3Residual_AK4PFchs.txt").fullPath());
-	JetCorrectorParameters *L3JetPar  = new JetCorrectorParameters(edm::FileInPath(path+gt+"_L3Absolute_AK4PFchs.txt").fullPath());
-	JetCorrectorParameters *L2JetPar  = new JetCorrectorParameters(edm::FileInPath(path+gt+"_L2Relative_AK4PFchs.txt").fullPath());
-	JetCorrectorParameters *L1JetPar  = new JetCorrectorParameters(edm::FileInPath(path+gt+"_L1FastJet_AK4PFchs.txt").fullPath());
-	fJetCorPar.push_back(*L1JetPar);
-	fJetCorPar.push_back(*L2JetPar);
-	fJetCorPar.push_back(*L3JetPar);
-	if (isdata) fJetCorPar.push_back(*ResJetPar);
-	fJetCorrector = new FactorizedJetCorrector(fJetCorPar);
-	fIsData = isdata;
-	
-	delete L1JetPar;
-	delete L2JetPar;
-	delete L3JetPar; 
-	delete ResJetPar; 
+        std::vector<std::string> runs;
+        if(isdata) runs = {"BCD_DATA", "E_DATA", "F_DATA", "p2_DATA"};
+        else       runs = {"_MC"};
 
-	fJetUncertainty = new JetCorrectionUncertainty(edm::FileInPath(path+gt+"_Uncertainty_AK4PFchs.txt").fullPath());
+        for(std::string run : runs){
+	  jetUncertainties[run] = new JetCorrectionUncertainty(edm::FileInPath(path+gt+run+"_Uncertainty_AK4PFchs.txt").fullPath());
+          std::vector<JetCorrectorParameters> jcParam;
+          jcParam.push_back(JetCorrectorParameters(edm::FileInPath(path+gt+run+"_L1FastJet_AK4PFchs.txt").fullPath()));
+          jcParam.push_back(JetCorrectorParameters(edm::FileInPath(path+gt+run+"_L2Relative_AK4PFchs.txt").fullPath()));
+          jcParam.push_back(JetCorrectorParameters(edm::FileInPath(path+gt+run+"_L3Absolute_AK4PFchs.txt").fullPath()));
+          if(isdata) jcParam.push_back(JetCorrectorParameters(edm::FileInPath(path+gt+run+"_L2L3Residual_AK4PFchs.txt").fullPath()));
+	  jetCorrectors[run] = new FactorizedJetCorrector(jcParam);
+        }
+
+        fIsData = isdata;
 }
 
-float OnTheFlyCorrections::getJECUncertainty(float pt, float eta){
+std::string getRunName(int runNumber){
+  if(runNumber < 1)           return "_MC";
+  else if(runNumber < 276811) return "BCD_DATA";
+  else if(runNumber < 277420) return "E_DATA";
+  else if(runNumber < 278801) return "E_DATA";
+  else                        return "p2_DATA";
+
+}
+
+
+float OnTheFlyCorrections::getJECUncertainty(float pt, float eta, int runnumber){
 	if      (eta> 5.0) eta = 5.0;
 	else if (eta<-5.0) eta =-5.0;
-	fJetUncertainty->setJetPt(pt);
-	fJetUncertainty->setJetEta(eta);
-	float uncert= fJetUncertainty->getUncertainty(true);
-	return uncert;
-
-}
-
-std::vector< float > OnTheFlyCorrections::getCorrPtECorr(float jetpt, float jeteta, float jetenergy, float jecorr, float jetarea, float rho){
-// give this function a corrected jet and it will return a vector with the 
-// corrected jet-pt, jet-energy and the new correction according to the global tag that is set
-
-	float rawpt = jetpt/jecorr;
-	float rawe  = jetenergy/jecorr;
-	fJetCorrector->setJetPt(rawpt); // raw-pT here
-	fJetCorrector->setJetEta(jeteta);
-	fJetCorrector->setRho(rho);
-	fJetCorrector->setJetA(jetarea);
-
-	float corr = fJetCorrector->getCorrection();
-	std::vector< float > corrected;
-
-	// new jetpt = old jet-pt * new correction / old correction
-	corrected.push_back(corr*rawpt); // new corrected pt as 0th item
-	corrected.push_back(corr*rawe);  // new corrected energy as 1st item
-	corrected.push_back(corr);       // new correction as 2nd item
-	return corrected;
-
+	jetUncertainties[fIsData ? getRunName(runnumber) : "_MC"]->setJetPt(pt);
+	jetUncertainties[fIsData ? getRunName(runnumber) : "_MC"]->setJetEta(eta);
+	return jetUncertainties[fIsData ? getRunName(runnumber) : "_MC"]->getUncertainty(true);
 }
 
 float OnTheFlyCorrections::getJetCorrection(float pt, float corr, float eta, float rho, float area, std::string level = "L3Absolute"){
@@ -60,13 +44,14 @@ float OnTheFlyCorrections::getJetCorrection(float pt, float corr, float eta, flo
 	return getJetCorrectionRawPt(pt/corr, eta, rho, area, level);
 }
 
-float OnTheFlyCorrections::getJetCorrectionRawPt(float rawpt, float eta, float rho, float area, std::string level = "L3Absolute"){
+float OnTheFlyCorrections::getJetCorrectionRawPt(float rawpt, float eta, float rho, float area, std::string level = "L3Absolute", int runnumber){
 	// slighly redundant considering we have what we have below, but I think that's what frederic was thinking about
-	fJetCorrector->setJetEta(eta);
-	fJetCorrector->setRho(rho);
-	fJetCorrector->setJetA(area);
-	fJetCorrector->setJetPt(rawpt); // new raw-pT here...! this is called with fTR->JPt[jetindex]/fTR->JEcorr[jetindex]; in the useranalysisbase.
-	std::vector< float > corrections = fJetCorrector->getSubCorrections();
+        FactorizedJetCorrector* jetCorrector = jetCorrectors[fIsData ? getRunName(runnumber) : "_MC"];
+	jetCorrector->setJetEta(eta);
+	jetCorrector->setRho(rho);
+	jetCorrector->setJetA(area);
+	jetCorrector->setJetPt(rawpt); // new raw-pT here...! this is called with fTR->JPt[jetindex]/fTR->JEcorr[jetindex]; in the useranalysisbase.
+	std::vector< float > corrections = jetCorrector->getSubCorrections();
 
 	if (level == "L1FastJet")    return corrections.front();
 	if (level == "L2Relative")   return corrections[1];
@@ -74,52 +59,25 @@ float OnTheFlyCorrections::getJetCorrectionRawPt(float rawpt, float eta, float r
 	return corrections[2];
 }
 
-float OnTheFlyCorrections::getJetCorrectedPt(float pt, float corr, float eta, float rho, float area){
-	// slighly redundant considering we have what we have below, but I think that's what frederic was thinking about
-	fJetCorrector->setJetEta(eta);
-	fJetCorrector->setRho(rho);
-	fJetCorrector->setJetA(area);
-	fJetCorrector->setJetPt(pt/corr);
-	std::vector< float > corrections = fJetCorrector->getSubCorrections();
 
-	return corrections.back() * pt/corr;
 
-}
-
-float OnTheFlyCorrections::getJetPtNoResidual(float pt, float eta, float ecorr, float area, float rho){
-	if (!fIsData) return pt; // no residual corrections for MC
-	float rawpt = pt/ecorr;
-	fJetCorrector->setJetEta(eta);
-	fJetCorrector->setRho(rho);
-	fJetCorrector->setJetA(area);
-	fJetCorrector->setJetPt(rawpt);      // the jets we have in the collection are raw already
-	
-	std::vector<float> factors = fJetCorrector->getSubCorrections();
-	if(fabs(factors[3] - ecorr) > 0.000001) std::cout << "OnTheFlyCorrections::getJetPtNoResidual ==> WARNING: Your JECs don't seem to be consistent!" << std::endl;
-	float l1l2l3scale = factors[2];
-	return rawpt*l1l2l3scale;
-}
-
-std::pair< float, float > 
-OnTheFlyCorrections::getCorrections(float rawpt, float raweta, float rawnomupt, float phi, float emf, float rho, float area, std::string level) {
+std::pair<float,float> OnTheFlyCorrections::getCorrections(float rawpt, float raweta, float rawnomupt, float phi, float emf, float rho, float area, int runnumber) {
+  std::pair<float, float> corr = std::pair<float, float>(0, 0);
+  FactorizedJetCorrector* jetCorrector = jetCorrectors[fIsData ? getRunName(runnumber) : "_MC"];
+  jetCorrector->setJetEta(raweta);
+  jetCorrector->setRho(rho);
+  jetCorrector->setJetA(area);
+  jetCorrector->setJetPt(rawpt);
   
-  std::pair< float, float > corr(0., 0.); // pair with zeroes that gets returned if jet fails a cut
-  if (emf > 0.9)       return corr;       // skip jets with EMF > 0.9
-
-  fJetCorrector->setJetEta(raweta);
-  fJetCorrector->setRho(rho);
-  fJetCorrector->setJetA(area);
-  fJetCorrector->setJetPt(rawpt);      // the jets we have in the collection are raw already
-  
-  std::vector< float > corrections = fJetCorrector->getSubCorrections();
+  std::vector< float > corrections = jetCorrector->getSubCorrections();
   
 
   float l1corrpt   = rawnomupt*corrections.front(); // l1fastjet corrections were pushed pack first
   float fullcorrpt = rawnomupt*corrections.back();  // full corrections are the last in the vector
 
-  if (fullcorrpt < 15.)     return corr;        // skip all jets that have corrected pt below 15 GeV
 
   // the corretions for the MET are the difference between l1fastjet and the full corrections on the jet!
+  if(emf > 0.9 or fullcorrpt < 15.) return corr;       // skip jets with EMF > 0.9
   
   corr.first  = getPx(l1corrpt - fullcorrpt, phi); // fill the px of the correction in the pair.first
   corr.second = getPy(l1corrpt - fullcorrpt, phi); // and the py in the pair.second

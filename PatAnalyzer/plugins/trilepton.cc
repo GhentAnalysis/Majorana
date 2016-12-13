@@ -367,13 +367,12 @@ void trilepton::beginJob()
 
     
     GPM = GenParticleManager();
-    
-    if (isData) fMetCorrector = new OnTheFlyCorrections("Majorana/PatAnalyzer/data/", "Spring16_25nsV6_DATA", isData);
-    else        fMetCorrector = new OnTheFlyCorrections("Majorana/PatAnalyzer/data/", "Spring16_25nsV6_MC",   isData);
+
+    fMetCorrector = new OnTheFlyCorrections("Majorana/PatAnalyzer/data/", "Spring16_25nsV10", isData);
     if (isData) _corrLevel = "L2L3Residual";
     else        _corrLevel = "L3Absolute";
 
-    jecUnc = new JetCorrectionUncertainty(edm::FileInPath("Majorana/PatAnalyzer/data/Spring16_25nsV6_MC_Uncertainty_AK4PFchs.txt").fullPath());
+    jecUnc = new JetCorrectionUncertainty(edm::FileInPath("Majorana/PatAnalyzer/data/Spring16_25nsV10_MC_Uncertainty_AK4PFchs.txt").fullPath());
     
     for(TString wp : {"VT","T","M","L","VL"}){
       leptonWorkingPoints["multiIsolation" + wp] = new std::vector<bool>();
@@ -804,7 +803,7 @@ void trilepton::analyze(const edm::Event& iEvent, const edm::EventSetup& iEventS
                                                                       pJet.Phi(),
                                                                       (&*jet)->neutralEmEnergyFraction()+(&*jet)->chargedEmEnergyFraction(),
                                                                       myRhoJECJets,
-                                                                      (&*jet)->jetArea());
+                                                                      (&*jet)->jetArea(), _runNb);
         corrMetx += corr.first ;
         corrMety += corr.second;
     }
@@ -1011,7 +1010,7 @@ cout<<"Gen matched: "<<_lpdgmc[leptonCounter]<<" "<<_lPtmc[leptonCounter]<<" "<<
 	    
 	    
       bool MVAlooseFR = tools::passed_loose_MVA_FR_slidingCut(&*electron, _mvaValue[leptonCounter]);	    
-      //if (!MVAlooseFR) continue;
+      if (!MVAlooseFR) continue;
       //bool crossCheckTight = tools::isTightCutBasedElectronWithoutIsolation(&*electron, false) and tools::pfRelIso(&*electron, myRhoJECJets) < (electron->isEB() ? 0.0588 : 0.0571);
 
       _flavors[leptonCounter]            = 0;
@@ -1116,7 +1115,7 @@ cout<<"Gen matched: "<<_lpdgmc[leptonCounter]<<" "<<_lPtmc[leptonCounter]<<" "<<
         double uncEta = (SelectedJets[i]->correctedP4("Uncorrected")).Eta();
          
         //double corr = fMetCorrector->getJetCorrectionRawPt(uncPt, uncEta, myRhoJets, SelectedJets[i]->jetArea(),_corrLevel);
-        double corr = fMetCorrector->getJetCorrectionRawPt(uncPt, uncEta, myRhoJECJets, SelectedJets[i]->jetArea(),_corrLevel);
+        double corr = fMetCorrector->getJetCorrectionRawPt(uncPt, uncEta, myRhoJECJets, SelectedJets[i]->jetArea(),_corrLevel, _runNb);
         //std::cout << "Before correction pt of jet: " << uncPt << " " << uncPt*corr << std::endl;
                                  
         if (uncPt*corr < 30) continue;
@@ -1313,8 +1312,8 @@ void trilepton::fillCloseJetVars(const int leptonCounter, Vertex::Point PV) {
     for(unsigned int k = 0 ; k < SelectedJetsAll.size() ;k++ ){
         double uncorrPt = (SelectedJetsAll[k]->correctedP4("Uncorrected")).Pt();
 
-        double corr = fMetCorrector->getJetCorrectionRawPt( uncorrPt, (SelectedJetsAll[k]->correctedP4("Uncorrected")).Eta(), myRhoJECJets, SelectedJetsAll[k]->jetArea(),"L1FastJet");
-        double corr2 = fMetCorrector->getJetCorrectionRawPt( uncorrPt, (SelectedJetsAll[k]->correctedP4("Uncorrected")).Eta(), myRhoJECJets, SelectedJetsAll[k]->jetArea(),_corrLevel);
+        double corr = fMetCorrector->getJetCorrectionRawPt( uncorrPt, (SelectedJetsAll[k]->correctedP4("Uncorrected")).Eta(), myRhoJECJets, SelectedJetsAll[k]->jetArea(),"L1FastJet", _runNb);
+        double corr2 = fMetCorrector->getJetCorrectionRawPt( uncorrPt, (SelectedJetsAll[k]->correctedP4("Uncorrected")).Eta(), myRhoJECJets, SelectedJetsAll[k]->jetArea(),_corrLevel, _runNb);
         
        pJet.SetPtEtaPhiE( corr*uncorrPt, SelectedJetsAll[k]->eta(), SelectedJetsAll[k]->phi(), corr*(SelectedJetsAll[k]->correctedP4("Uncorrected")).E());
        pJet-=*((TLorentzVector *)_leptonP4->At(leptonCounter));
@@ -1517,7 +1516,7 @@ void trilepton::fillRegVars(const pat::Jet *jet, double genpt, const pat::Muon* 
     
     hJet_cef = jet->chargedHadronEnergyFraction() + jet->chargedEmEnergyFraction();
     hJet_nconstituents = jet->getPFConstituents().size();
-    hJet_JECUnc = fMetCorrector->getJECUncertainty(jet->pt(),jet->eta());
+    hJet_JECUnc = fMetCorrector->getJECUncertainty(jet->pt(),jet->eta(), _runNb);
     
     
     TLorentzVector pJet; pJet.SetPtEtaPhiE( jet->pt(), jet->eta(), jet->phi(), jet->energy() );
@@ -1574,7 +1573,7 @@ void trilepton::fillRegVars(const pat::Jet *jet, double genpt, const pat::Electr
     
     hJet_cef = jet->chargedHadronEnergyFraction() + jet->chargedEmEnergyFraction();
     hJet_nconstituents = jet->getPFConstituents().size();
-    hJet_JECUnc = fMetCorrector->getJECUncertainty(jet->pt(),jet->eta());
+    hJet_JECUnc = fMetCorrector->getJECUncertainty(jet->pt(),jet->eta(), _runNb);
     
     
     TLorentzVector pJet; pJet.SetPtEtaPhiE( jet->pt(), jet->eta(), jet->phi(), jet->energy() );
