@@ -203,7 +203,7 @@ bool tools::passed_loose_MVA_FR(const pat::Electron* iE, double mvaValue){
 
 float tools::slidingCut(float pt, float low, float high){
   float slope = (high - low)/10.;
-  return std::min(low, std::max(high, - slope*(pt-15)));
+  return std::min(low, std::max(high, low + slope*(pt-15)));
 }
 
 bool tools::passed_loose_MVA_FR_slidingCut(const pat::Electron* iE, double mvaValue){
