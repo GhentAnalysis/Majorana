@@ -1176,11 +1176,11 @@ cout<<"Gen matched: "<<_lpdgmc[leptonCounter]<<" "<<_lPtmc[leptonCounter]<<" "<<
 
     // Here we make the decision on what to save
     if(treeForFakeRate){
-      if(_nLeptons < 3) return; // for FR in ttbar sample 
-      //if(_nLeptons != 1)       return;
-      //if(_n_Jets < 1)          return;				// For fake rate tree: exactly 1 loose lepton + at least 1 jet
+      //if(_nLeptons < 3) return; // for FR in ttbar sample 
+      if(_nLeptons != 1)       return;
+      if(_n_Jets < 1)          return;				// For fake rate tree: exactly 1 loose lepton + at least 1 jet
       if(_jetPt[0] < 30)       return;				// with deltaR(j, l) > 1 (back-to-back)
-      //if(_jetDeltaR[0][0] < 1) return;
+      if(_jetDeltaR[0][0] < 1) return;
     } else {
       if(_nLeptons < 3) return;
     }
