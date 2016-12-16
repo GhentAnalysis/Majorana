@@ -16,7 +16,7 @@ config.General.workArea     = os.path.join('crab', productionLabel, dataset.spli
 
 config.section_('JobType')
 config.JobType.psetName                = 'trilepton.py'
-config.JobType.pyCfgParams             = (['isData=True'] if not 'SIM' in dataset else []) + (['treeForFakeRate=True'] if treeForFakeRate else []) + ['events=-1']
+config.JobType.pyCfgParams             = (['isData=True'] if not 'SIM' in dataset else []) + ['treeForFakeRate='+treeForFakeRate, 'events=-1']
 config.JobType.pluginName              = 'analysis'
 config.JobType.outputFiles             = ['trilepton.root' if treeForFakeRate=='False' else 'fakeRate.root']
 config.JobType.sendExternalFolder      = True
