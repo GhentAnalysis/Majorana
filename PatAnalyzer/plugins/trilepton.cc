@@ -453,7 +453,7 @@ void trilepton::analyze(const edm::Event& iEvent, const edm::EventSetup& iEventS
     for(TString wp : {"VT","T","M","L","VL","RelIso04","MiniIso04"}) leptonConeCorrectedPt[wp]->clear();
 
     _nZboson = 0;
-
+	/*
     if(not isData) {
         //******************************************************************************************************************
         // Gen level particles                  ****************************************************************************
@@ -651,7 +651,7 @@ void trilepton::analyze(const edm::Event& iEvent, const edm::EventSetup& iEventS
       cout << "+++++++++++++++++++++++++++" << endl;
       }
 	
-	
+	*/
 	
     getTriggerResults(iEvent, true,  triggerResultsHLTToken,  triggersToSave);
     getTriggerResults(iEvent, false, triggerResultsRECOToken, filtersToSave);
@@ -660,12 +660,13 @@ void trilepton::analyze(const edm::Event& iEvent, const edm::EventSetup& iEventS
     realdata_ = iEvent.isRealData();
 
     _weight = 1.;
+	/*
     if(not isData) {
         edm::Handle<GenEventInfoProduct> pdfvariables;
         iEvent.getByToken(pdfvariablesToken, pdfvariables);
         _weight = pdfvariables->weight();
     }
-
+	*/
     _runNb     = iEvent.id().run();
     _eventNb   = iEvent.id().event();
     _lumiBlock = iEvent.luminosityBlock();
@@ -692,6 +693,7 @@ void trilepton::analyze(const edm::Event& iEvent, const edm::EventSetup& iEventS
     //iEvent.getByLabel("addPileupInfo", theMCTruthVertices) ;
     //if( ! theVertices.isValid() ) ERR(IT_MCTruthVtx ) ;
     //int nMCTruthvertex = theMCTruthVertices->size();
+		/*
     if (not isData) {
         edm::Handle<vector< PileupSummaryInfo > >  PupInfo;
         iEvent.getByToken(PileUpToken, PupInfo);
@@ -705,7 +707,7 @@ void trilepton::analyze(const edm::Event& iEvent, const edm::EventSetup& iEventS
         }
         //std::cout << std::endl;
     }
-
+	*/
     //============ Primary vertices ============
     //edm::InputTag IT_goodVtx = edm::InputTag("offlineSlimmedPrimaryVertices");
     edm::Handle<std::vector<Vertex> > theVertices;
@@ -925,7 +927,7 @@ void trilepton::analyze(const edm::Event& iEvent, const edm::EventSetup& iEventS
       }
       leptonConeCorrectedPt["MiniIso04"]->push_back(tools::leptonConeCorrectedPt(_lPt[leptonCounter], "MiniIso04", _miniisolation[leptonCounter], 0, 0));
       leptonConeCorrectedPt["RelIso04"]->push_back(tools::leptonConeCorrectedPt(_lPt[leptonCounter], "RelIso04", _isolation[leptonCounter], 0, 0));
-
+/*
       if(not isData){
 	  const GenParticle* mc = GPM.matchedMC(&*muon);
 	  if(mc!=0){
@@ -946,7 +948,7 @@ void trilepton::analyze(const edm::Event& iEvent, const edm::EventSetup& iEventS
 	    cout<<"reduced: "<<_originReduced[leptonCounter]<<endl;
 cout<<"RECO: ("<<_charges[leptonCounter]<<","<<_flavors[leptonCounter]<<") "<<_lPt[leptonCounter]<<" "<< _lEta[leptonCounter] <<" "<< _lPhi[leptonCounter] <<" "<<_lE[leptonCounter]  <<" mom info: "<< _mompdg[leptonCounter]<<" "<<_mompt[leptonCounter]<<endl;
 cout<<"Gen matched: "<<_lpdgmc[leptonCounter]<<" "<<_lPtmc[leptonCounter]<<" "<< _lEtamc[leptonCounter] <<" "<< _lPhimc[leptonCounter] <<" "<<_lEmc[leptonCounter]  <<" mom info: "<< _mompdg[leptonCounter]<<" "<<_mompt[leptonCounter]<<endl;
-
+*/
 
         
         leptonCounter++;
@@ -1063,7 +1065,7 @@ cout<<"Gen matched: "<<_lpdgmc[leptonCounter]<<" "<<_lPtmc[leptonCounter]<<" "<<
       }
       leptonConeCorrectedPt["MiniIso04"]->push_back(tools::leptonConeCorrectedPt(_lPt[leptonCounter], "MiniIso04", _miniisolation[leptonCounter], 0, 0));
       leptonConeCorrectedPt["RelIso04"]->push_back(tools::leptonConeCorrectedPt(_lPt[leptonCounter], "RelIso04", _isolation[leptonCounter], 0, 0));
-
+/*
       if (not isData) {
 	_findMatched[leptonCounter]=-1;
 	  const GenParticle* mc = GPM.matchedMC(&*electron);
@@ -1088,7 +1090,7 @@ cout<<"Gen matched: "<<_lpdgmc[leptonCounter]<<" "<<_lPtmc[leptonCounter]<<" "<<
 	    cout<<"reduced: "<<_originReduced[leptonCounter]<<endl;
 cout<<"RECO: ("<<_charges[leptonCounter]<<","<<_flavors[leptonCounter]<<") "<<_lPt[leptonCounter]<<" "<< _lEta[leptonCounter] <<" "<< _lPhi[leptonCounter] <<" "<<_lE[leptonCounter]  <<" mom info: "<< _mompdg[leptonCounter]<<" "<<_mompt[leptonCounter]<<endl;
 cout<<"Gen matched: "<<_lpdgmc[leptonCounter]<<" "<<_lPtmc[leptonCounter]<<" "<< _lEtamc[leptonCounter] <<" "<< _lPhimc[leptonCounter] <<" "<<_lEmc[leptonCounter]  <<" mom info: "<< _mompdg[leptonCounter]<<" "<<_mompt[leptonCounter]<<endl;
-
+*/
       leptonCounter++;
       
     }
@@ -1175,7 +1177,7 @@ cout<<"Gen matched: "<<_lpdgmc[leptonCounter]<<" "<<_lPtmc[leptonCounter]<<" "<<
 
 
     // Here we make the decision on what to save
-    if(treeForFakeRate){
+    /*if(treeForFakeRate){
       //if(_nLeptons < 3) return; // for FR in ttbar sample 
       if(_nLeptons != 1)       return;
       if(_n_Jets < 1)          return;				// For fake rate tree: exactly 1 loose lepton + at least 1 jet
@@ -1183,7 +1185,8 @@ cout<<"Gen matched: "<<_lpdgmc[leptonCounter]<<" "<<_lPtmc[leptonCounter]<<" "<<
       if(_jetDeltaR[0][0] < 1) return;
     } else {
       if(_nLeptons < 3) return;
-    }
+    }*/
+		if(_nLeptons < 3) return;
 	cout<< "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"<<endl;
 	cout<< "  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%  "<<endl;
 	cout<< "    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%  "<<endl;
