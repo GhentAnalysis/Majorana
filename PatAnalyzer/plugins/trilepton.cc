@@ -1012,7 +1012,7 @@ cout<<"Gen matched: "<<_lpdgmc[leptonCounter]<<" "<<_lPtmc[leptonCounter]<<" "<<
 	    
 	    
       bool MVAlooseFR = tools::passed_loose_MVA_FR_slidingCut(&*electron, _mvaValue[leptonCounter]);	    
-      if (!MVAlooseFR) continue;
+      //if (!MVAlooseFR) continue;
       //bool crossCheckTight = tools::isTightCutBasedElectronWithoutIsolation(&*electron, false) and tools::pfRelIso(&*electron, myRhoJECJets) < (electron->isEB() ? 0.0588 : 0.0571);
 
       _flavors[leptonCounter]            = 0;
@@ -1177,7 +1177,7 @@ cout<<"Gen matched: "<<_lpdgmc[leptonCounter]<<" "<<_lPtmc[leptonCounter]<<" "<<
 
 
     // Here we make the decision on what to save
-    /*if(treeForFakeRate){
+    if(treeForFakeRate){
       //if(_nLeptons < 3) return; // for FR in ttbar sample 
       if(_nLeptons != 1)       return;
       if(_n_Jets < 1)          return;				// For fake rate tree: exactly 1 loose lepton + at least 1 jet
@@ -1185,8 +1185,8 @@ cout<<"Gen matched: "<<_lpdgmc[leptonCounter]<<" "<<_lPtmc[leptonCounter]<<" "<<
       if(_jetDeltaR[0][0] < 1) return;
     } else {
       if(_nLeptons < 3) return;
-    }*/
-		if(_nLeptons < 3) return;
+    }
+		//if(_nLeptons < 3) return;
 	cout<< "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"<<endl;
 	cout<< "  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%  "<<endl;
 	cout<< "    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%  "<<endl;
