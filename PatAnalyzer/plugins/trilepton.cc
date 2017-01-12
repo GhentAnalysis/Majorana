@@ -878,7 +878,7 @@ void trilepton::analyze(const edm::Event& iEvent, const edm::EventSetup& iEventS
       if(std::abs(muon->innerTrack()->dz(PV)) > 0.1  ) continue;
 
       double relIso = tools::pfRelIso(&*muon,myRhoJECJets);
-      if(relIso > 0.4) continue; // loose selection for FR
+      if(relIso > 0.6) continue; // loose selection for FR
 
       if (leptonCounter == 10) continue;  // using arrays, so do not store more than 10 muons, they are sorted in pt anyway
 
@@ -974,7 +974,7 @@ cout<<"Gen matched: "<<_lpdgmc[leptonCounter]<<" "<<_lPtmc[leptonCounter]<<" "<<
 
       double relIso = tools::pfRelIso(&*electron, myRhoJECJets);
       	    
-      if(relIso > 0.4) continue;
+      if(relIso > 0.6) continue;
       // There will be a new electron MVA soon
       edm::RefToBase<pat::Electron> electronRef(edm::Ref<edm::View<pat::Electron>>(electrons, (electron - electrons->begin())));
       _mvaValue[leptonCounter]               = (*electronMvaIdMap)[electronRef];
