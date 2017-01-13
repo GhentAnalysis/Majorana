@@ -125,7 +125,12 @@ trilepton::trilepton(const edm::ParameterSet & iConfig) :
 		      "HLT_Mu8_v","HLT_Mu17_v","HLT_Mu24_v","HLT_Mu34_v",
 		      
 		      "HLT_Ele12_CaloIdL_TrackIdL_IsoVL_PFJet30_v","HLT_Ele18_CaloIdL_TrackIdL_IsoVL_PFJet30_v",
-		      "HLT_Ele23_CaloIdL_TrackIdL_IsoVL_PFJet30_v","HLT_Ele33_CaloIdL_TrackIdL_IsoVL_PFJet30_v"
+		      "HLT_Ele23_CaloIdL_TrackIdL_IsoVL_PFJet30_v","HLT_Ele33_CaloIdL_TrackIdL_IsoVL_PFJet30_v",
+		      
+		      "HLT_Ele12_CaloIdL_TrkIdL_IsoVL_v","HLT_Ele17_CaloIdL_TrackIdL_IsoVL_v",
+		      "HLT_Ele23_CaloIdL_TrackIdL_IsoVL_v"
+		      
+		      
 		     };
     filtersToSave  = {"Flag_HBHENoiseFilter", "Flag_HBHENoiseIsoFilter", "Flag_EcalDeadCellTriggerPrimitiveFilter", "Flag_goodVertices", "Flag_eeBadScFilter", "Flag_globalTightHalo2016Filter"};
 }
