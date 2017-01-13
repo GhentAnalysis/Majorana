@@ -23,27 +23,31 @@
 #/user/tomc/public/Majorana/MajoranaNeutrino_trilepton_M-60_5f_NLO
 #/user/tomc/public/Majorana/MajoranaNeutrino_trilepton_M-10_5f_NLO_ctau100mm
 
-#QCD 
-FAKERATE:/pnfs/iihe/cms/ph/sc4/store/mc/RunIISpring16MiniAODv2/QCD_Pt-20to30_MuEnrichedPt5_TuneCUETP8M1_13TeV_pythia8/MINIAODSIM/PUSpring16RAWAODSIM_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1
-FAKERATE:/pnfs/iihe/cms/ph/sc4/store/mc/RunIISpring16MiniAODv2/QCD_Pt-30to50_MuEnrichedPt5_TuneCUETP8M1_13TeV_pythia8/MINIAODSIM/PUSpring16RAWAODSIM_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1
-FAKERATE:/pnfs/iihe/cms/ph/sc4/store/mc/RunIISpring16MiniAODv2/QCD_Pt-50to80_MuEnrichedPt5_TuneCUETP8M1_13TeV_pythia8/MINIAODSIM/PUSpring16RAWAODSIM_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1
-FAKERATE:/pnfs/iihe/cms/ph/sc4/store/mc/RunIISpring16MiniAODv2/QCD_Pt-80to120_MuEnrichedPt5_TuneCUETP8M1_13TeV_pythia8/MINIAODSIM/PUSpring16RAWAODSIM_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1
-FAKERATE:/pnfs/iihe/cms/ph/sc4/store/mc/RunIISpring16MiniAODv2/QCD_Pt-120to170_MuEnrichedPt5_TuneCUETP8M1_13TeV_pythia8/MINIAODSIM/PUSpring16RAWAODSIM_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1
-FAKERATE:/pnfs/iihe/cms/ph/sc4/store/mc/RunIISpring16MiniAODv2/QCD_Pt-170to300_MuEnrichedPt5_TuneCUETP8M1_13TeV_pythia8/MINIAODSIM/PUSpring16RAWAODSIM_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1
-FAKERATE:/pnfs/iihe/cms/ph/sc4/store/mc/RunIISpring16MiniAODv2/QCD_Pt-300to470_MuEnrichedPt5_TuneCUETP8M1_13TeV_pythia8/MINIAODSIM/PUSpring16RAWAODSIM_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1
-FAKERATE:/pnfs/iihe/cms/ph/sc4/store/mc/RunIISpring16MiniAODv2/QCD_Pt-470to600_MuEnrichedPt5_TuneCUETP8M1_13TeV_pythia8/MINIAODSIM/PUSpring16RAWAODSIM_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1
-FAKERATE:/pnfs/iihe/cms/ph/sc4/store/mc/RunIISpring16MiniAODv2/QCD_Pt-600to800_MuEnrichedPt5_TuneCUETP8M1_13TeV_pythia8/MINIAODSIM/PUSpring16RAWAODSIM_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1
-FAKERATE:/pnfs/iihe/cms/ph/sc4/store/mc/RunIISpring16MiniAODv2/QCD_Pt-800to1000_MuEnrichedPt5_TuneCUETP8M1_13TeV_pythia8/MINIAODSIM/PUSpring16RAWAODSIM_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1
-FAKERATE:/pnfs/iihe/cms/ph/sc4/store/mc/RunIISpring16MiniAODv2/QCD_Pt-1000toInf_MuEnrichedPt5_TuneCUETP8M1_13TeV_pythia8/MINIAODSIM/PUSpring16RAWAODSIM_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1
-FAKERATE:/pnfs/iihe/cms/ph/sc4/store/mc/RunIISpring16MiniAODv2/QCD_Pt-20to30_EMEnriched_TuneCUETP8M1_13TeV_pythia8/MINIAODSIM/PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1
-FAKERATE:/pnfs/iihe/cms/ph/sc4/store/mc/RunIISpring16MiniAODv2/QCD_Pt-30to50_EMEnriched_TuneCUETP8M1_13TeV_pythia8/MINIAODSIM/PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1
-FAKERATE:/pnfs/iihe/cms/ph/sc4/store/mc/RunIISpring16MiniAODv2/QCD_Pt-50to80_EMEnriched_TuneCUETP8M1_13TeV_pythia8/MINIAODSIM/PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1
-FAKERATE:/pnfs/iihe/cms/ph/sc4/store/mc/RunIISpring16MiniAODv2/QCD_Pt-80to120_EMEnriched_TuneCUETP8M1_13TeV_pythia8/MINIAODSIM/PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1
-FAKERATE:/pnfs/iihe/cms/ph/sc4/store/mc/RunIISpring16MiniAODv2/QCD_Pt-120to170_EMEnriched_TuneCUETP8M1_13TeV_pythia8/MINIAODSIM/PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1
-FAKERATE:/pnfs/iihe/cms/ph/sc4/store/mc/RunIISpring16MiniAODv2/QCD_Pt-170to300_EMEnriched_TuneCUETP8M1_13TeV_pythia8/MINIAODSIM/PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1
-FAKERATE:/pnfs/iihe/cms/ph/sc4/store/mc/RunIISpring16MiniAODv2/QCD_Pt-300toInf_EMEnriched_TuneCUETP8M1_13TeV_pythia8/MINIAODSIM/PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1
-
-
+#QCD
+#FAKERATE:/pnfs/iihe/cms/ph/sc4/store/mc/RunIISpring16MiniAODv2/QCD_Pt-20to30_MuEnrichedPt5_TuneCUETP8M1_13TeV_pythia8/MINIAODSIM/PUSpring16RAWAODSIM_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1
+#FAKERATE:/pnfs/iihe/cms/ph/sc4/store/mc/RunIISpring16MiniAODv2/QCD_Pt-30to50_MuEnrichedPt5_TuneCUETP8M1_13TeV_pythia8/MINIAODSIM/PUSpring16RAWAODSIM_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1
+#FAKERATE:/pnfs/iihe/cms/ph/sc4/store/mc/RunIISpring16MiniAODv2/QCD_Pt-50to80_MuEnrichedPt5_TuneCUETP8M1_13TeV_pythia8/MINIAODSIM/PUSpring16RAWAODSIM_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1
+#FAKERATE:/pnfs/iihe/cms/ph/sc4/store/mc/RunIISpring16MiniAODv2/QCD_Pt-80to120_MuEnrichedPt5_TuneCUETP8M1_13TeV_pythia8/MINIAODSIM/PUSpring16RAWAODSIM_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1
+#FAKERATE:/pnfs/iihe/cms/ph/sc4/store/mc/RunIISpring16MiniAODv2/QCD_Pt-120to170_MuEnrichedPt5_TuneCUETP8M1_13TeV_pythia8/MINIAODSIM/PUSpring16RAWAODSIM_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1
+#FAKERATE:/pnfs/iihe/cms/ph/sc4/store/mc/RunIISpring16MiniAODv2/QCD_Pt-170to300_MuEnrichedPt5_TuneCUETP8M1_13TeV_pythia8/MINIAODSIM/PUSpring16RAWAODSIM_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1
+#FAKERATE:/pnfs/iihe/cms/ph/sc4/store/mc/RunIISpring16MiniAODv2/QCD_Pt-300to470_MuEnrichedPt5_TuneCUETP8M1_13TeV_pythia8/MINIAODSIM/PUSpring16RAWAODSIM_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1
+#FAKERATE:/pnfs/iihe/cms/ph/sc4/store/mc/RunIISpring16MiniAODv2/QCD_Pt-470to600_MuEnrichedPt5_TuneCUETP8M1_13TeV_pythia8/MINIAODSIM/PUSpring16RAWAODSIM_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1
+#FAKERATE:/pnfs/iihe/cms/ph/sc4/store/mc/RunIISpring16MiniAODv2/QCD_Pt-600to800_MuEnrichedPt5_TuneCUETP8M1_13TeV_pythia8/MINIAODSIM/PUSpring16RAWAODSIM_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1
+#FAKERATE:/pnfs/iihe/cms/ph/sc4/store/mc/RunIISpring16MiniAODv2/QCD_Pt-800to1000_MuEnrichedPt5_TuneCUETP8M1_13TeV_pythia8/MINIAODSIM/PUSpring16RAWAODSIM_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1
+#FAKERATE:/pnfs/iihe/cms/ph/sc4/store/mc/RunIISpring16MiniAODv2/QCD_Pt-1000toInf_MuEnrichedPt5_TuneCUETP8M1_13TeV_pythia8/MINIAODSIM/PUSpring16RAWAODSIM_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1
+#FAKERATE:/pnfs/iihe/cms/ph/sc4/store/mc/RunIISpring16MiniAODv2/QCD_Pt-20to30_EMEnriched_TuneCUETP8M1_13TeV_pythia8/MINIAODSIM/PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1
+#FAKERATE:/pnfs/iihe/cms/ph/sc4/store/mc/RunIISpring16MiniAODv2/QCD_Pt-30to50_EMEnriched_TuneCUETP8M1_13TeV_pythia8/MINIAODSIM/PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1
+#FAKERATE:/pnfs/iihe/cms/ph/sc4/store/mc/RunIISpring16MiniAODv2/QCD_Pt-50to80_EMEnriched_TuneCUETP8M1_13TeV_pythia8/MINIAODSIM/PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1
+#FAKERATE:/pnfs/iihe/cms/ph/sc4/store/mc/RunIISpring16MiniAODv2/QCD_Pt-80to120_EMEnriched_TuneCUETP8M1_13TeV_pythia8/MINIAODSIM/PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1
+#FAKERATE:/pnfs/iihe/cms/ph/sc4/store/mc/RunIISpring16MiniAODv2/QCD_Pt-120to170_EMEnriched_TuneCUETP8M1_13TeV_pythia8/MINIAODSIM/PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1
+#FAKERATE:/pnfs/iihe/cms/ph/sc4/store/mc/RunIISpring16MiniAODv2/QCD_Pt-170to300_EMEnriched_TuneCUETP8M1_13TeV_pythia8/MINIAODSIM/PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1
+#FAKERATE:/pnfs/iihe/cms/ph/sc4/store/mc/RunIISpring16MiniAODv2/QCD_Pt-300toInf_EMEnriched_TuneCUETP8M1_13TeV_pythia8/MINIAODSIM/PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1
+#FAKERATE:/pnfs/iihe/cms/ph/sc4/store/mc/RunIISpring16MiniAODv2/QCD_Pt_30to80_bcToE_TuneCUETP8M1_13TeV_pythia8/MINIAODSIM/PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v2
+#FAKERATE:/pnfs/iihe/cms/ph/sc4/store/mc/RunIISpring16MiniAODv2/QCD_Pt_80to170_bcToE_TuneCUETP8M1_13TeV_pythia8/MINIAODSIM/PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v2
+#FAKERATE:/pnfs/iihe/cms/ph/sc4/store/mc/RunIISpring16MiniAODv2/QCD_Pt_250toInf_bcToE_TuneCUETP8M1_13TeV_pythia8/MINIAODSIM/PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v2
+#FAKERATE:/pnfs/iihe/cms/ph/sc4/store/mc/RunIISpring16MiniAODv2/QCD_Pt_170to250_bcToE_TuneCUETP8M1_13TeV_pythia8/MINIAODSIM/PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1
+#FAKERATE:/pnfs/iihe/cms/ph/sc4/store/mc/RunIIFall15MiniAODv2/QCD_Pt_15to20_bcToE_TuneCUETP8M1_13TeV_pythia8/MINIAODSIM/PU25nsData2015v1_76X_mcRun2_asymptotic_v12-v1
+#FAKERATE:/pnfs/iihe/cms/ph/sc4/store/mc/RunIIFall15MiniAODv2/QCD_Pt_20to30_bcToE_TuneCUETP8M1_13TeV_pythia8/MINIAODSIM/PU25nsData2015v1_76X_mcRun2_asymptotic_v12-v1
 
 
 
@@ -71,7 +75,7 @@ FAKERATE:/pnfs/iihe/cms/ph/sc4/store/mc/RunIISpring16MiniAODv2/QCD_Pt-300toInf_E
 #FAKERATE:/QCD_Pt_80to170_bcToE_TuneCUETP8M1_13TeV_pythia8/RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v2/MINIAODSIM
 #FAKERATE:/QCD_Pt_170to250_bcToE_TuneCUETP8M1_13TeV_pythia8/RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1/MINIAODSIM
 #FAKERATE:/QCD_Pt_250toInf_bcToE_TuneCUETP8M1_13TeV_pythia8/RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1/MINIAODSIM
-#FAKERATE:/SingleElectron/Run2016B-23Sep2016-v2/MINIAOD																 # see https://twiki.cern.ch/twiki/bin/view/CMS/PdmV2016Analysis
+#FAKERATE:/SingleElectron/Run2016B-23Sep2016-v2/MINIAOD                                                                                                                          # see https://twiki.cern.ch/twiki/bin/view/CMS/PdmV2016Analysis
 #FAKERATE:/SingleElectron/Run2016B-23Sep2016-v3/MINIAOD
 #FAKERATE:/SingleElectron/Run2016C-23Sep2016-v1/MINIAOD
 #FAKERATE:/SingleElectron/Run2016D-23Sep2016-v1/MINIAOD
@@ -84,9 +88,9 @@ FAKERATE:/pnfs/iihe/cms/ph/sc4/store/mc/RunIISpring16MiniAODv2/QCD_Pt-300toInf_E
 #FAKERATE:/SingleMuon/Run2016C-23Sep2016-v1/MINIAOD
 #FAKERATE:/SingleMuon/Run2016D-23Sep2016-v1/MINIAOD
 #FAKERATE:/SingleMuon/Run2016E-23Sep2016-v1/MINIAOD
-#FAKERATE:/SingleMuon/Run2016F-23Sep2016-v1/MINIAOD
 #FAKERATE:/SingleMuon/Run2016G-23Sep2016-v1/MINIAOD
 #FAKERATE:/SingleMuon/Run2016H-PromptReco-v3/MINIAOD
+
 #FAKERATE:/pnfs/iihe/cms/ph/sc4/store/mc/RunIISpring16MiniAODv2/WJetsToLNu_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8/RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1/MINIAODSIM
 #FAKERATE:/pnfs/iihe/cms/ph/sc4/store/mc/RunIISpring16MiniAODv2/DYJetsToLL_M-10to50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8/MINIAODSIM/PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1
 #FAKERATE:/DYJetsToLL_M-10to50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1/MINIAODSIM
@@ -95,17 +99,43 @@ FAKERATE:/pnfs/iihe/cms/ph/sc4/store/mc/RunIISpring16MiniAODv2/QCD_Pt-300toInf_E
 #FAKERATE:/pnfs/iihe/cms/ph/sc4/store/mc/RunIISpring16MiniAODv2/WJetsToLNu_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8/MINIAODSIM/PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1
 #FAKERATE:/pnfs/iihe/cms/ph/sc4/store/mc/RunIISpring16MiniAODv2/DYJetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/MINIAODSIM/PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0_ext1-v1
 #FAKERATE:/pnfs/iihe/cms/ph/sc4/store/mc/RunIISpring16MiniAODv2/DYJetsToLL_M-10to50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/MINIAODSIM/PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1
-#FAKERATE:/pnfs/iihe/cms/ph/sc4/store/mc/RunIISpring16MiniAODv2/WJetsToLNu_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/MINIAODSIM/PUSpring16RAWAODSIM_80X_mcRun2_asymptotic_2016_miniAODv2_v0_ext1-v1
+FAKERATE:/pnfs/iihe/cms/ph/sc4/store/mc/RunIISpring16MiniAODv2/WJetsToLNu_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/MINIAODSIM/PUSpring16RAWAODSIM_80X_mcRun2_asymptotic_2016_miniAODv2_v0_ext1-v1
 #FAKERATE:/pnfs/iihe/cms/ph/sc4/store/mc/RunIISpring16MiniAODv2/TTJets_DiLept_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/MINIAODSIM/PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0_ext1-v1
 #FAKERATE:/pnfs/iihe/cms/ph/sc4/store/mc/RunIISpring16MiniAODv2/TTJets_DiLept_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/MINIAODSIM/PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v4
-
+#/pnfs/iihe/cms/ph/sc4/store/mc/RunIISpring16MiniAODv2/DYJetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/MINIAODSIM/PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0_ext1-v1
+#/pnfs/iihe/cms/ph/sc4/store/mc/RunIISpring16MiniAODv2/DYJetsToLL_M-10to50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/MINIAODSIM/PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1
 
 
 
 
 
 #DATASET BGK FROM LESYA
+#/WZTo3LNu_TuneCUETP8M1_13TeV-powheg-pythia8/RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1/MINIAODSIM
+#/ZGTo2LG_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8/RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1/MINIAODSIM
+#/ZGTo2LG_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8/RunIISpring16MiniAODv2-premix_withHLT_80X_mcRun2_asymptotic_v14_ext1-v1/MINIAODSIM
+#/WGToLNuG_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIISpring16MiniAODv2-premix_withHLT_80X_mcRun2_asymptotic_v14-v1/MINIAODSIM
+#/ZZTo4L_13TeV_powheg_pythia8/RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1/MINIAODSIM
+#/ZZZ_TuneCUETP8M1_13TeV-amcatnlo-pythia8/RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1/MINIAODSIM
+#/WZZ_TuneCUETP8M1_13TeV-amcatnlo-pythia8/RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1/MINIAODSIM
+#/WWZ_TuneCUETP8M1_13TeV-amcatnlo-pythia8/RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1/MINIAODSIM
+#/WWW_4F_TuneCUETP8M1_13TeV-amcatnlo-pythia8/RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1/MINIAODSIM
+#/WWG_TuneCUETP8M1_13TeV-amcatnlo-pythia8/RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0_ext1-v3/MINIAODSIM
+#/GluGluHToZZTo4L_M125_13TeV_powheg2_JHUgenV6_pythia8/RunIISpring16MiniAODv2-PUSpring16RAWAODSIM_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v3/MINIAODSIM
+#/TTWJetsToLNu_TuneCUETP8M1_13TeV-amcatnloFXFX-madspin-pythia8/RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1/MINIAODSIM
+#/TTZToLLNuNu_M-10_TuneCUETP8M1_13TeV-amcatnlo-pythia8/RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1/MINIAODSIM
+#/ttHJetToNonbb_M125_13TeV_amcatnloFXFX_madspin_pythia8_mWCutfix/RunIISpring16MiniAODv2-PUSpring16RAWAODSIM_80X_mcRun2_asymptotic_2016_miniAODv2_v0_ext1-v2/MINIAODSIM
+#/tZq_ll_4f_13TeV-amcatnlo-pythia8_TuneCUETP8M1/RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1/MINIAODSIM
+#/VHToNonbb_M125_13TeV_amcatnloFXFX_madspin_pythia8/RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1/MINIAODSIM
+#/TTGJets_TuneCUETP8M1_13TeV-amcatnloFXFX-madspin-pythia8/RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1/MINIAODSIM
+#/TTTT_TuneCUETP8M1_13TeV-amcatnlo-pythia8/RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0_ext1-v1/MINIAODSIM
 
+
+
+
+#/pnfs/iihe/cms/ph/sc4/store/mc/RunIISpring16MiniAODv2/GluGluHToZZTo4L_M125_13TeV_powheg2_JHUgenV6_pythia8/MINIAODSIM/PUSpring16RAWAODSIM_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v3
+#/pnfs/iihe/cms/ph/sc4/store/mc/RunIISpring16MiniAODv2/ttHJetToNonbb_M125_13TeV_amcatnloFXFX_madspin_pythia8_mWCutfix/MINIAODSIM/PUSpring16RAWAODSIM_80X_mcRun2_asymptotic_2016_miniAODv2_v0_ext1-v2
+#/pnfs/iihe/cms/ph/sc4/store/mc/RunIISpring16MiniAODv2/GluGluHToZZTo4L_M125_13TeV_powheg2_JHUgenV6_pythia8/MINIAODSIM/PUSpring16RAWAODSIM_80X_mcRun2_asymptotic_2016_miniAOD_v0-v3
+#/pnfs/iihe/cms/ph/sc4/store/mc/RunIISpring16MiniAODv2/WGToLNuG_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/MINIAODSIM/PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1
 #/pnfs/iihe/cms/ph/sc4/store/mc/RunIISpring16MiniAODv2/WZTo3LNu_TuneCUETP8M1_13TeV-powheg-pythia8/MINIAODSIM/PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1
 #/pnfs/iihe/cms/ph/sc4/store/mc/RunIISpring16MiniAODv2/ZGTo2LG_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8/MINIAODSIM/PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1
 #/pnfs/iihe/cms/ph/sc4/store/mc/RunIISpring16MiniAODv2/ZGTo2LG_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8/RunIISpring16MiniAODv2-premix_withHLT_80X_mcRun2_asymptotic_v14_ext1-v1/MINIAODSIM
@@ -124,7 +154,7 @@ FAKERATE:/pnfs/iihe/cms/ph/sc4/store/mc/RunIISpring16MiniAODv2/QCD_Pt-300toInf_E
 #/pnfs/iihe/cms/ph/sc4/store/mc/RunIISpring16MiniAODv2/VHToNonbb_M125_13TeV_amcatnloFXFX_madspin_pythia8/MINIAODSIM/PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1
 #/pnfs/iihe/cms/ph/sc4/store/mc/RunIISpring16MiniAODv2/TTGJets_TuneCUETP8M1_13TeV-amcatnloFXFX-madspin-pythia8/MINIAODSIM/PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1
 #/pnfs/iihe/cms/ph/sc4/store/mc/RunIISpring16MiniAODv2/TTTT_TuneCUETP8M1_13TeV-amcatnlo-pythia8/RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0_ext1-v1/MINIAODSIM
-
+#/pnfs/iihe/cms/ph/sc4/store/mc/RunIISpring16MiniAODv2/TTTT_TuneCUETP8M1_13TeV-amcatnlo-pythia8/MINIAODSIM/PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0_ext1-v1
 
 
 #/pnfs/iihe/cms/ph/sc4/store/mc/RunIISpring16MiniAODv2/WJetsToLNu_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8/RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1/MINIAODSIM
@@ -136,4 +166,29 @@ FAKERATE:/pnfs/iihe/cms/ph/sc4/store/mc/RunIISpring16MiniAODv2/QCD_Pt-300toInf_E
 #/pnfs/iihe/cms/ph/sc4/store/mc/RunIISpring16MiniAODv2/WJetsToLNu_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/MINIAODSIM/PUSpring16RAWAODSIM_80X_mcRun2_asymptotic_2016_miniAODv2_v0_ext1-v1
 #/pnfs/iihe/cms/ph/sc4/store/mc/RunIISpring16MiniAODv2/TTJets_DiLept_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/MINIAODSIM/PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0_ext1-v1
 #/pnfs/iihe/cms/ph/sc4/store/mc/RunIISpring16MiniAODv2/TTJets_DiLept_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/MINIAODSIM/PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v4
+
+
+### DATA FR
+
+#FAKERATE:/DoubleEG/Run2016B-23Sep2016-v2/MINIAOD
+#FAKERATE:/DoubleEG/Run2016B-23Sep2016-v3/MINIAOD
+#FAKERATE:/DoubleEG/Run2016C-23Sep2016-v1/MINIAOD
+#FAKERATE:/DoubleEG/Run2016D-23Sep2016-v1/MINIAOD
+#FAKERATE:/DoubleEG/Run2016E-23Sep2016-v1/MINIAOD
+#FAKERATE:/DoubleEG/Run2016F-23Sep2016-v1/MINIAOD
+#FAKERATE:/DoubleEG/Run2016G-23Sep2016-v1/MINIAOD
+#FAKERATE:/DoubleEG/Run2016H-PromptReco-v1/MINIAOD
+#FAKERATE:/DoubleEG/Run2016H-PromptReco-v2/MINIAOD
+#FAKERATE:/DoubleEG/Run2016H-PromptReco-v3/MINIAOD
+
+#FAKERATE:/DoubleMuon/Run2016B-23Sep2016-v2/MINIAOD
+#FAKERATE:/DoubleMuon/Run2016B-23Sep2016-v3/MINIAOD
+#FAKERATE:/DoubleMuon/Run2016C-23Sep2016-v1/MINIAOD
+#FAKERATE:/DoubleMuon/Run2016D-23Sep2016-v1/MINIAOD
+#FAKERATE:/DoubleMuon/Run2016E-23Sep2016-v1/MINIAOD
+#FAKERATE:/DoubleMuon/Run2016F-23Sep2016-v1/MINIAOD
+#FAKERATE:/DoubleMuon/Run2016G-23Sep2016-v1/MINIAOD
+#FAKERATE:/DoubleMuon/Run2016H-PromptReco-v1/MINIAOD
+#FAKERATE:/DoubleMuon/Run2016H-PromptReco-v2/MINIAOD
+#FAKERATE:/DoubleMuon/Run2016H-PromptReco-v3/MINIAOD
 
