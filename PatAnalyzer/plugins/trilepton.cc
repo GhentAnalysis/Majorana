@@ -695,7 +695,7 @@ void trilepton::analyze(const edm::Event& iEvent, const edm::EventSetup& iEventS
     _eventNb   = iEvent.id().event();
     _lumiBlock = iEvent.luminosityBlock();
    
-    std::cout<<"EVENT "<<_runNb << " " << _lumiBlock << " " << _eventNb<<std::endl;
+    //std::cout<<"EVENT "<<_runNb << " " << _lumiBlock << " " << _eventNb<<std::endl;
   
     
     //============ Total number of events is the sum of the events ============
@@ -967,13 +967,13 @@ void trilepton::analyze(const edm::Event& iEvent, const edm::EventSetup& iEventS
 	      _mompdg[leptonCounter] = 0;
 	  }
         }
-	    cout<<"----------------------------  MUON after matching    ---->  "<<endl;
+	   /* cout<<"----------------------------  MUON after matching    ---->  "<<endl;
 	    cout<<"origin: "<<_origin[leptonCounter]<<endl;
 	    cout<<"reduced: "<<_originReduced[leptonCounter]<<endl;
 cout<<"RECO: ("<<_charges[leptonCounter]<<","<<_flavors[leptonCounter]<<") "<<_lPt[leptonCounter]<<" "<< _lEta[leptonCounter] <<" "<< _lPhi[leptonCounter] <<" "<<_lE[leptonCounter]  <<" mom info: "<< _mompdg[leptonCounter]<<" "<<_mompt[leptonCounter]<<endl;
 cout<<"Gen matched: "<<_lpdgmc[leptonCounter]<<" "<<_lPtmc[leptonCounter]<<" "<< _lEtamc[leptonCounter] <<" "<< _lPhimc[leptonCounter] <<" "<<_lEmc[leptonCounter]  <<" mom info: "<< _mompdg[leptonCounter]<<" "<<_mompt[leptonCounter]<<endl;
 
-
+*/
         
         leptonCounter++;
     }
@@ -1109,12 +1109,12 @@ cout<<"Gen matched: "<<_lpdgmc[leptonCounter]<<" "<<_lPtmc[leptonCounter]<<" "<<
 	      _findMatched[leptonCounter]=0;
 	  }
       }
-      cout<<"----------------------------  ELECTRON after matching    ---->  "<<endl;
+     /* cout<<"----------------------------  ELECTRON after matching    ---->  "<<endl;
 	    cout<<"origin: "<<_origin[leptonCounter]<<endl;
 	    cout<<"reduced: "<<_originReduced[leptonCounter]<<endl;
 cout<<"RECO: ("<<_charges[leptonCounter]<<","<<_flavors[leptonCounter]<<") "<<_lPt[leptonCounter]<<" "<< _lEta[leptonCounter] <<" "<< _lPhi[leptonCounter] <<" "<<_lE[leptonCounter]  <<" mom info: "<< _mompdg[leptonCounter]<<" "<<_mompt[leptonCounter]<<endl;
 cout<<"Gen matched: "<<_lpdgmc[leptonCounter]<<" "<<_lPtmc[leptonCounter]<<" "<< _lEtamc[leptonCounter] <<" "<< _lPhimc[leptonCounter] <<" "<<_lEmc[leptonCounter]  <<" mom info: "<< _mompdg[leptonCounter]<<" "<<_mompt[leptonCounter]<<endl;
-
+*/
       leptonCounter++;
       
     }
