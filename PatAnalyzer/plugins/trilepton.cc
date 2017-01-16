@@ -442,6 +442,7 @@ const edm::TriggerNames& triggerNames = iEvent.triggerNames(*trigResults);
       for(TString triggerName : toSave){
 	if(TString(triggerNames.triggerName(i)).Contains(triggerName)){
 	  triggerIndices[triggerName] = i;
+		cout<<"index before: "<<i<<endl;
 	}
       }
     }
