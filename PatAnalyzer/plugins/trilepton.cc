@@ -430,15 +430,15 @@ void trilepton::getTriggerResults(const edm::Event& iEvent, bool isHLT, edm::EDG
     return;
   }
 
-  const edm::TriggerNames& triggerNames = iEvent.triggerNames(*trigResults);
+  const edm::TriggerNames& triggerName = iEvent.triggerNames(*trigResults);
 
-
+	
   // Get full trigger list, and remember the indices of triggers we need to save
   for(TString triggerName : toSave) triggerIndices[triggerName] = -1;
   if(firstEvent_){
     std::cout << "Available triggers:" << std::endl;
     for (unsigned int i = 0; i < trigResults->size(); ++i){
-      std::cout << "  " << triggerNames.triggerName(i) << std::endl;
+      std::cout << "  " << triggerName.triggerName(i) << std::endl;
       for(TString triggerName : toSave){
 	if(TString(triggerNames.triggerName(i)).Contains(triggerName)){
 	  triggerIndices[triggerName] = i;
@@ -450,6 +450,7 @@ void trilepton::getTriggerResults(const edm::Event& iEvent, bool isHLT, edm::EDG
 
   // Save our triggers/flags
   for(TString triggerName : toSave){
+	  cout<<"to be saved:  ================ "<<triggerName<<"   index: "<<triggerIndices[triggerName]<<endl;
     if(triggerIndices[triggerName] == -1){
       triggerFlags[triggerName] = false;
       triggerPrescales[triggerName] = 0;
