@@ -451,7 +451,7 @@ const edm::TriggerNames& triggerNames = iEvent.triggerNames(*trigResults);
 
   // Save our triggers/flags
   for(TString triggerName : toSave){
-	  cout<<"to be saved:  ================ "<<triggerName<<"   index: "<<triggerIndices[triggerName]<<endl;
+	//  cout<<"to be saved:  ================ "<<triggerName<<"   index: "<<triggerIndices[triggerName]<<endl;
     if(triggerIndices[triggerName] == -1){
       triggerFlags[triggerName] = false;
       triggerPrescales[triggerName] = 0;
