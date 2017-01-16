@@ -659,7 +659,7 @@ void trilepton::analyze(const edm::Event& iEvent, const edm::EventSetup& iEventS
 	    _gen_nW= nw;
 	}
     }
-	cout << "~~~~~~~~~~~~~~~~~~~~~~~~~~ ALL GENERATOR LEPTONS ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" << endl;
+	/*cout << "~~~~~~~~~~~~~~~~~~~~~~~~~~ ALL GENERATOR LEPTONS ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" << endl;
     cout << "number of leptons : " << _gen_nL << endl;
     for(int i = 0; i < _gen_nL; ++i){
       cout << "+++++++++++++++++++++++++++" << endl;
@@ -669,7 +669,7 @@ void trilepton::analyze(const edm::Event& iEvent, const edm::EventSetup& iEventS
       else if(_gen_flavors[i] == 1 && _gen_charges[i] < 0) cout << "flavor : mu-" << endl;
       else cout << "flavor : mu+" << endl;
       cout << "+++++++++++++++++++++++++++" << endl;
-      }
+      }*/
 	
 	
 	
