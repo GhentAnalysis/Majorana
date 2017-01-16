@@ -456,8 +456,8 @@ void trilepton::getTriggerResults(const edm::Event& iEvent, bool isHLT, edm::EDG
       continue;
     }
     triggerFlags[triggerName] = trigResults->accept(triggerIndices[triggerName]);
-	  if (!triggerFlags[triggerName] ) cout<<"++++++++++++++++++++++++++++ false trigger flag: "<<triggerName<<endl;
-	   if (triggerFlags[triggerName] ) cout<<"++++++++++++++++++++++++++++ true trigger flag: "<<triggerName<<endl;
+	  if (!triggerFlags[triggerName] )  std::cout<<"++++++++++++++++++++++++++++ false trigger flag: "<<triggerName<<endl;
+	   if (triggerFlags[triggerName] )  std::cout<<"++++++++++++++++++++++++++++ true trigger flag: "<<triggerName<<endl;
 
     if(isHLT){
       triggerPrescales[triggerName] = prescales->getPrescaleForIndex(triggerIndices[triggerName]);
@@ -490,8 +490,8 @@ void trilepton::analyze(const edm::Event& iEvent, const edm::EventSetup& iEventS
             vGenNPMuons = GPM.filterByStatus(GPM.getNonPromptMuons(),1);
             vGenNPElectrons = GPM.filterByStatus(GPM.getNonPromptElectrons(),1);
 	    vGenMajorana = GPM.filterByStatus(GPM.getMajorana(),1);
-            std::cout<<"********************************************************************"<<std::endl;
-                        std::cout<<"********************************************************************"<<std::endl;
+          //  std::cout<<"********************************************************************"<<std::endl;
+          //              std::cout<<"********************************************************************"<<std::endl;
 		
             TLorentzVector Gen0;
             Gen0.SetPtEtaPhiE( 0, 0, 0, 0);
