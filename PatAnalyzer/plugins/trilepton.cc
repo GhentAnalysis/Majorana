@@ -456,6 +456,9 @@ void trilepton::getTriggerResults(const edm::Event& iEvent, bool isHLT, edm::EDG
       continue;
     }
     triggerFlags[triggerName] = trigResults->accept(triggerIndices[triggerName]);
+	  if (!triggerFlags[triggerName] ) cout<<"++++++++++++++++++++++++++++ false trigger flag: "<<triggerName<<endl;
+	   if (triggerFlags[triggerName] ) cout<<"++++++++++++++++++++++++++++ true trigger flag: "<<triggerName<<endl;
+
     if(isHLT){
       triggerPrescales[triggerName] = prescales->getPrescaleForIndex(triggerIndices[triggerName]);
     }
