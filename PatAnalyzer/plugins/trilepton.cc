@@ -443,7 +443,7 @@ const edm::TriggerNames& triggerNames = iEvent.triggerNames(*trigResults);
       for(TString triggerName : toSave){
 	if(TString(triggerNames.triggerName(i)).Contains(triggerName)){
 	  triggerIndices[triggerName] = i;
-		cout<<"index before: "<<i<<endl;
+		//cout<<"index before: "<<i<<endl;
 	}
       }
     }
@@ -461,7 +461,7 @@ const edm::TriggerNames& triggerNames = iEvent.triggerNames(*trigResults);
 	 //cout<<"to be saved:  ================ "<<triggerName<<"   index: "<<triggerIndices[triggerName]<<endl;
     triggerFlags[triggerName] = trigResults->accept(triggerIndices[triggerName]);
 	 // if (!triggerFlags[triggerName] )  std::cout<<"++++++++++++++++++++++++++++ false trigger flag: "<<triggerName<<endl;
-	   if (triggerFlags[triggerName] )  std::cout<<"++++++++++++++++++++++++++++ true trigger flag: "<<triggerName<<endl;
+	  // if (triggerFlags[triggerName] )  std::cout<<"++++++++++++++++++++++++++++ true trigger flag: "<<triggerName<<endl;
 
     if(isHLT){
       triggerPrescales[triggerName] = prescales->getPrescaleForIndex(triggerIndices[triggerName]);
