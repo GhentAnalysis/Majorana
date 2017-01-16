@@ -457,6 +457,7 @@ const edm::TriggerNames& triggerNames = iEvent.triggerNames(*trigResults);
       triggerPrescales[triggerName] = 0;
       continue;
     }
+	 cout<<"to be saved:  ================ "<<triggerName<<"   index: "<<triggerIndices[triggerName]<<endl;
     triggerFlags[triggerName] = trigResults->accept(triggerIndices[triggerName]);
 	  if (!triggerFlags[triggerName] )  std::cout<<"++++++++++++++++++++++++++++ false trigger flag: "<<triggerName<<endl;
 	   if (triggerFlags[triggerName] )  std::cout<<"++++++++++++++++++++++++++++ true trigger flag: "<<triggerName<<endl;
