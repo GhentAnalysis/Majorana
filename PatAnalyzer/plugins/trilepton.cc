@@ -434,8 +434,9 @@ const edm::TriggerNames& triggerNames = iEvent.triggerNames(*trigResults);
 
 	
   // Get full trigger list, and remember the indices of triggers we need to save
-  for(TString triggerName : toSave) triggerIndices[triggerName] = -1;
+  
   if(firstEvent_){
+	  for(TString triggerName : toSave) triggerIndices[triggerName] = -1;
     std::cout << "Available triggers:" << std::endl;
     for (unsigned int i = 0; i < trigResults->size(); ++i){
        std::cout << "  " << triggerNames.triggerName(i) << std::endl;
@@ -457,7 +458,7 @@ const edm::TriggerNames& triggerNames = iEvent.triggerNames(*trigResults);
       triggerPrescales[triggerName] = 0;
       continue;
     }
-	 cout<<"to be saved:  ================ "<<triggerName<<"   index: "<<triggerIndices[triggerName]<<endl;
+	 //cout<<"to be saved:  ================ "<<triggerName<<"   index: "<<triggerIndices[triggerName]<<endl;
     triggerFlags[triggerName] = trigResults->accept(triggerIndices[triggerName]);
 	 // if (!triggerFlags[triggerName] )  std::cout<<"++++++++++++++++++++++++++++ false trigger flag: "<<triggerName<<endl;
 	   if (triggerFlags[triggerName] )  std::cout<<"++++++++++++++++++++++++++++ true trigger flag: "<<triggerName<<endl;
