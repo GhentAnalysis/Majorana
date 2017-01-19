@@ -1316,7 +1316,7 @@ void trilepton::fillCloseJetVars(const int leptonCounter, Vertex::Point PV) {
        pJet+=vect_j;
 
               
-       double ang = ((TLorentzVector *)_leptonP4->At(leptonCounter))->DeltaR( pJet );
+       double ang = vect_j.DeltaR( pJet );
        if (ang < _closeJetAngAll[leptonCounter]) {
            _closeJetAngAll[leptonCounter] = ((TLorentzVector *)_leptonP4->At(leptonCounter))->DeltaR( pJet );
            _closeJetPtAll[leptonCounter] = pJet.Pt();
@@ -1357,7 +1357,7 @@ void trilepton::fillCloseJetVars(const int leptonCounter, Vertex::Point PV) {
     }
 
     if (_closeJetAngAll[leptonCounter] > 0.4) {
-        _closeJetPtAll[leptonCounter] = ((TLorentzVector *)_leptonP4->At(leptonCounter))->Pt();
+        _closeJetPtAll[leptonCounter] = _lPt[leptonCounter];
         //_closeJetPhiAll[leptonCounter] = ((TLorentzVector *)_leptonP4->At(leptonCounter))->Phi();
         //_closeJetEtaAll[leptonCounter] = ((TLorentzVector *)_leptonP4->At(leptonCounter))->Eta();
         //_closeJetNconstAll[leptonCounter] = 1;
@@ -1442,7 +1442,7 @@ void trilepton::fillIsoMCVars(const int leptonCounter) {
             //int id = std::abs(p->pdgId());
             if (p->status() == 1) {
                 TLorentzVector pmc; pmc.SetPtEtaPhiM( p->pt(), p->eta(), p->phi(), p->mass() );
-		TLorentzVector pm1; pm1.SetPtEtaPhiM(_lPt[leptonCounter],_lEta[leptonCounter],_lPhi[leptonCounter], _lM[leptonCounter]);
+		TLorentzVector pm1; pm1.SetPtEtaPhiE(_lPt[leptonCounter],_lEta[leptonCounter],_lPhi[leptonCounter], _lE[leptonCounter]);
                 double ang = pm1.DeltaR( pmc );
                 if (ang < 0.3) {
                     _isolationMC[leptonCounter][2]+=p->pt();
@@ -1456,7 +1456,7 @@ void trilepton::fillIsoMCVars(const int leptonCounter) {
                 }
             }
         }
-        double leptpt = pm1.Pt();
+        double leptpt = _lPt[leptonCounter];
         _isolationMC[leptonCounter][2]/=leptpt;
         _isolationMC[leptonCounter][3]/=leptpt;
         _isolationMC[leptonCounter][2]-=1;
