@@ -243,21 +243,7 @@ private:
     double _csvAll[100];
     int _closeIndex[nLeptonsMax];
     
-    
-    TClonesArray* _leptonP4;
-    TClonesArray* _gen_leptonP4;
-    TClonesArray* _gen_nuP4;
-    TClonesArray* _gen_wP4;
-    TClonesArray* _gen_majoP4;
-    TClonesArray* _gen_leptonP4_var;
-    TClonesArray* _gen_nuP4_var;
-    TClonesArray* _gen_majoP4_var;
-
-
-
-    TClonesArray* _jetP4;
-    TClonesArray* _jetAllP4;
-    
+ 
     
     int _nLeptons;
     int _nEle;
