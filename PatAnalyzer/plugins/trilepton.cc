@@ -1023,7 +1023,7 @@ cout<<"Gen matched: "<<_lpdgmc[leptonCounter]<<" "<<_lPtmc[leptonCounter]<<" "<<
 
       
  TLorentzVector vect_e;
-	vect_e.SetPtEtaPhiE(muon->pt(),muon->eta(),muon->phi(), muon->energy());
+	vect_e.SetPtEtaPhiE(electron->pt(),electron->eta(),electron->phi(), electron->energy());
 	      
       _mt[leptonCounter] = tools::MT_calc(vect_e, _met, _met_phi);
       
@@ -1118,7 +1118,7 @@ cout<<"Gen matched: "<<_lpdgmc[leptonCounter]<<" "<<_lPtmc[leptonCounter]<<" "<<
 		    
 	vect_k.SetPtEtaPhiE(_lPt[k],_lEta[k],_lPhi[k], _lE[k]);
 	
-                double dR1 = (vect_k.DeltaR( jt );
+                double dR1 = (vect_k.DeltaR( jt ));
                 //std::cout << "jet cleaning: " << dR1 << " " << ((TLorentzVector *)_leptonP4->At(k))->Pt()  << std::endl;
                 clean = clean && (dR1 > 0.4) ;
             }
@@ -1132,7 +1132,7 @@ cout<<"Gen matched: "<<_lpdgmc[leptonCounter]<<" "<<_lPtmc[leptonCounter]<<" "<<
 		 TLorentzVector vect_i;
 		    
 	vect_i.SetPtEtaPhiE(_lPt[j],_lEta[j],_lPhi[j], _lE[j]);
-            _jetDeltaR[_n_Jets][j] = (vect_i.DeltaR( jt ) ;
+            _jetDeltaR[_n_Jets][j] = (vect_i.DeltaR( jt ) );
         }
 
         _csv[_n_Jets] = SelectedJets[i]->bDiscriminator("pfCombinedInclusiveSecondaryVertexV2BJetTags");
@@ -1303,15 +1303,17 @@ void trilepton::fillCloseJetVars(const int leptonCounter, Vertex::Point PV) {
     //std::cout << "Selected Jets Number:\t"<< SelectedJetsAll.size() << std::endl;
     for(unsigned int k = 0 ; k < SelectedJetsAll.size() ;k++ ){
         double uncorrPt = (SelectedJetsAll[k]->correctedP4("Uncorrected")).Pt();
+	TLorentzVector vect_j;		    
+	vect_j.SetPtEtaPhiE(_lPt[leptonCounter],_lEta[leptonCounter],_lPhi[leptonCounter], _lE[leptonCounter]);
 
         double corr = fMetCorrector->getJetCorrectionRawPt( uncorrPt, (SelectedJetsAll[k]->correctedP4("Uncorrected")).Eta(), myRhoJECJets, SelectedJetsAll[k]->jetArea(),"L1FastJet", _runNb);
         double corr2 = fMetCorrector->getJetCorrectionRawPt( uncorrPt, (SelectedJetsAll[k]->correctedP4("Uncorrected")).Eta(), myRhoJECJets, SelectedJetsAll[k]->jetArea(),_corrLevel, _runNb);
         
        pJet.SetPtEtaPhiE( corr*uncorrPt, SelectedJetsAll[k]->eta(), SelectedJetsAll[k]->phi(), corr*(SelectedJetsAll[k]->correctedP4("Uncorrected")).E());
-       pJet-=*((TLorentzVector *)_leptonP4->At(leptonCounter));
+       pJet-=vect_j;
        
        pJet*=corr2/corr;
-       pJet+=*((TLorentzVector *)_leptonP4->At(leptonCounter));
+       pJet+=vect_j;
 
               
        double ang = ((TLorentzVector *)_leptonP4->At(leptonCounter))->DeltaR( pJet );
@@ -1440,7 +1442,8 @@ void trilepton::fillIsoMCVars(const int leptonCounter) {
             //int id = std::abs(p->pdgId());
             if (p->status() == 1) {
                 TLorentzVector pmc; pmc.SetPtEtaPhiM( p->pt(), p->eta(), p->phi(), p->mass() );
-                double ang = ((TLorentzVector *)_leptonP4->At(leptonCounter))->DeltaR( pmc );
+		TLorentzVector pm1; pm1.SetPtEtaPhiM(_lPt[leptonCounter],_lEta[leptonCounter],_lPhi[leptonCounter], _lM[leptonCounter]);
+                double ang = pm1.DeltaR( pmc );
                 if (ang < 0.3) {
                     _isolationMC[leptonCounter][2]+=p->pt();
                     if (fabs(p->pdgId())!= 12 && fabs(p->pdgId())!= 14 && fabs(p->pdgId())!= 16) {
@@ -1453,7 +1456,7 @@ void trilepton::fillIsoMCVars(const int leptonCounter) {
                 }
             }
         }
-        double leptpt = ((TLorentzVector *)_leptonP4->At(leptonCounter))->Pt();
+        double leptpt = pm1.Pt();
         _isolationMC[leptonCounter][2]/=leptpt;
         _isolationMC[leptonCounter][3]/=leptpt;
         _isolationMC[leptonCounter][2]-=1;
