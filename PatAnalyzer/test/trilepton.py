@@ -102,7 +102,7 @@ process.goodOfflinePrimaryVertices = cms.EDFilter("PrimaryVertexObjectFilter",
 
 if isData:
    import FWCore.PythonUtilities.LumiList as LumiList
-   process.source.lumisToProcess = LumiList.LumiList(filename = 'JSON/Cert_271036-280385_13TeV_PromptReco_Collisions16_JSON.txt').getVLuminosityBlockRange()
+   process.source.lumisToProcess = LumiList.LumiList(filename = 'JSON/Cert_271036-284044_13TeV_23Sep2016ReReco_Collisions16_JSON.txt').getVLuminosityBlockRange()
 
 process.p = cms.Path(process.goodOfflinePrimaryVertices
 		    *process.egmGsfElectronIDSequence
