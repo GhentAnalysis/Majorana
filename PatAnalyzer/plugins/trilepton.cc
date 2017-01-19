@@ -1318,7 +1318,7 @@ void trilepton::fillCloseJetVars(const int leptonCounter, Vertex::Point PV) {
               
        double ang = vect_j.DeltaR( pJet );
        if (ang < _closeJetAngAll[leptonCounter]) {
-           _closeJetAngAll[leptonCounter] = ((TLorentzVector *)_leptonP4->At(leptonCounter))->DeltaR( pJet );
+           _closeJetAngAll[leptonCounter] = vect_j.DeltaR( pJet );
            _closeJetPtAll[leptonCounter] = pJet.Pt();
                                   
            //_closeJetEtaAll[leptonCounter] = pJet.Eta();
