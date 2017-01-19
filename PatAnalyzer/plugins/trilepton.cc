@@ -1328,9 +1328,9 @@ void trilepton::fillCloseJetVars(const int leptonCounter, Vertex::Point PV) {
            //_closeJetNconstAll[leptonCounter] = SelectedJetsAll[k]->numberOfDaughters();
            _closeJetCSVAll[leptonCounter] = SelectedJetsAll[k]->bDiscriminator("pfCombinedInclusiveSecondaryVertexV2BJetTags");
        
-           _ptrel[leptonCounter] = ((TLorentzVector *)_leptonP4->At(leptonCounter))->Perp(pJet.Vect() - ((TLorentzVector *)_leptonP4->At(leptonCounter))->Vect());
+           _ptrel[leptonCounter] = vect_j.Perp(pJet.Vect() - (vect_j.Vect());
 
-           _ptratio[leptonCounter] = ((TLorentzVector *)_leptonP4->At(leptonCounter))->Pt()/(_closeJetPtAll[leptonCounter]);
+           _ptratio[leptonCounter] = (vect_j.Pt()/(_closeJetPtAll[leptonCounter]);
 
            _closeIndex[leptonCounter] = k;
 
