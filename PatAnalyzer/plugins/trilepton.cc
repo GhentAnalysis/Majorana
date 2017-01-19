@@ -149,38 +149,7 @@ void trilepton::beginJob()
     
     _hCounter = fs->make<TH1D>("hCounter", "Events counter", 5,0,5);
 
-    _leptonP4     = new TClonesArray("TLorentzVector", nLeptonsMax);
-    _gen_leptonP4 = new TClonesArray("TLorentzVector", nLeptonsMax);
-    _gen_nuP4     = new TClonesArray("TLorentzVector", nLeptonsMax);
-    _gen_majoP4   = new TClonesArray("TLorentzVector", nLeptonsMax);
-    _gen_majoP4   = new TClonesArray("TLorentzVector", nLeptonsMax);
-    _gen_wP4      = new TClonesArray("TLorentzVector", nLeptonsMax);
-    _jetP4        = new TClonesArray("TLorentzVector", 100); // Currently not used?
-    _jetAllP4     = new TClonesArray("TLorentzVector", 100);
-
-    for(int i=0; i!=nLeptonsMax; ++i){
-      new ((*_leptonP4)[i])     TLorentzVector();
-      new ((*_gen_leptonP4)[i]) TLorentzVector(); 
-      new ((*_gen_nuP4)[i])     TLorentzVector();
-      new ((*_gen_majoP4)[i])   TLorentzVector();
-      new ((*_gen_majoP4)[i])   TLorentzVector();
-      new ((*_gen_wP4)[i])      TLorentzVector();
-    }
-
-    for(int i=0; i!=100; ++i){
-      new ((*_jetP4)[i])    TLorentzVector();
-      new ((*_jetAllP4)[i]) TLorentzVector();
-    }
- 
-    outputTree->Branch("_leptonP4",     "TClonesArray", &_leptonP4,     32000, 0);
-    outputTree->Branch("_gen_leptonP4", "TClonesArray", &_gen_leptonP4, 32000, 0);
-    outputTree->Branch("_gen_nuP4",     "TClonesArray", &_gen_nuP4,     32000, 0);
-    outputTree->Branch("_gen_majoP4",   "TClonesArray", &_gen_majoP4,   32000, 0);
-    outputTree->Branch("_gen_majoP4",   "TClonesArray", &_gen_majoP4,   32000, 0);
-    outputTree->Branch("_gen_wP4",      "TClonesArray", &_gen_wP4,      32000, 0);
-  //outputTree->Branch("_jetP4",        "TClonesArray", &_jetP4,        32000, 0);
-  //outputTree->Branch("_jetAllP4",     "TClonesArray", &_jetAllP4,     32000, 0);
-    
+   
     outputTree->Branch("_eventNb",   &_eventNb,   "_eventNb/l");
     outputTree->Branch("_runNb",     &_runNb,     "_runNb/l");
     outputTree->Branch("_lumiBlock", &_lumiBlock, "_lumiBlock/l");
@@ -568,12 +537,10 @@ void trilepton::analyze(const edm::Event& iEvent, const edm::EventSetup& iEventS
 		  //else if(id ==15) {_gen_flavors[nL] = 2;}
 		  _gen_charges[nL] = p->charge();
 
-
-		  ((TLorentzVector *)_gen_leptonP4->At(nL))->SetPtEtaPhiE(p->pt(), p->eta(), p->phi(), p->energy());
-		  _gen_lPt[nL] = ((TLorentzVector *)_gen_leptonP4->At(nL))->Pt();
-		  _gen_lEta[nL] = ((TLorentzVector *)_gen_leptonP4->At(nL))->Eta();
-		  _gen_lPhi[nL] = ((TLorentzVector *)_gen_leptonP4->At(nL))->Phi();
-		  _gen_lE[nL] = ((TLorentzVector *)_gen_leptonP4->At(nL))->E();
+		  _gen_lPt[nL] = p->pt();
+		  _gen_lEta[nL] = p->eta();
+		  _gen_lPhi[nL] = p->phi();
+		  _gen_lE[nL] = p->energy();
 		  ++nL;
 		}
 	      }	      
@@ -584,11 +551,7 @@ void trilepton::analyze(const edm::Event& iEvent, const edm::EventSetup& iEventS
 		  _gen_nuE[nNu] = p->energy();
 		  _gen_nuEta[nNu] = p->eta();
 		  _gen_nuPhi[nNu] = p->phi();
-		  ((TLorentzVector *)_gen_nuP4->At(nNu))->SetPtEtaPhiE(p->pt(), p->eta(), p->phi(), p->energy());
-		  //_gen_lPt[nNu] = ((TLorentzVector *)_gen_nuP4->At(nNu))->Pt();
-		  //_gen_lEta[nNu] = ((TLorentzVector *)_gen_nuP4->At(nNu))->Eta();
-		  //_gen_lPhi[nNu] = ((TLorentzVector *)_gen_nuP4->At(nNu))->Phi();
-		  //_gen_lE[nNu] = ((TLorentzVector *)_gen_nuP4->At(nNu))->E();
+		  
 		  const GenParticle *mom = GPM.getMother(&*p);				//Use getmother or getmotherparton here?
 		  while( fabs(mom->pdgId()) == id && GPM.getMother(mom) != nullptr)
 		    mom = GPM.getMother(mom);
@@ -613,12 +576,7 @@ void trilepton::analyze(const edm::Event& iEvent, const edm::EventSetup& iEventS
 		  _gen_wEta[nw] = p->eta();
 		  _gen_wPhi[nw] = p->phi();
 		  if ( p->pt() == 0 &&  p->phi() == 0 && p->eta()== 0 ) continue;
-		  //if (p->eta() == TMath::Power(10,10) || p->eta() == - TMath::Power(10,10)) continue;
-		  //((TLorentzVector *)_gen_wP4->At(nw))->SetPtEtaPhiE(p->pt(), _gen_wEta[nw], p->phi(), p->energy());
-		  //_gen_lPt[nw] = ((TLorentzVector *)_gen_wP4->At(nw))->Pt();
-		  //_gen_lEta[nw] = ((TLorentzVector *)_gen_wP4->At(nw))->Eta();
-		  //_gen_lPhi[nw] = ((TLorentzVector *)_gen_wP4->At(nw))->Phi();
-		  //_gen_lE[nw] = ((TLorentzVector *)_gen_wP4->At(nw))->E();
+		  
 		  const GenParticle *mom = GPM.getMother(&*p);				//Use getmother or getmotherparton here?
 		  while( fabs(mom->pdgId()) == id && GPM.getMother(mom) != nullptr)
 		    mom = GPM.getMother(mom);
@@ -628,11 +586,7 @@ void trilepton::analyze(const edm::Event& iEvent, const edm::EventSetup& iEventS
 		  else{
 		    _gen_wmompdg[nw] = 0;  //Particles for which mompdg is 0 have no mother.
 		  }
-		  ((TLorentzVector *)_gen_wP4->At(nw))->SetPtEtaPhiE(p->pt(), p->eta(), p->phi(), p->energy());
-		  //_gen_lPt[nw] = ((TLorentzVector *)_gen_wP4->At(nw))->Pt();
-		  //_gen_lEta[nw] = ((TLorentzVector *)_gen_wP4->At(nw))->Eta();
-		 //_gen_lPhi[nw] = ((TLorentzVector *)_gen_wP4->At(nw))->Phi();
-		  //_gen_lE[nw] = ((TLorentzVector *)_gen_wP4->At(nw))->E();
+		  
 		  ++nw;
 		}
 		}
@@ -647,11 +601,7 @@ void trilepton::analyze(const edm::Event& iEvent, const edm::EventSetup& iEventS
 		  _gen_majoE[nMajo] = p->energy();
 		  _gen_majoEta[nMajo] = p->eta();
 		  _gen_majoPhi[nMajo] = p->phi();
-		  ((TLorentzVector *)_gen_majoP4->At(nMajo))->SetPtEtaPhiE(p->pt(), p->eta(), p->phi(), p->energy());
-		  _gen_majoPt[nMajo] = ((TLorentzVector *)_gen_majoP4->At(nMajo))->Pt();
-		  _gen_majoEta[nMajo] = ((TLorentzVector *)_gen_majoP4->At(nMajo))->Eta();
-		  _gen_majoPhi[nMajo] = ((TLorentzVector *)_gen_majoP4->At(nMajo))->Phi();
-		  _gen_majoE[nMajo] = ((TLorentzVector *)_gen_majoP4->At(nMajo))->E();
+		
 		  ++nMajo;
 		  //}
 	      }
