@@ -884,9 +884,10 @@ void trilepton::analyze(const edm::Event& iEvent, const edm::EventSetup& iEventS
       _istight[leptonCounter]  = muon->isTightMuon(*PVtx);
 
       //if(!_isloose[leptonCounter]) continue;
-      
-      ((TLorentzVector *)_leptonP4->At(leptonCounter))->SetPtEtaPhiE(muon->pt(), muon->eta(), muon->phi(), muon->energy());
-      _mt[leptonCounter] = tools::MT_calc(*((TLorentzVector *)_leptonP4->At(leptonCounter)), _met, _met_phi);
+      TLorentzVector vect;
+	vect.SetPtEtaPhiE(muon->pt(),muon->eta(),muon->phi(), muon->energy());
+	    
+      _mt[leptonCounter] = tools::MT_calc(vect, _met, _met_phi);
 
       // So for some reason, here we are adding again the same stuff to out tree
       _lPt[leptonCounter]  = muon->pt();
@@ -1021,9 +1022,10 @@ cout<<"Gen matched: "<<_lpdgmc[leptonCounter]<<" "<<_lPtmc[leptonCounter]<<" "<<
       //if(_3dIPsig[leptonCounter] > 4) continue;
 
       
-      ((TLorentzVector *)_leptonP4->At(leptonCounter))->SetPtEtaPhiE(electron->pt(), electron->eta(), electron->phi(), electron->energy());
-      
-      _mt[leptonCounter] = tools::MT_calc(*((TLorentzVector *)_leptonP4->At(leptonCounter)), _met, _met_phi);
+ TLorentzVector vect_e;
+	vect_e.SetPtEtaPhiE(muon->pt(),muon->eta(),muon->phi(), muon->energy());
+	      
+      _mt[leptonCounter] = tools::MT_calc(vect_e, _met, _met_phi);
       
       _lPt[leptonCounter]  = electron->pt();
       _lEta[leptonCounter] = electron->eta();
@@ -1112,7 +1114,11 @@ cout<<"Gen matched: "<<_lpdgmc[leptonCounter]<<" "<<_lPtmc[leptonCounter]<<" "<<
         bool clean = true;
         for (int k=0; k!=_nLeptons; ++k) {
             if (_isloose[k] && _lPt[k] > 10){
-                double dR1 = ((TLorentzVector *)_leptonP4->At(k))->DeltaR( jt );
+		 TLorentzVector vect_k;
+		    
+	vect_k.SetPtEtaPhiE(_lPt[k],_lEta[k],_lPhi[k], _lE[k]);
+	
+                double dR1 = (vect_k.DeltaR( jt );
                 //std::cout << "jet cleaning: " << dR1 << " " << ((TLorentzVector *)_leptonP4->At(k))->Pt()  << std::endl;
                 clean = clean && (dR1 > 0.4) ;
             }
@@ -1123,7 +1129,10 @@ cout<<"Gen matched: "<<_lpdgmc[leptonCounter]<<" "<<_lPtmc[leptonCounter]<<" "<<
         
 
         for(int j=0; j != _nLeptons; ++j){
-            _jetDeltaR[_n_Jets][j] = ((TLorentzVector *)_leptonP4->At(j))->DeltaR( jt ) ;
+		 TLorentzVector vect_i;
+		    
+	vect_i.SetPtEtaPhiE(_lPt[j],_lEta[j],_lPhi[j], _lE[j]);
+            _jetDeltaR[_n_Jets][j] = (vect_i.DeltaR( jt ) ;
         }
 
         _csv[_n_Jets] = SelectedJets[i]->bDiscriminator("pfCombinedInclusiveSecondaryVertexV2BJetTags");
