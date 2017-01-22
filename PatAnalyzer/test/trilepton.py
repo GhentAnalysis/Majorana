@@ -33,8 +33,9 @@ process.maxEvents = cms.untracked.PSet(input = cms.untracked.int32(nEvents)) # f
 
 process.load("Configuration.StandardSequences.FrontierConditions_GlobalTag_cff")
 
-if isData: process.GlobalTag.globaltag = '80X_dataRun2_Prompt_ICHEP16JEC_v0'
-else:      process.GlobalTag.globaltag = '80X_mcRun2_asymptotic_2016_miniAODv2'
+if isData: process.GlobalTag.globaltag = '80X_dataRun2_2016SeptRepro_v4'
+#else:      process.GlobalTag.globaltag = '80X_mcRun2_asymptotic_2016_miniAODv2'
+else:	   process.GlobalTag.globaltag = '80X_dataRun2_2016SeptRepro_v4'
 
 #process.load("Configuration.StandardSequences.Geometry_cff")
 process.load("Configuration.StandardSequences.GeometryRecoDB_cff")
