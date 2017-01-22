@@ -1166,7 +1166,7 @@ cout<<"Gen matched: "<<_lpdgmc[leptonCounter]<<" "<<_lPtmc[leptonCounter]<<" "<<
     // Here we make the decision on what to save
     if(treeForFakeRate){
       //if(_nLeptons < 3) return; // for FR in ttbar sample 
-      if (!triggerFlags["HLT_Mu3_PFJet40_v"]  && !triggerFlags["HLT_Mu8_v"] && !triggerFlags["HLT_Mu17_v"] && !triggerFlags["HLT_Ele12_CaloIdL_TrackIdL_IsoVL_PFJet30_v"]) return;
+      if (!triggerFlags["HLT_Mu3_PFJet40_v"]  && !triggerFlags["HLT_Mu8_v"] && !triggerFlags["HLT_Mu17_v"] && !triggerFlags["HLT_Ele12_CaloIdL_TrackIdL_IsoVL_PFJet30_v"] && !triggerFlags["HLT_Ele18_CaloIdL_TrackIdL_IsoVL_PFJet30_v"] && !triggerFlags["HLT_Ele23_CaloIdL_TrackIdL_IsoVL_PFJet30_v"] && !triggerFlags["HLT_Ele33_CaloIdL_TrackIdL_IsoVL_PFJet30_v"] && !triggerFlags["HLT_Ele12_CaloIdL_TrkIdL_IsoVL_v"] && !triggerFlags["HLT_Ele17_CaloIdL_TrackIdL_IsoVL_v"] && !triggerFlags["HLT_Ele23_CaloIdL_TrackIdL_IsoVL_v"] && !triggerFlags["HLT_Ele8_CaloIdM_TrackIdM_PFJet30_v"] && !triggerFlags["HLT_Ele12_CaloIdM_TrackIdM_PFJet30_v"] && !triggerFlags["HLT_Ele18_CaloIdM_TrackIdM_PFJet30_v"] && !triggerFlags["HLT_Ele23_CaloIdM_TrackIdM_PFJet30_v"] && !triggerFlags["HLT_Ele33_CaloIdM_TrackIdM_PFJet30_v"]) return;
 
 	if(_nLeptons != 1)       return;
       if(_n_Jets < 1)          return;				// For fake rate tree: exactly 1 loose lepton + at least 1 jet
