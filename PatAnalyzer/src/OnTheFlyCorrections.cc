@@ -1,4 +1,4 @@
-#include "SUSYAnalyzer/PatAnalyzer/interface/OnTheFlyCorrections.hh"
+#include "Majorana/PatAnalyzer/interface/OnTheFlyCorrections.hh"
 #include "FWCore/ParameterSet/interface/FileInPath.h"
 #include <math.h>
 
