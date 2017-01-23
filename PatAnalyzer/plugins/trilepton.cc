@@ -1173,6 +1173,41 @@ cout<<"Gen matched: "<<_lpdgmc[leptonCounter]<<" "<<_lPtmc[leptonCounter]<<" "<<
       if(_jetPt[0] < 30)       return;				// with deltaR(j, l) > 1 (back-to-back)
       if(_jetDeltaR[0][0] < 1) return;
     } else {
+	    if (!triggerFlags["HLT_TripleMu_12_10_5"] &&  !triggerFlags["HLT_DiMu9_Ele9_CaloIdL_TrackIdL"] &&  !triggerFlags["HLT_Mu8_DiEle12_CaloIdL_TrackIdL"] &&  !triggerFlags["HLT_Ele16_Ele12_Ele8_CaloIdL_TrackIdL"] &&
+!triggerFlags["HLT_TripleMu_5_3_3_DZ_Mass3p8"] && 													!triggerFlags["HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ"] &&  !triggerFlags["HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL_DZ"] &&  !triggerFlags["HLT_TkMu17_TrkIsoVVL_TkMu8_TrkIsoVVL_DZ"] &&
+!triggerFlags["HLT_Mu30_TkMu11"] &&  !triggerFlags["HLT_Mu40_TkMu11"] && 
+!triggerFlags["HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL"] &&     !triggerFlags["HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL"] &&     !triggerFlags["HLT_TkMu17_TrkIsoVVL_TkMu8_TrkIsoVVL"] &&
+!triggerFlags["HLT_Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_DZ"] &&
+!triggerFlags["HLT_Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_DZ"] &&  !triggerFlags["HLT_Mu23_TrkIsoVVL_Ele8_CaloIdL_TrackIdL_IsoVL_DZ"] && 
+!triggerFlags["HLT_Mu8_TrkIsoVVL_Ele17_CaloIdL_TrackIdL_IsoVL"] && 				!triggerFlags["HLT_DoubleEle37_Ele27_CaloIdL_GsfTrkIdVL"] &&  !triggerFlags["HLT_Ele23_Ele12_CaloIdL_TrackIdL_IsoVL_DZ"] &&  !triggerFlags["HLT_DoubleEle24_22_eta2p1_WPLoose_Gsf"] &&
+!triggerFlags["HLT_DoubleEle33_CaloIdL_GsfTrkIdVL"] && 
+!triggerFlags["HLT_Ele23_Ele12_CaloIdL_TrackIdL_IsoVL"] && 	!triggerFlags["HLT_Ele17_Ele12_CaloIdL_TrackIdL_IsoVL"] &&  !triggerFlags["HLT_Ele17_Ele12_CaloIdL_TrackIdL_IsoVL_DZ"] &&
+!triggerFlags["HLT_DoubleEle33_CaloIdL_GsfTrkIdVL"] && 
+!triggerFlags["HLT_Mu50"] &&  !triggerFlags["HLT_TkMu50"] &&  !triggerFlags["HLT_IsoMu27"] &&  !triggerFlags["HLT_IsoTkMu27"] &&
+!triggerFlags["HLT_IsoMu24"] &&  !triggerFlags["HLT_IsoTkMu24"] &&  !triggerFlags["HLT_IsoMu24_eta2p1"] &&  !triggerFlags["HLT_IsoTkMu24_eta2p1"] && 
+!triggerFlags["HLT_IsoMu22_eta2p1"] &&  !triggerFlags["HLT_IsoTkMu22_eta2p1"] && 
+!triggerFlags["HLT_IsoTkMu22"] &&  !triggerFlags["HLT_Mu45_eta2p1"] && 													!triggerFlags["HLT_Ele32_WPTight_Gsf"] &&  !triggerFlags["HLT_Ele32_eta2p1_WPTight_Gsf"] &&  !triggerFlags["HLT_Ele30_WPTight_Gsf"] &&  !triggerFlags["HLT_Ele30_eta2p1_WPTight_Gsf"] &&
+!triggerFlags["HLT_Ele27_WPTight_Gsf"] &&  !triggerFlags["HLT_Ele27_eta2p1_WPTight_Gsf"] &&  !triggerFlags["HLT_Ele27_eta2p1_WPLoose_Gsf"] &&  !triggerFlags["HLT_Ele25_eta2p1_WPTight_Gsf"] && 
+!triggerFlags["HLT_Ele25_WPTight_Gsf"] &&
+!triggerFlags["HLT_Ele8_CaloIdM_TrackIdM_PFJet30"] && !triggerFlags["HLT_Ele12_CaloIdM_TrackIdM_PFJet30"] && 	!triggerFlags["HLT_Ele8_CaloIdM_TrackIdM_IsoVL_PFJet30"] && !triggerFlags["HLT_Ele12_CaloIdM_TrackIdM_IsoVL_PFJet30"] &&
+
+!triggerFlags["HLT_Mu8_TrkIsoVVL_v"] && !triggerFlags["HLT_Mu17_TrkIsoVVL_v"] && !triggerFlags["HLT_Mu24_TrkIsoVVL_v"] && !triggerFlags["HLT_Mu34_TrkIsoVVL_v"] &&
+
+!triggerFlags["HLT_Ele8_CaloIdM_TrackIdM_PFJet30_v"] && !triggerFlags["HLT_Ele12_CaloIdM_TrackIdM_PFJet30_v"] && !triggerFlags["HLT_Ele18_CaloIdM_TrackIdM_PFJet30_v"] && 
+!triggerFlags["HLT_Ele23_CaloIdM_TrackIdM_PFJet30_v"] && !triggerFlags["HLT_Ele33_CaloIdM_TrackIdM_PFJet30_v"] && 
+
+!triggerFlags["HLT_Mu3_PFJet40_v"] && 
+!triggerFlags["HLT_Mu8_v"] && !triggerFlags["HLT_Mu17_v"] && !triggerFlags["HLT_Mu24_v"] && !triggerFlags["HLT_Mu34_v"] && 
+
+!triggerFlags["HLT_Ele12_CaloIdL_TrackIdL_IsoVL_PFJet30_v"] && !triggerFlags["HLT_Ele18_CaloIdL_TrackIdL_IsoVL_PFJet30_v"] && 
+!triggerFlags["HLT_Ele23_CaloIdL_TrackIdL_IsoVL_PFJet30_v"] && !triggerFlags["HLT_Ele33_CaloIdL_TrackIdL_IsoVL_PFJet30_v"] && 
+
+!triggerFlags["HLT_Ele12_CaloIdL_TrkIdL_IsoVL_v"] && !triggerFlags["HLT_Ele17_CaloIdL_TrackIdL_IsoVL_v"] && 
+    !triggerFlags["HLT_Ele23_CaloIdL_TrackIdL_IsoVL_v"]) return;
+	    
+	    
+	    
+	    
       if(_nLeptons < 3) return;
     }
 		//if(_nLeptons < 3) return;
