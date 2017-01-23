@@ -25,7 +25,7 @@ std::string getRunName(int runNumber){
   if(runNumber < 1)           return "_MC";
   else if(runNumber < 276811) return "BCD_DATA";
   else if(runNumber < 277420) return "E_DATA";
-  else if(runNumber < 278801) return "E_DATA";
+  else if(runNumber < 278801) return "F_DATA";
   else                        return "p2_DATA";
 
 }
