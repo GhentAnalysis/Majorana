@@ -1,12 +1,12 @@
-#include "Majorana/PatAnalyzer/interface/OnTheFlyCorrections.hh"
+#include "SUSYAnalyzer/PatAnalyzer/interface/OnTheFlyCorrections.hh"
 #include "FWCore/ParameterSet/interface/FileInPath.h"
 #include <math.h>
 
 
 OnTheFlyCorrections::OnTheFlyCorrections(std::string path, std::string gt, bool isdata){
         std::vector<std::string> runs;
-        if(isdata) runs = {"BCD_DATA", "E_DATA", "F_DATA", "p2_DATA"};
-        else       runs = {"_MC"};
+        if(isdata) runs = {"BCDV2_DATA", "EFV2_DATA", "GV2_DATA", "HV2_DATA"};
+        else       runs = {"V2_MC"};
 
         for(std::string run : runs){
 	  jetUncertainties[run] = new JetCorrectionUncertainty(edm::FileInPath(path+gt+run+"_Uncertainty_AK4PFchs.txt").fullPath());
@@ -21,12 +21,12 @@ OnTheFlyCorrections::OnTheFlyCorrections(std::string path, std::string gt, bool 
         fIsData = isdata;
 }
 
-std::string getRunName(int runNumber){
-  if(runNumber < 1)           return "_MC";
-  else if(runNumber < 276811) return "BCD_DATA";
-  else if(runNumber < 277420) return "E_DATA";
-  else if(runNumber < 278801) return "F_DATA";
-  else                        return "p2_DATA";
+std::string getRunName(unsigned long runNumber){
+  if(runNumber < 1)           return "V2_MC";
+  else if(runNumber < 276812) return "BCDV2_DATA";
+  else if(runNumber < 278809) return "EFV2_DATA";
+  else if(runNumber < 280385) return "GV2_DATA";
+  else                        return "HV2_DATA";
 
 }
 
