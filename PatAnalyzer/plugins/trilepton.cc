@@ -354,7 +354,7 @@ void trilepton::beginJob()
     
     GPM = GenParticleManager();
 
-    fMetCorrector = new OnTheFlyCorrections("Majorana/PatAnalyzer/data/", "Spring16_25nsV10", isData);
+    fMetCorrector = new OnTheFlyCorrections("Majorana/PatAnalyzer/data/", "Spring16_23Sep2016V2", isData);
     if (isData) _corrLevel = "L2L3Residual";
     else        _corrLevel = "L3Absolute";
 
