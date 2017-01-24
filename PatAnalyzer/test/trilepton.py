@@ -35,7 +35,7 @@ process.load("Configuration.StandardSequences.FrontierConditions_GlobalTag_cff")
 
 if isData: process.GlobalTag.globaltag = '80X_dataRun2_2016SeptRepro_v4'
 #else:      process.GlobalTag.globaltag = '80X_mcRun2_asymptotic_2016_miniAODv2'
-else:	   process.GlobalTag.globaltag = '80X_dataRun2_2016SeptRepro_v4'
+else:	   process.GlobalTag.globaltag = '80X_mcRun2_asymptotic_2016_TrancheIV_v6'
 
 #process.load("Configuration.StandardSequences.Geometry_cff")
 process.load("Configuration.StandardSequences.GeometryRecoDB_cff")
