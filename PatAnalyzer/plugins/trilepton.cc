@@ -358,7 +358,7 @@ void trilepton::beginJob()
     if (isData) _corrLevel = "L2L3Residual";
     else        _corrLevel = "L3Absolute";
 
-    jecUnc = new JetCorrectionUncertainty(edm::FileInPath("Majorana/PatAnalyzer/data/Spring16_25nsV10_MC_Uncertainty_AK4PFchs.txt").fullPath());
+    jecUnc = new JetCorrectionUncertainty(edm::FileInPath("Majorana/PatAnalyzer/data/Spring16_23Sep2016V2_MC_Uncertainty_AK4PFchs.txt").fullPath());
     
     for(TString wp : {"VT","T","M","L","VL"}){
       leptonWorkingPoints["multiIsolation" + wp] = new std::vector<bool>();
