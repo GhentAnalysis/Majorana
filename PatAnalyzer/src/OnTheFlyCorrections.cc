@@ -34,9 +34,9 @@ std::string getRunName(unsigned long runNumber){
 float OnTheFlyCorrections::getJECUncertainty(float pt, float eta, int runnumber){
 	if      (eta> 5.0) eta = 5.0;
 	else if (eta<-5.0) eta =-5.0;
-	jetUncertainties[fIsData ? getRunName(runnumber) : "_MC"]->setJetPt(pt);
-	jetUncertainties[fIsData ? getRunName(runnumber) : "_MC"]->setJetEta(eta);
-	return jetUncertainties[fIsData ? getRunName(runnumber) : "_MC"]->getUncertainty(true);
+	jetUncertainties[fIsData ? getRunName(runnumber) : "V2_MC"]->setJetPt(pt);
+	jetUncertainties[fIsData ? getRunName(runnumber) : "V2_MC"]->setJetEta(eta);
+	return jetUncertainties[fIsData ? getRunName(runnumber) : "V2_MC"]->getUncertainty(true);
 }
 
 float OnTheFlyCorrections::getJetCorrection(float pt, float corr, float eta, float rho, float area, std::string level = "L3Absolute"){
@@ -46,7 +46,7 @@ float OnTheFlyCorrections::getJetCorrection(float pt, float corr, float eta, flo
 
 float OnTheFlyCorrections::getJetCorrectionRawPt(float rawpt, float eta, float rho, float area, std::string level = "L3Absolute", int runnumber){
 	// slighly redundant considering we have what we have below, but I think that's what frederic was thinking about
-        FactorizedJetCorrector* jetCorrector = jetCorrectors[fIsData ? getRunName(runnumber) : "_MC"];
+        FactorizedJetCorrector* jetCorrector = jetCorrectors[fIsData ? getRunName(runnumber) : "V2_MC"];
 	jetCorrector->setJetEta(eta);
 	jetCorrector->setRho(rho);
 	jetCorrector->setJetA(area);
@@ -63,7 +63,7 @@ float OnTheFlyCorrections::getJetCorrectionRawPt(float rawpt, float eta, float r
 
 std::pair<float,float> OnTheFlyCorrections::getCorrections(float rawpt, float raweta, float rawnomupt, float phi, float emf, float rho, float area, int runnumber) {
   std::pair<float, float> corr = std::pair<float, float>(0, 0);
-  FactorizedJetCorrector* jetCorrector = jetCorrectors[fIsData ? getRunName(runnumber) : "_MC"];
+  FactorizedJetCorrector* jetCorrector = jetCorrectors[fIsData ? getRunName(runnumber) : "V2_MC"];
   jetCorrector->setJetEta(raweta);
   jetCorrector->setRho(rho);
   jetCorrector->setJetA(area);
