@@ -102,6 +102,8 @@ trilepton::trilepton(const edm::ParameterSet & iConfig) :
                       "HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL",    "HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL",    "HLT_TkMu17_TrkIsoVVL_TkMu8_TrkIsoVVL",			// mumu prescaled
                       "HLT_Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_DZ", 											// mue
                       "HLT_Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_DZ", "HLT_Mu23_TrkIsoVVL_Ele8_CaloIdL_TrackIdL_IsoVL_DZ",
+                      "HLT_Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL", "HLT_Mu23_TrkIsoVVL_Ele8_CaloIdL_TrackIdL_IsoVL",					// mue prescaled
+                      "HLT_Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL",
                       "HLT_Mu8_TrkIsoVVL_Ele17_CaloIdL_TrackIdL_IsoVL",												// mue partially off
                       "HLT_DoubleEle37_Ele27_CaloIdL_GsfTrkIdVL", "HLT_Ele23_Ele12_CaloIdL_TrackIdL_IsoVL_DZ", "HLT_DoubleEle24_22_eta2p1_WPLoose_Gsf",		// ee
                       "HLT_DoubleEle33_CaloIdL_GsfTrkIdVL",
