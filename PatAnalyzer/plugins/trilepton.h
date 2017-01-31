@@ -165,6 +165,7 @@ private:
     edm::EDGetTokenT<LHEEventProduct>                IT_externalLHEProducer;
     bool isData;
     bool treeForFakeRate;
+    bool singleLep;
     std::string SampleName;
 
 

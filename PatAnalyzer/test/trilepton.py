@@ -2,10 +2,12 @@ import sys
 import FWCore.ParameterSet.Config as cms
 from RecoTauTag.RecoTau.PFRecoTauQualityCuts_cfi import PFTauQualityCuts
 
-isData          = False
+isData          = True
 treeForFakeRate = False
-inputFile       = "file:///user/mvit/public/Majorana/MajoranaNeutrino_trilepton_M-10_5f_NLO/Majorana_trilepton_RunIISpring16MiniAODv2_96.root"
-nEvents         = -1
+singleLep       = False
+#inputFile       = "file:///user/mvit/public/Majorana/MajoranaNeutrino_trilepton_M-10_5f_NLO/Majorana_trilepton_RunIISpring16MiniAODv2_96.root"
+inputFile       = "/store/data/Run2016H/SingleElectron/MINIAOD/PromptReco-v3/000/284/037/00000/54D1BAE3-BD9F-E611-9E45-02163E012706.root"
+nEvents         = 10
 outputFile      = None
 
 def getVal(arg):
@@ -16,6 +18,7 @@ for i in range(1,len(sys.argv)):
     print "[arg "+str(i)+"] : ", sys.argv[i]
     if   "isData"          in sys.argv[i]: isData          = (getVal(sys.argv[i]) == "True")
     elif "treeForFakeRate" in sys.argv[i]: treeForFakeRate = (getVal(sys.argv[i]) == "True")
+    elif "singleLep"       in sys.argv[i]: singleLep       = (getVal(sys.argv[i]) == "True")
     elif "output"          in sys.argv[i]: outputFile      = getVal(sys.argv[i])
     elif "input"           in sys.argv[i]: inputFile       = getVal(sys.argv[i])
     elif "events"          in sys.argv[i]: nEvents         = int(getVal(sys.argv[i]))
@@ -57,6 +60,7 @@ for idmod in my_id_modules:
 
 if not outputFile:
   if treeForFakeRate: outputFile = 'fakeRate.root'
+  if singleLep:       outputFile = 'singleLep.root'
   else:               outputFile = 'trilepton.root'
 process.TFileService = cms.Service("TFileService", fileName = cms.string(outputFile))
 
@@ -91,6 +95,7 @@ process.trileptonProducer = cms.EDAnalyzer("trilepton",
                                            triggerResultsRECO                     = cms.InputTag("TriggerResults::RECO"),
 					   exernalLHEPLabel                       = cms.InputTag("externalLHEProducer"),
                                            treeForFakeRate                        = cms.untracked.bool(treeForFakeRate),
+                                           singleLep                              = cms.untracked.bool(singleLep),
 					   )
 
 process.goodOfflinePrimaryVertices = cms.EDFilter("PrimaryVertexObjectFilter",

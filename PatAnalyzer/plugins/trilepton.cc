@@ -71,6 +71,7 @@ trilepton::trilepton(const edm::ParameterSet & iConfig) :
   IT_externalLHEProducer(                consumes<LHEEventProduct>(               iConfig.getParameter<edm::InputTag>("exernalLHEPLabel"))),
   isData(                                                                         iConfig.getUntrackedParameter<bool>("isData")),
   treeForFakeRate(                                                                iConfig.getUntrackedParameter<bool>("treeForFakeRate")),
+  singleLep(                                                                      iConfig.getUntrackedParameter<bool>("singleLep")),
   SampleName(                                                                     iConfig.getUntrackedParameter<std::string>("SampleName")),
   _relIsoCutE(999.),//0.15
   _relIsoCutMu(999.),//0.15
@@ -105,7 +106,6 @@ trilepton::trilepton(const edm::ParameterSet & iConfig) :
                       "HLT_DoubleEle37_Ele27_CaloIdL_GsfTrkIdVL", "HLT_Ele23_Ele12_CaloIdL_TrackIdL_IsoVL_DZ", "HLT_DoubleEle24_22_eta2p1_WPLoose_Gsf",		// ee
                       "HLT_DoubleEle33_CaloIdL_GsfTrkIdVL",
                       "HLT_Ele23_Ele12_CaloIdL_TrackIdL_IsoVL",	"HLT_Ele17_Ele12_CaloIdL_TrackIdL_IsoVL", "HLT_Ele17_Ele12_CaloIdL_TrackIdL_IsoVL_DZ",		// ee prescaled
-                      "HLT_DoubleEle33_CaloIdL_GsfTrkIdVL",
                       "HLT_Mu50", "HLT_TkMu50", "HLT_IsoMu27", "HLT_IsoTkMu27", 										// mu
                       "HLT_IsoMu24", "HLT_IsoTkMu24", "HLT_IsoMu24_eta2p1", "HLT_IsoTkMu24_eta2p1",
                       "HLT_IsoMu22_eta2p1", "HLT_IsoTkMu22_eta2p1",
@@ -116,21 +116,19 @@ trilepton::trilepton(const edm::ParameterSet & iConfig) :
                       "HLT_Ele8_CaloIdM_TrackIdM_PFJet30","HLT_Ele12_CaloIdM_TrackIdM_PFJet30",									// e + PF jet (for fake rate measurment)
                       "HLT_Ele8_CaloIdM_TrackIdM_IsoVL_PFJet30","HLT_Ele12_CaloIdM_TrackIdM_IsoVL_PFJet30",
 		      
-		     "HLT_Mu8_TrkIsoVVL_v","HLT_Mu17_TrkIsoVVL_v","HLT_Mu24_TrkIsoVVL_v","HLT_Mu34_TrkIsoVVL_v", // FR
+	 	      "HLT_Mu8_TrkIsoVVL","HLT_Mu17_TrkIsoVVL","HLT_Mu24_TrkIsoVVL","HLT_Mu34_TrkIsoVVL", // FR
 		      
-		     "HLT_Ele8_CaloIdM_TrackIdM_PFJet30_v","HLT_Ele12_CaloIdM_TrackIdM_PFJet30_v","HLT_Ele18_CaloIdM_TrackIdM_PFJet30_v",
-		      "HLT_Ele23_CaloIdM_TrackIdM_PFJet30_v","HLT_Ele33_CaloIdM_TrackIdM_PFJet30_v",
+		      "HLT_Ele18_CaloIdM_TrackIdM_PFJet30",
+		      "HLT_Ele23_CaloIdM_TrackIdM_PFJet30","HLT_Ele33_CaloIdM_TrackIdM_PFJet30",
 		      
-		      "HLT_Mu3_PFJet40_v",
-		      "HLT_Mu8_v","HLT_Mu17_v","HLT_Mu24_v","HLT_Mu34_v",
+		      "HLT_Mu3_PFJet40",
+		      "HLT_Mu8","HLT_Mu17","HLT_Mu24","HLT_Mu34",
 		      
-		      "HLT_Ele12_CaloIdL_TrackIdL_IsoVL_PFJet30_v","HLT_Ele18_CaloIdL_TrackIdL_IsoVL_PFJet30_v",
-		      "HLT_Ele23_CaloIdL_TrackIdL_IsoVL_PFJet30_v","HLT_Ele33_CaloIdL_TrackIdL_IsoVL_PFJet30_v",
+		      "HLT_Ele12_CaloIdL_TrackIdL_IsoVL_PFJet30","HLT_Ele18_CaloIdL_TrackIdL_IsoVL_PFJet30",
+		      "HLT_Ele23_CaloIdL_TrackIdL_IsoVL_PFJet30","HLT_Ele33_CaloIdL_TrackIdL_IsoVL_PFJet30",
 		      
-		      "HLT_Ele12_CaloIdL_TrkIdL_IsoVL_v","HLT_Ele17_CaloIdL_TrackIdL_IsoVL_v",
-		      "HLT_Ele23_CaloIdL_TrackIdL_IsoVL_v"
-		      
-		      
+		      "HLT_Ele12_CaloIdL_TrkIdL_IsoVL","HLT_Ele17_CaloIdL_TrackIdL_IsoVL",
+		      "HLT_Ele23_CaloIdL_TrackIdL_IsoVL"
 		     };
     filtersToSave  = {"Flag_HBHENoiseFilter", "Flag_HBHENoiseIsoFilter", "Flag_EcalDeadCellTriggerPrimitiveFilter", "Flag_goodVertices", "Flag_eeBadScFilter", "Flag_globalTightHalo2016Filter"};
 }
@@ -399,20 +397,18 @@ void trilepton::getTriggerResults(const edm::Event& iEvent, bool isHLT, edm::EDG
     return;
   }
 
-const edm::TriggerNames& triggerNames = iEvent.triggerNames(*trigResults);
+  const edm::TriggerNames& triggerNames = iEvent.triggerNames(*trigResults);
 
-	
   // Get full trigger list, and remember the indices of triggers we need to save
-  
   if(firstEvent_){
-	  for(TString triggerName : toSave) triggerIndices[triggerName] = -1;
+    for(TString triggerName : toSave) triggerIndices[triggerName] = -1;
     std::cout << "Available triggers:" << std::endl;
     for (unsigned int i = 0; i < trigResults->size(); ++i){
-       std::cout << "  " << triggerNames.triggerName(i) << std::endl;
+      std::cout << "  " << triggerNames.triggerName(i) << std::endl;
       for(TString triggerName : toSave){
-	if(TString(triggerNames.triggerName(i)).Contains(triggerName)){
+	if(TString(triggerNames.triggerName(i)).Contains(triggerName + "_v")){
 	  triggerIndices[triggerName] = i;
-		//cout<<"index before: "<<i<<endl;
+          std::cout << "     --> index: " << i << std::endl;
 	}
       }
     }
@@ -421,17 +417,12 @@ const edm::TriggerNames& triggerNames = iEvent.triggerNames(*trigResults);
 
   // Save our triggers/flags
   for(TString triggerName : toSave){
-	//  cout<<"to be saved:  ================ "<<triggerName<<"   index: "<<triggerIndices[triggerName]<<endl;
     if(triggerIndices[triggerName] == -1){
       triggerFlags[triggerName] = false;
-      triggerPrescales[triggerName] = 0;
+      triggerPrescales[triggerName] = -1;
       continue;
     }
-	 //cout<<"to be saved:  ================ "<<triggerName<<"   index: "<<triggerIndices[triggerName]<<endl;
     triggerFlags[triggerName] = trigResults->accept(triggerIndices[triggerName]);
-	 // if (!triggerFlags[triggerName] )  std::cout<<"++++++++++++++++++++++++++++ false trigger flag: "<<triggerName<<endl;
-	   //if (triggerFlags[triggerName] )  std::cout<<"++++++++++++++++++++++++++++ true trigger flag: "<<triggerName<<endl;
-
     if(isHLT){
       triggerPrescales[triggerName] = prescales->getPrescaleForIndex(triggerIndices[triggerName]);
     }
@@ -986,7 +977,7 @@ cout<<"Gen matched: "<<_lpdgmc[leptonCounter]<<" "<<_lPtmc[leptonCounter]<<" "<<
      }	    
 	    
 	    
-      bool MVAlooseFR = tools::passed_loose_MVA_FR_slidingCut(&*electron, _mvaValue[leptonCounter]);	    
+      //bool MVAlooseFR = tools::passed_loose_MVA_FR_slidingCut(&*electron, _mvaValue[leptonCounter]);	    
       //if (!MVAlooseFR) continue;
       //bool crossCheckTight = tools::isTightCutBasedElectronWithoutIsolation(&*electron, false) and tools::pfRelIso(&*electron, myRhoJECJets) < (electron->isEB() ? 0.0588 : 0.0571);
 
@@ -1166,55 +1157,16 @@ cout<<"Gen matched: "<<_lpdgmc[leptonCounter]<<" "<<_lPtmc[leptonCounter]<<" "<<
     // Here we make the decision on what to save
     if(treeForFakeRate){
       //if(_nLeptons < 3) return; // for FR in ttbar sample 
-      if (!triggerFlags["HLT_Mu3_PFJet40_v"]  && !triggerFlags["HLT_Mu8_v"] && !triggerFlags["HLT_Mu17_v"] && !triggerFlags["HLT_Ele12_CaloIdL_TrackIdL_IsoVL_PFJet30_v"] && !triggerFlags["HLT_Ele18_CaloIdL_TrackIdL_IsoVL_PFJet30_v"] && !triggerFlags["HLT_Ele23_CaloIdL_TrackIdL_IsoVL_PFJet30_v"] && !triggerFlags["HLT_Ele33_CaloIdL_TrackIdL_IsoVL_PFJet30_v"] && !triggerFlags["HLT_Ele12_CaloIdL_TrkIdL_IsoVL_v"] && !triggerFlags["HLT_Ele17_CaloIdL_TrackIdL_IsoVL_v"] && !triggerFlags["HLT_Ele23_CaloIdL_TrackIdL_IsoVL_v"] && !triggerFlags["HLT_Ele8_CaloIdM_TrackIdM_PFJet30_v"] && !triggerFlags["HLT_Ele12_CaloIdM_TrackIdM_PFJet30_v"] && !triggerFlags["HLT_Ele18_CaloIdM_TrackIdM_PFJet30_v"] && !triggerFlags["HLT_Ele23_CaloIdM_TrackIdM_PFJet30_v"] && !triggerFlags["HLT_Ele33_CaloIdM_TrackIdM_PFJet30_v"]) return;
 
-	if(_nLeptons != 1)       return;
+      if(_nLeptons != 1)       return;
       if(_n_Jets < 1)          return;				// For fake rate tree: exactly 1 loose lepton + at least 1 jet
       if(_jetPt[0] < 30)       return;				// with deltaR(j, l) > 1 (back-to-back)
       if(_jetDeltaR[0][0] < 1) return;
+    } else if(singleLep){
+      if(_nLeptons < 1) return;
     } else {
-	    if (!triggerFlags["HLT_TripleMu_12_10_5"] &&  !triggerFlags["HLT_DiMu9_Ele9_CaloIdL_TrackIdL"] &&  !triggerFlags["HLT_Mu8_DiEle12_CaloIdL_TrackIdL"] &&  !triggerFlags["HLT_Ele16_Ele12_Ele8_CaloIdL_TrackIdL"] &&
-!triggerFlags["HLT_TripleMu_5_3_3_DZ_Mass3p8"] && 													!triggerFlags["HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ"] &&  !triggerFlags["HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL_DZ"] &&  !triggerFlags["HLT_TkMu17_TrkIsoVVL_TkMu8_TrkIsoVVL_DZ"] &&
-!triggerFlags["HLT_Mu30_TkMu11"] &&  !triggerFlags["HLT_Mu40_TkMu11"] && 
-!triggerFlags["HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL"] &&     !triggerFlags["HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL"] &&     !triggerFlags["HLT_TkMu17_TrkIsoVVL_TkMu8_TrkIsoVVL"] &&
-!triggerFlags["HLT_Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_DZ"] &&
-!triggerFlags["HLT_Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_DZ"] &&  !triggerFlags["HLT_Mu23_TrkIsoVVL_Ele8_CaloIdL_TrackIdL_IsoVL_DZ"] && 
-!triggerFlags["HLT_Mu8_TrkIsoVVL_Ele17_CaloIdL_TrackIdL_IsoVL"] && 				!triggerFlags["HLT_DoubleEle37_Ele27_CaloIdL_GsfTrkIdVL"] &&  !triggerFlags["HLT_Ele23_Ele12_CaloIdL_TrackIdL_IsoVL_DZ"] &&  !triggerFlags["HLT_DoubleEle24_22_eta2p1_WPLoose_Gsf"] &&
-!triggerFlags["HLT_DoubleEle33_CaloIdL_GsfTrkIdVL"] && 
-!triggerFlags["HLT_Ele23_Ele12_CaloIdL_TrackIdL_IsoVL"] && 	!triggerFlags["HLT_Ele17_Ele12_CaloIdL_TrackIdL_IsoVL"] &&  !triggerFlags["HLT_Ele17_Ele12_CaloIdL_TrackIdL_IsoVL_DZ"] &&
-!triggerFlags["HLT_DoubleEle33_CaloIdL_GsfTrkIdVL"] && 
-!triggerFlags["HLT_Mu50"] &&  !triggerFlags["HLT_TkMu50"] &&  !triggerFlags["HLT_IsoMu27"] &&  !triggerFlags["HLT_IsoTkMu27"] &&
-!triggerFlags["HLT_IsoMu24"] &&  !triggerFlags["HLT_IsoTkMu24"] &&  !triggerFlags["HLT_IsoMu24_eta2p1"] &&  !triggerFlags["HLT_IsoTkMu24_eta2p1"] && 
-!triggerFlags["HLT_IsoMu22_eta2p1"] &&  !triggerFlags["HLT_IsoTkMu22_eta2p1"] && 
-!triggerFlags["HLT_IsoTkMu22"] &&  !triggerFlags["HLT_Mu45_eta2p1"] && 													!triggerFlags["HLT_Ele32_WPTight_Gsf"] &&  !triggerFlags["HLT_Ele32_eta2p1_WPTight_Gsf"] &&  !triggerFlags["HLT_Ele30_WPTight_Gsf"] &&  !triggerFlags["HLT_Ele30_eta2p1_WPTight_Gsf"] &&
-!triggerFlags["HLT_Ele27_WPTight_Gsf"] &&  !triggerFlags["HLT_Ele27_eta2p1_WPTight_Gsf"] &&  !triggerFlags["HLT_Ele27_eta2p1_WPLoose_Gsf"] &&  !triggerFlags["HLT_Ele25_eta2p1_WPTight_Gsf"] && 
-!triggerFlags["HLT_Ele25_WPTight_Gsf"] &&
-!triggerFlags["HLT_Ele8_CaloIdM_TrackIdM_PFJet30"] && !triggerFlags["HLT_Ele12_CaloIdM_TrackIdM_PFJet30"] && 	!triggerFlags["HLT_Ele8_CaloIdM_TrackIdM_IsoVL_PFJet30"] && !triggerFlags["HLT_Ele12_CaloIdM_TrackIdM_IsoVL_PFJet30"] &&
-
-!triggerFlags["HLT_Mu8_TrkIsoVVL_v"] && !triggerFlags["HLT_Mu17_TrkIsoVVL_v"] && !triggerFlags["HLT_Mu24_TrkIsoVVL_v"] && !triggerFlags["HLT_Mu34_TrkIsoVVL_v"] &&
-
-!triggerFlags["HLT_Ele8_CaloIdM_TrackIdM_PFJet30_v"] && !triggerFlags["HLT_Ele12_CaloIdM_TrackIdM_PFJet30_v"] && !triggerFlags["HLT_Ele18_CaloIdM_TrackIdM_PFJet30_v"] && 
-!triggerFlags["HLT_Ele23_CaloIdM_TrackIdM_PFJet30_v"] && !triggerFlags["HLT_Ele33_CaloIdM_TrackIdM_PFJet30_v"] && 
-
-!triggerFlags["HLT_Mu3_PFJet40_v"] && 
-!triggerFlags["HLT_Mu8_v"] && !triggerFlags["HLT_Mu17_v"] && !triggerFlags["HLT_Mu24_v"] && !triggerFlags["HLT_Mu34_v"] && 
-
-!triggerFlags["HLT_Ele12_CaloIdL_TrackIdL_IsoVL_PFJet30_v"] && !triggerFlags["HLT_Ele18_CaloIdL_TrackIdL_IsoVL_PFJet30_v"] && 
-!triggerFlags["HLT_Ele23_CaloIdL_TrackIdL_IsoVL_PFJet30_v"] && !triggerFlags["HLT_Ele33_CaloIdL_TrackIdL_IsoVL_PFJet30_v"] && 
-
-!triggerFlags["HLT_Ele12_CaloIdL_TrkIdL_IsoVL_v"] && !triggerFlags["HLT_Ele17_CaloIdL_TrackIdL_IsoVL_v"] && 
-    !triggerFlags["HLT_Ele23_CaloIdL_TrackIdL_IsoVL_v"]) return;
-	    
-	    
-	    
-	    
       if(_nLeptons < 3) return;
     }
-		//if(_nLeptons < 3) return;
-	cout<< "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"<<endl;
-	cout<< "  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%  "<<endl;
-	cout<< "    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%  "<<endl;
-	cout<< "        %%%%%%%%%%%%%%%%%%%%"<<endl;
     outputTree->Fill();
 }
 
