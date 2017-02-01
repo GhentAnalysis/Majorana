@@ -143,7 +143,8 @@ void trilepton::beginJob()
     tools::readEffAreas(edm::FileInPath("Majorana/PatAnalyzer/data/effAreaMuons_cone03_pfNeuHadronsAndPhotons_80X.txt").fullPath(), 13);
     tools::initMultiIsoConstants(); // that's the problem when using namespaces instead of classes, you need to have separate init functions
 
-    if(treeForFakeRate) outputTree = fs->make<TTree>("fakeRateTree", "fakeRateTree");
+    if(singleLep)       outputTree = fs->make<TTree>("singleLepTree", "singleLepTree");
+    if(treeForFakeRate) outputTree = fs->make<TTree>("fakeRateTree",  "fakeRateTree");
     else                outputTree = fs->make<TTree>("trileptonTree","trileptonTree");
     Nvtx = fs->make<TH1F>("N_{vtx}", "Number of vertices;N_{vtx};events / 1"  ,    40, 0., 40.);
     
