@@ -7,6 +7,21 @@ import Majorana.tools.samples      as samples
 import Majorana.tools.style        as style
 import Majorana.analysis.selectors as selectors
 
+
+triggerSamples      = ['WZ','WJets','MET','JetHT']
+triggerCombinations = ['1l','2l','3l','2l1l','3l2l1l']
+
+import argparse
+argParser = argparse.ArgumentParser(description = "Argument parser")
+argParser.add_argument('--sample',         action='store',      default=None, nargs='?', choices=triggerSamples)
+argParser.add_argument('--type',           action='store',      default=None, nargs='?', choices=triggerCombinations)
+argParser.add_argument('--isChild',        action='store_true', default=False)
+argParser.add_argument('--dryRun',         action='store_true', default=False)
+argParser.add_argument('--runLocal',       action='store_true', default=False)
+args = argParser.parse_args()
+
+
+
 samples.init(os.path.join(os.environ['CMSSW_BASE'], 'src', 'Majorana', 'analysis', 'samples.txt'))
 
 triggers_3l     = {3: ['HLT_TripleMu_12_10_5'],
@@ -14,12 +29,16 @@ triggers_3l     = {3: ['HLT_TripleMu_12_10_5'],
                    1: ['HLT_Mu8_DiEle12_CaloIdL_TrackIdL'],
                    0: ['HLT_Ele16_Ele12_Ele8_CaloIdL_TrackIdL']}
 
-triggers_2l     = {2: ['HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL','HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL','HLT_TkMu17_TrkIsoVVL_TkMu8_TrkIsoVVL','HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ','HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL_DZ','HLT_TkMu17_TrkIsoVVL_TkMu8_TrkIsoVVL_DZ'],
-                   1: ['HLT_Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_DZ','HLT_Mu23_TrkIsoVVL_Ele8_CaloIdL_TrackIdL_IsoVL_DZ','HLT_Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_DZ','HLT_Mu23_TrkIsoVVL_Ele8_CaloIdL_TrackIdL_IsoVL_DZ'],
+triggers_2l     = {2: ['HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ','HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL_DZ','HLT_TkMu17_TrkIsoVVL_TkMu8_TrkIsoVVL_DZ','HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL','HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL','HLT_TkMu17_TrkIsoVVL_TkMu8_TrkIsoVVL'],
+                   1: ['HLT_Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_DZ','HLT_Mu23_TrkIsoVVL_Ele8_CaloIdL_TrackIdL_IsoVL_DZ','HLT_Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_DZ','HLT_Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL','HLT_Mu23_TrkIsoVVL_Ele8_CaloIdL_TrackIdL_IsoVL'],
                    0: ['HLT_Ele23_Ele12_CaloIdL_TrackIdL_IsoVL_DZ']}
 
 triggers_1l     = {1: ['HLT_IsoMu24','HLT_IsoTkMu24'],
                    0: ['HLT_Ele27_WPTight_Gsf']}
+
+triggers_2l1l   = {2: triggers_2l[2] + triggers_1l[1],
+                   1: triggers_2l[1] + triggers_1l[1] + triggers_1l[0],
+                   0: triggers_2l[0] + triggers_1l[0]}
 
 triggers_3l2l   = {3: triggers_3l[3] + triggers_2l[2],
                    2: triggers_3l[2] + triggers_2l[2] + triggers_2l[1],
@@ -64,7 +83,7 @@ def run(inputTree, triggers, dir, nLepton):
   elif nLepton == 2: channels = ['ee', 'emu', 'mumu']
   elif nLepton == 1: channels = ['e', 'mu']
 
-  ptThresholds = ['10to15','15to20','20to30','30to40','40to50'] if nLepton == 3 else [None]
+  ptThresholds = ['10to15','15to20','20to30','30to40','40to50','50to70','70to100'] if nLepton == 3 else [None]
   for ptThreshold in ptThresholds:
     hists[ptThreshold] = {}
     for triggerApplied in [True, False]:
@@ -72,8 +91,8 @@ def run(inputTree, triggers, dir, nLepton):
       for channel in channels:
 	if nLepton==3: name = channel + "_pt" + str(ptThreshold) + ("" if triggerApplied else "_noTrig")
 	else:          name = channel + ("" if triggerApplied else "_noTrig")
-	if nLepton==1: hists[ptThreshold][triggerApplied][channel] = ROOT.TH1D(name, name, 26, 5, 70)
-        else:          hists[ptThreshold][triggerApplied][channel] = ROOT.TH2D(name, name, 13, 5, 70, 13, 5, 70)
+	if nLepton==1: hists[ptThreshold][triggerApplied][channel] = ROOT.TH1D(name, name, 38, 5, 100)
+        else:          hists[ptThreshold][triggerApplied][channel] = ROOT.TH2D(name, name, 19, 5, 100, 19, 5, 100)
 
   # loop over events
   print inputTree.GetEntries()
@@ -83,6 +102,7 @@ def run(inputTree, triggers, dir, nLepton):
 
     if inputTree._nLeptons != nLepton: continue
     if not all(selectors.leptonSelector(inputTree, i) for i in range(nLepton)): continue
+ 
      
     # flavor of muon is 1, flavor of electron is 0 
     nMuon = sum(inputTree._flavors[i] for i in range(nLepton))
@@ -140,6 +160,7 @@ def run(inputTree, triggers, dir, nLepton):
 
         if nLepton == 1:
 	  eff.GetXaxis().SetTitle("lepton p_{T} [Gev]")
+	  eff.GetYaxis().SetRangeUser(0, 1)
         else:
 	  eff.GetZaxis().SetRangeUser(0, 1)
 	  eff.GetXaxis().SetTitle("trailing lepton p_{T} [Gev]")
@@ -158,16 +179,35 @@ def run(inputTree, triggers, dir, nLepton):
 	c1.RedrawAxis()
 	c1.Print(os.path.join(dir, eff.GetName() + ('_cumul' if useCumul else '') + '.pdf'))
 	c1.Print(os.path.join(dir, eff.GetName() + ('_cumul' if useCumul else '') + '.png'))
+        file = ROOT.TFile(os.path.join("triggerEfficiencies.root"),"UPDATE")
+        eff.Write(dir + '_' + eff.GetName() + ('cumul' if useCumul else ''), ROOT.TObject.kOverwrite)
+        file.Close()
 
   return True
 
 
-for pd in ['WZ','JetHT','MET']:
-  chain = samples.getTree(pd, productionLabel='triggerEfficiency_v3', shortDebug=False)
+def launch(command, logfile):
+  if args.dryRun:     print command
+  elif args.runLocal: os.system(command + " --isChild &> " + logfile)
+  else:               os.system("qsub -v command=\"" + command + " --isChild\" -q localgrid@cream02 -o " + logfile + " -e " + logfile + " -l walltime=10:00:00 runTriggerPlotsOnCream02.sh")
 
-  run(chain, triggers_3l, pd + '/3l', 3)
-  run(chain, triggers_2l, pd + '/2l', 2)
-  run(chain, triggers_1l, pd + '/1l', 1)
- #run(chain, triggers_3l2l1l, '3l2l1l', 3)
+if not args.sample:
+  try:    os.makedirs('log')
+  except: pass
+  for pd in triggerSamples:
+    for type in triggerCombinations:
+      launch('./triggerPlots.py --sample=' + pd + ' --type=' + type + ' --isChild', 'log/' + pd + '_' + type + '.log')
+elif args.isChild:
+  pd = args.sample
+  chain = samples.getTree(pd, treeType='singleLep', productionLabel='triggerEfficiency_v5', shortDebug=False)
 
-for w in sorted(set(listOfWarnings)): print w
+  extraLabel = ''
+#  extraLabel = 'test_multiIsolation_'
+  if args.type == '1l':       run(chain, triggers_1l, extraLabel + pd + '/1l', 1)
+  elif args.type == '3l':     run(chain, triggers_3l, extraLabel + pd + '/3l', 3)
+  elif args.type == '2l':     run(chain, triggers_2l, extraLabel + pd + '/2l', 2)
+  elif args.type == '2l1l':   run(chain, triggers_2l1l, extraLabel + pd + '/2l1l', 2)
+  elif args.type == '3l2l1l': run(chain, triggers_3l2l1l, extraLabel + pd +'/3l2l1l', 3)
+
+with open('triggerWarnings.txt','a') as f:
+  for w in sorted(set(listOfWarnings)): f.write(w + '\n')
