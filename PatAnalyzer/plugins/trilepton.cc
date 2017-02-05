@@ -838,7 +838,7 @@ void trilepton::analyze(const edm::Event& iEvent, const edm::EventSetup& iEventS
       if(std::abs(muon->eta()) > 2.5) continue;
       if(!muon->isLooseMuon())        continue;  // Store only loose muons, see https://twiki.cern.ch/twiki/bin/viewauth/CMS/SWGuideMuonIdRun2
       bool goodGlb      = muon->isGlobalMuon() and muon->globalTrack()->normalizedChi2() < 3 and muon->combinedQuality().chi2LocalPosition < 12 and muon->combinedQuality().trkKink < 20;
-      bool isMedium     = muon->isLooseMuon() and muon->innerTrack()->validFraction() > 0.49 and muon->segmentCompatibility() >= (goodGlb ? 0.303 : 0.451); // temporary ICHEP recommendation	    
+      bool isMedium     = muon->isLooseMuon() and muon->innerTrack()->validFraction() > 0.8 and muon->segmentCompatibility() >= (goodGlb ? 0.303 : 0.451); // temporary ICHEP recommendation	    
       if (!isMedium) continue;   
 	      
       if(muon->innerTrack().isNull()) 		       continue;  // Store only when we have an innertrack
