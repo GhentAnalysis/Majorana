@@ -6,7 +6,7 @@ isData          = True
 treeForFakeRate = False
 singleLep       = False
 #inputFile       = "file:///user/mvit/public/Majorana/MajoranaNeutrino_trilepton_M-10_5f_NLO/Majorana_trilepton_RunIISpring16MiniAODv2_96.root"
-inputFile       = "/store/data/Run2016H/SingleElectron/MINIAOD/PromptReco-v3/000/284/037/00000/54D1BAE3-BD9F-E611-9E45-02163E012706.root"
+inputFile       = "/pnfs/iihe/cms/ph/sc4/store/mc/RunIISummer16MiniAODv2/WZTo3LNu_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8/MINIAODSIM/PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/120000/14CED05F-DFBB-E611-ACE6-00259029E922.root"
 nEvents         = 10
 outputFile      = None
 
