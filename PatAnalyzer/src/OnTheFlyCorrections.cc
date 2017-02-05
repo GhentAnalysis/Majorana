@@ -5,8 +5,8 @@
 
 OnTheFlyCorrections::OnTheFlyCorrections(std::string path, std::string gt, bool isdata){
         std::vector<std::string> runs;
-        if(isdata) runs = {"BCDV2_DATA", "EFV2_DATA", "GV2_DATA", "HV2_DATA"};
-        else       runs = {"V2_MC"};
+        if(isdata) runs = {"BCDV3_DATA", "EFV3_DATA", "GV3_DATA", "HV3_DATA"};
+        else       runs = {"V3_MC"};
 
         for(std::string run : runs){
 	  jetUncertainties[run] = new JetCorrectionUncertainty(edm::FileInPath(path+gt+run+"_Uncertainty_AK4PFchs.txt").fullPath());
@@ -22,11 +22,11 @@ OnTheFlyCorrections::OnTheFlyCorrections(std::string path, std::string gt, bool 
 }
 
 std::string getRunName(unsigned long runNumber){
-  if(runNumber < 1)           return "V2_MC";
-  else if(runNumber < 276812) return "BCDV2_DATA";
-  else if(runNumber < 278809) return "EFV2_DATA";
-  else if(runNumber < 280385) return "GV2_DATA";
-  else                        return "HV2_DATA";
+  if(runNumber < 1)           return "V3_MC";
+  else if(runNumber < 276812) return "BCDV3_DATA";
+  else if(runNumber < 278809) return "EFV3_DATA";
+  else if(runNumber < 280385) return "GV3_DATA";
+  else                        return "HV3_DATA";
 
 }
 
@@ -34,9 +34,9 @@ std::string getRunName(unsigned long runNumber){
 float OnTheFlyCorrections::getJECUncertainty(float pt, float eta, int runnumber){
 	if      (eta> 5.0) eta = 5.0;
 	else if (eta<-5.0) eta =-5.0;
-	jetUncertainties[fIsData ? getRunName(runnumber) : "V2_MC"]->setJetPt(pt);
-	jetUncertainties[fIsData ? getRunName(runnumber) : "V2_MC"]->setJetEta(eta);
-	return jetUncertainties[fIsData ? getRunName(runnumber) : "V2_MC"]->getUncertainty(true);
+	jetUncertainties[fIsData ? getRunName(runnumber) : "V3_MC"]->setJetPt(pt);
+	jetUncertainties[fIsData ? getRunName(runnumber) : "V3_MC"]->setJetEta(eta);
+	return jetUncertainties[fIsData ? getRunName(runnumber) : "V3_MC"]->getUncertainty(true);
 }
 
 float OnTheFlyCorrections::getJetCorrection(float pt, float corr, float eta, float rho, float area, std::string level = "L3Absolute"){
@@ -46,7 +46,7 @@ float OnTheFlyCorrections::getJetCorrection(float pt, float corr, float eta, flo
 
 float OnTheFlyCorrections::getJetCorrectionRawPt(float rawpt, float eta, float rho, float area, std::string level = "L3Absolute", int runnumber){
 	// slighly redundant considering we have what we have below, but I think that's what frederic was thinking about
-        FactorizedJetCorrector* jetCorrector = jetCorrectors[fIsData ? getRunName(runnumber) : "V2_MC"];
+        FactorizedJetCorrector* jetCorrector = jetCorrectors[fIsData ? getRunName(runnumber) : "V3_MC"];
 	jetCorrector->setJetEta(eta);
 	jetCorrector->setRho(rho);
 	jetCorrector->setJetA(area);
@@ -63,7 +63,7 @@ float OnTheFlyCorrections::getJetCorrectionRawPt(float rawpt, float eta, float r
 
 std::pair<float,float> OnTheFlyCorrections::getCorrections(float rawpt, float raweta, float rawnomupt, float phi, float emf, float rho, float area, int runnumber) {
   std::pair<float, float> corr = std::pair<float, float>(0, 0);
-  FactorizedJetCorrector* jetCorrector = jetCorrectors[fIsData ? getRunName(runnumber) : "V2_MC"];
+  FactorizedJetCorrector* jetCorrector = jetCorrectors[fIsData ? getRunName(runnumber) : "V3_MC"];
   jetCorrector->setJetEta(raweta);
   jetCorrector->setRho(rho);
   jetCorrector->setJetA(area);
