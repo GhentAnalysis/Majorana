@@ -184,14 +184,13 @@ elif args.isChild:
   pd = args.sample
   chain = samples.getTree(pd, treeType='singleLep', productionLabel='triggerEfficiency_v6', shortDebug=False)
 
-  extraLabel = ''
-#  extraLabel = 'test_multiIsolation_'
-  if args.type == '1l':       run(chain, triggers_1l, extraLabel + pd + '/1l', 1)
-  elif args.type == '3l':     run(chain, triggers_3l, extraLabel + pd + '/3l', 3)
-  elif args.type == '2l':     run(chain, triggers_2l, extraLabel + pd + '/2l', 2)
-  elif args.type == '1l1l':   run(chain, triggers_1l1l, extraLabel + pd + '/1l1l', 2)
-  elif args.type == '2l1l':   run(chain, triggers_2l1l, extraLabel + pd + '/2l1l', 2)
-  elif args.type == '3l2l1l': run(chain, triggers_3l2l1l, extraLabel + pd +'/3l2l1l', 3)
+  plotDir = 'plots/'
+  if args.type == '1l':       run(chain, triggers_1l,     plotDir + pd + '/1l', 1)
+  elif args.type == '3l':     run(chain, triggers_3l,     plotDir + pd + '/3l', 3)
+  elif args.type == '2l':     run(chain, triggers_2l,     plotDir + pd + '/2l', 2)
+  elif args.type == '1l1l':   run(chain, triggers_1l1l,   plotDir + pd + '/1l1l', 2)
+  elif args.type == '2l1l':   run(chain, triggers_2l1l,   plotDir + pd + '/2l1l', 2)
+  elif args.type == '3l2l1l': run(chain, triggers_3l2l1l, plotDir + pd + '/3l2l1l', 3)
 
 with open('triggerWarnings.txt','a') as f:
   for w in sorted(set(listOfWarnings)): f.write(w + '\n')
