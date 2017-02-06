@@ -14,8 +14,8 @@ def draw1D(histos, legend='auto'):
 
   histos[0].SetMaximum(max(h.GetMaximum() for h in histos)*1.1)
   histos[0].SetMinimum(min(h.GetMinimum() for h in histos))
-  histos[0].Draw("HIST")
-  for h in histos[1:]: h.Draw("HIST SAME")
+  histos[0].Draw(histos[0].drawOption)
+  for h in histos[1:]: h.Draw(h.drawOption + " SAME")
   c1.RedrawAxis()
 
   if legend is not None:
