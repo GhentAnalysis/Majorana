@@ -9,7 +9,7 @@ import Majorana.analysis.selectors as selectors
 
 
 triggerSamples      = ['WZ','WJets','MET','JetHT']
-triggerCombinations = ['1l','2l','3l','2l1l','3l2l1l']
+triggerCombinations = ['1l','2l','3l','2l1l','3l2l1l','1l1l']
 
 import argparse
 argParser = argparse.ArgumentParser(description = "Argument parser")
@@ -35,6 +35,10 @@ triggers_2l     = {2: ['HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ','HLT_Mu17_TrkIsoVVL
 
 triggers_1l     = {1: ['HLT_IsoMu24','HLT_IsoTkMu24'],
                    0: ['HLT_Ele27_WPTight_Gsf']}
+
+triggers_1l1l   = {2: triggers_1l[1],
+                   1: triggers_1l[1] + triggers_1l[0],
+                   0: triggers_1l[0]}
 
 triggers_2l1l   = {2: triggers_2l[2] + triggers_1l[1],
                    1: triggers_2l[1] + triggers_1l[1] + triggers_1l[0],
@@ -79,8 +83,8 @@ def run(inputTree, triggers, dir, nLepton):
   if nLepton ==1: style.setDefault()
   else:           style.setDefault2D()
 
-  if nLepton == 3:   channels = ['eee', 'eemu', 'emumu', 'mumumu']
-  elif nLepton == 2: channels = ['ee', 'emu', 'mumu']
+  if nLepton == 3:   channels = ['eee', 'eemu', 'emue', 'muee', 'emumu', 'muemu', 'mumue', 'mumumu']
+  elif nLepton == 2: channels = ['ee', 'emu', 'mue', 'mumu']
   elif nLepton == 1: channels = ['e', 'mu']
 
   ptThresholds = ['10to15','15to20','20to30','30to40','40to50','50to70','70to100'] if nLepton == 3 else [None]
@@ -92,7 +96,13 @@ def run(inputTree, triggers, dir, nLepton):
 	if nLepton==3: name = channel + "_pt" + str(ptThreshold) + ("" if triggerApplied else "_noTrig")
 	else:          name = channel + ("" if triggerApplied else "_noTrig")
 	if nLepton==1: hists[ptThreshold][triggerApplied][channel] = ROOT.TH1D(name, name, 38, 5, 100)
-        else:          hists[ptThreshold][triggerApplied][channel] = ROOT.TH2D(name, name, 19, 5, 100, 19, 5, 100)
+  else:          hists[ptThreshold][triggerApplied][channel] = ROOT.TH2D(name, name, 19, 5, 100, 19, 5, 100)
+
+  def getPtThreshold(pt):
+    for ptThreshold in ptThresholds:
+      ptMin = int(ptThreshold.split('to')[0])
+      ptMax = int(ptThreshold.split('to')[1])
+      if pt > ptMin or pt < ptMax: return ptThreshold
 
   # loop over events
   print inputTree.GetEntries()
@@ -103,85 +113,58 @@ def run(inputTree, triggers, dir, nLepton):
     if inputTree._nLeptons != nLepton: continue
     if not all(selectors.leptonSelector(inputTree, i) for i in range(nLepton)): continue
  
-     
     # flavor of muon is 1, flavor of electron is 0 
-    nMuon = sum(inputTree._flavors[i] for i in range(nLepton))
-    if nLepton == 3:
-      if   nMuon == 3: channel = "mumumu"
-      elif nMuon == 2: channel = "emumu"
-      elif nMuon == 1: channel = "eemu"
-      elif nMuon == 0: channel = "eee"
-    elif nLepton == 2:
-      if   nMuon == 2: channel = "mumu"
-      elif nMuon == 1: channel = "emu"
-      elif nMuon == 0: channel = "ee"
-    elif nLepton == 1:
-      if   nMuon == 1: channel = "mu"
-      elif nMuon == 0: channel = "e"
+    ptAndFlavour = [(inputTree._lPt[i], inputTree._flavors[i]) for i in range(nLepton)]
+    def getSortKey(item): return item[0]
+    ptAndFlavour.sort(reverse=True, key=getSortKey)
+    pt      = [i[0] for i in ptAndFlavour]
+    flavour = [i[1] for i in ptAndFlavour]
 
-    pt = [i for i in inputTree._lPt]
-    pt.sort(reverse=True)
+    nMuon   = sum(i for i in flavour)
+    channel = "".join(["mu" if i==1 else "e" for i in flavour])
 
-    if nLepton == 3:
-      for ptThreshold in ptThresholds:
-	if isinstance(ptThreshold, int): 
-	  if pt[0] < ptThreshold: continue
-	else:
-	  ptMin = int(ptThreshold.split('to')[0])
-	  ptMax = int(ptThreshold.split('to')[1])
-	  if pt[0] < ptMin or pt[0] > ptMax: continue
+    if nLepton == 3: ptThreshold = getPtThreshold(pt[0])
+    else:            ptThreshold = None
 
-	hists[ptThreshold][False][channel].Fill(pt[2], pt[1])
-	if passTriggers(inputTree, triggers[nMuon]): 
-	  hists[ptThreshold][True][channel].Fill(pt[2], pt[1])
-    elif nLepton == 2:
-	hists[None][False][channel].Fill(pt[1], pt[0])
-	if passTriggers(inputTree, triggers[nMuon]): 
-	  hists[None][True][channel].Fill(pt[1], pt[0])
-    elif nLepton == 1:
-	hists[None][False][channel].Fill(pt[0])
-	if passTriggers(inputTree, triggers[nMuon]):
-	  hists[None][True][channel].Fill(pt[0])
+    def fill(*args):
+      hists[ptThreshold][False][channel].Fill(*args)
+      if passTriggers(inputTree, triggers[nMuon]):
+	      hists[ptThreshold][True][channel].Fill(*args)
+
+    if   nLepton == 3: fill(pt[2], pt[1])
+    elif nLepton == 2: fill(pt[1], pt[0])
+    elif nLepton == 1: fill(pt[0])
 
   for ptThreshold in ptThresholds:
     for channel in channels:
-      for useCumul in [False]: # do not look at cumulative distributions, because they make it sample-dependent
-        if useCumul:
-	  hists[ptThreshold][False][channel] = makeCumul(hists[ptThreshold][False][channel])
-	  hists[ptThreshold][True][channel]  = makeCumul(hists[ptThreshold][True][channel])
-	hists[ptThreshold][False][channel].Sumw2()
-	hists[ptThreshold][True][channel].Sumw2()
-	eff = hists[ptThreshold][True][channel].Clone()
-	eff.Divide(hists[ptThreshold][False][channel])
-   
-	if hasattr("ROOT","c1"): del ROOT.c1 
-	c1 = ROOT.TCanvas(eff.GetName() + ('_cumul' if useCumul else ''), eff.GetName())
-	c1.cd()
+      hists[ptThreshold][False][channel].Sumw2()
+      hists[ptThreshold][True][channel].Sumw2()
+      eff = hists[ptThreshold][True][channel].Clone()
+      eff.Divide(hists[ptThreshold][False][channel])
+ 
+      c = ROOT.TCanvas(eff.GetName(), eff.GetName())
+      c.cd()
 
-        if nLepton == 1:
-	  eff.GetXaxis().SetTitle("lepton p_{T} [Gev]")
-	  eff.GetYaxis().SetRangeUser(0, 1)
-        else:
-	  eff.GetZaxis().SetRangeUser(0, 1)
-	  eff.GetXaxis().SetTitle("trailing lepton p_{T} [Gev]")
-	  eff.GetYaxis().SetTitle(("sub" if nLepton==3 else "") + "leading lepton p_{T} [Gev]")
+      if nLepton == 1:
+        eff.GetXaxis().SetTitle("lepton p_{T} [Gev]")
+        eff.GetYaxis().SetRangeUser(0, 1)
+      else:
+        eff.GetZaxis().SetRangeUser(0, 1)
+        eff.GetXaxis().SetTitle("trailing lepton p_{T} [Gev]")
+        eff.GetYaxis().SetTitle(("sub" if nLepton==3 else "") + "leading lepton p_{T} [Gev]")
 
-        if ptThreshold:
-	  if isinstance(ptThreshold, int): ptRange = "p_{T} > " + str(ptThreshold) + " Gev"
-	  else:                            ptRange = ptThreshold.split('to')[0] + ' GeV < p_{T} < ' + ptThreshold.split('to')[1] + ' GeV'
-	  eff.SetTitle(channel + " channel, leading lepton " + ptRange + (' (cumulative distributions)' if useCumul else ''))
-        else:
-	  eff.SetTitle(channel + " channel")
+      if ptThreshold: eff.SetTitle(channel + " channel, leading lepton " + ptThreshold.split('to')[0] + ' GeV < p_{T} < ' + ptThreshold.split('to')[1] + ' GeV')
+      else:           eff.SetTitle(channel + " channel")
 
-	if nLepton==1: eff.Draw("E")
-        else:          eff.Draw("COLZ TEXT")
+      if nLepton==1: eff.Draw("E")
+      else:          eff.Draw("COLZ TEXT")
 
-	c1.RedrawAxis()
-	c1.Print(os.path.join(dir, eff.GetName() + ('_cumul' if useCumul else '') + '.pdf'))
-	c1.Print(os.path.join(dir, eff.GetName() + ('_cumul' if useCumul else '') + '.png'))
-        file = ROOT.TFile(os.path.join("triggerEfficiencies.root"),"UPDATE")
-        eff.Write(dir + '_' + eff.GetName() + ('cumul' if useCumul else ''), ROOT.TObject.kOverwrite)
-        file.Close()
+      c.RedrawAxis()
+      c.Print(os.path.join(dir, eff.GetName() + '.pdf'))
+      c.Print(os.path.join(dir, eff.GetName() + '.png'))
+      file = ROOT.TFile(os.path.join("triggerEfficiencies.root"),"UPDATE")
+      eff.Write(dir + '_' + eff.GetName(), ROOT.TObject.kOverwrite)
+      file.Close()
 
   return True
 
@@ -199,13 +182,14 @@ if not args.sample:
       launch('./triggerPlots.py --sample=' + pd + ' --type=' + type + ' --isChild', 'log/' + pd + '_' + type + '.log')
 elif args.isChild:
   pd = args.sample
-  chain = samples.getTree(pd, treeType='singleLep', productionLabel='triggerEfficiency_v5', shortDebug=False)
+  chain = samples.getTree(pd, treeType='singleLep', productionLabel='triggerEfficiency_v6', shortDebug=False)
 
   extraLabel = ''
 #  extraLabel = 'test_multiIsolation_'
   if args.type == '1l':       run(chain, triggers_1l, extraLabel + pd + '/1l', 1)
   elif args.type == '3l':     run(chain, triggers_3l, extraLabel + pd + '/3l', 3)
   elif args.type == '2l':     run(chain, triggers_2l, extraLabel + pd + '/2l', 2)
+  elif args.type == '1l1l':   run(chain, triggers_1l1l, extraLabel + pd + '/1l1l', 2)
   elif args.type == '2l1l':   run(chain, triggers_2l1l, extraLabel + pd + '/2l1l', 2)
   elif args.type == '3l2l1l': run(chain, triggers_3l2l1l, extraLabel + pd +'/3l2l1l', 3)
 
