@@ -1,12 +1,13 @@
+# These are the spring15 effective areas, before we used the more up to date
+# spring 16 values which can be found in the history of this file or in
+# https://github.com/ikrav/cmssw/blob/egm_id_80X_v1/RecoEgamma/ElectronIdentification/data/Summer16/effAreaElectrons_cone03_pfNeuHadronsAndPhotons_80X.txt
 # This file contains Effective Area constants for 
 # computing pile-up corrections for the neutral hadron and photon
 # isolation for an electron object.
 #   Documentation:
-#    https://indico.cern.ch/event/482673/contributions/2187022/attachments/1282446/1905912/talk_electron_ID_spring16.pdf
-# 
-#  The effective areas are based on 90% efficient contours
+#    https://indico.cern.ch/event/369239/contribution/4/attachments/1134761/1623262/talk_effective_areas_25ns.pdf
 #
-# |eta| min   |eta| max   effective area
+# |eta| min    |eta| max     effective area
 0.0000         1.0000        0.1752
 1.0000         1.4790        0.1862
 1.4790         2.0000        0.1411
