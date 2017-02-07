@@ -95,43 +95,37 @@ trilepton::trilepton(const edm::ParameterSet & iConfig) :
 {
     // eventually move this to config level
     // just a bunch of lepton triggers, might need a closer look for cleanup or additions
-    triggersToSave = {"HLT_TripleMu_12_10_5", "HLT_DiMu9_Ele9_CaloIdL_TrackIdL", "HLT_Mu8_DiEle12_CaloIdL_TrackIdL", "HLT_Ele16_Ele12_Ele8_CaloIdL_TrackIdL",   // 3l
-                      "HLT_TripleMu_5_3_3_DZ_Mass3p8",														// 3l (with mass requirement)
-                      "HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ", "HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL_DZ", "HLT_TkMu17_TrkIsoVVL_TkMu8_TrkIsoVVL_DZ",		// mumu
+    triggersToSave = {"HLT_TripleMu_12_10_5", "HLT_DiMu9_Ele9_CaloIdL_TrackIdL", "HLT_Mu8_DiEle12_CaloIdL_TrackIdL", "HLT_Ele16_Ele12_Ele8_CaloIdL_TrackIdL",  // 3l
+                      "HLT_TripleMu_5_3_3_DZ_Mass3p8",                                                                                                         // 3l (with mass requirement)
+                      "HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ", "HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL_DZ", "HLT_TkMu17_TrkIsoVVL_TkMu8_TrkIsoVVL_DZ",               // mumu
                       "HLT_Mu30_TkMu11", "HLT_Mu40_TkMu11",
-                      "HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL",    "HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL",    "HLT_TkMu17_TrkIsoVVL_TkMu8_TrkIsoVVL",			// mumu prescaled
-                      "HLT_Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_DZ", 											// mue
+                      "HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL",    "HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL",    "HLT_TkMu17_TrkIsoVVL_TkMu8_TrkIsoVVL",                  // mumu prescaled
+                      "HLT_Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_DZ",                                                                                     // mue
                       "HLT_Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_DZ", "HLT_Mu23_TrkIsoVVL_Ele8_CaloIdL_TrackIdL_IsoVL_DZ",
-                      "HLT_Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL", "HLT_Mu23_TrkIsoVVL_Ele8_CaloIdL_TrackIdL_IsoVL",					// mue prescaled
+                      "HLT_Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL", "HLT_Mu23_TrkIsoVVL_Ele8_CaloIdL_TrackIdL_IsoVL",                                     // mue prescaled
                       "HLT_Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL",
-                      "HLT_Mu8_TrkIsoVVL_Ele17_CaloIdL_TrackIdL_IsoVL",												// mue partially off
-                      "HLT_DoubleEle37_Ele27_CaloIdL_GsfTrkIdVL", "HLT_Ele23_Ele12_CaloIdL_TrackIdL_IsoVL_DZ", "HLT_DoubleEle24_22_eta2p1_WPLoose_Gsf",		// ee
+                      "HLT_Mu8_TrkIsoVVL_Ele17_CaloIdL_TrackIdL_IsoVL",                                                                                        // mue partially off
+                      "HLT_DoubleEle37_Ele27_CaloIdL_GsfTrkIdVL", "HLT_Ele23_Ele12_CaloIdL_TrackIdL_IsoVL_DZ", "HLT_DoubleEle24_22_eta2p1_WPLoose_Gsf",        // ee
                       "HLT_DoubleEle33_CaloIdL_GsfTrkIdVL",
-                      "HLT_Ele23_Ele12_CaloIdL_TrackIdL_IsoVL",	"HLT_Ele17_Ele12_CaloIdL_TrackIdL_IsoVL", "HLT_Ele17_Ele12_CaloIdL_TrackIdL_IsoVL_DZ",		// ee prescaled
-                      "HLT_Mu50", "HLT_TkMu50", "HLT_IsoMu27", "HLT_IsoTkMu27", 										// mu
+                      "HLT_Ele23_Ele12_CaloIdL_TrackIdL_IsoVL",  "HLT_Ele17_Ele12_CaloIdL_TrackIdL_IsoVL", "HLT_Ele17_Ele12_CaloIdL_TrackIdL_IsoVL_DZ",        // ee prescaled
+                      "HLT_Mu50", "HLT_TkMu50", "HLT_IsoMu27", "HLT_IsoTkMu27",                                                                                // mu
                       "HLT_IsoMu24", "HLT_IsoTkMu24", "HLT_IsoMu24_eta2p1", "HLT_IsoTkMu24_eta2p1",
                       "HLT_IsoMu22_eta2p1", "HLT_IsoTkMu22_eta2p1",
-                      "HLT_IsoTkMu22", "HLT_Mu45_eta2p1",													// mu partially off
-                      "HLT_Ele32_WPTight_Gsf", "HLT_Ele32_eta2p1_WPTight_Gsf", "HLT_Ele30_WPTight_Gsf", "HLT_Ele30_eta2p1_WPTight_Gsf", 			// e
+                      "HLT_IsoTkMu22", "HLT_Mu45_eta2p1",                                                                                                      // mu partially off
+                      "HLT_Ele32_WPTight_Gsf", "HLT_Ele32_eta2p1_WPTight_Gsf", "HLT_Ele30_WPTight_Gsf", "HLT_Ele30_eta2p1_WPTight_Gsf",                        // e
                       "HLT_Ele27_WPTight_Gsf", "HLT_Ele27_eta2p1_WPTight_Gsf", "HLT_Ele27_eta2p1_WPLoose_Gsf", "HLT_Ele25_eta2p1_WPTight_Gsf",
-                      "HLT_Ele25_WPTight_Gsf",															// e partially off
-                      "HLT_Ele8_CaloIdM_TrackIdM_PFJet30","HLT_Ele12_CaloIdM_TrackIdM_PFJet30",									// e + PF jet (for fake rate measurment)
+                      "HLT_Ele25_WPTight_Gsf",                                                                                                                 // e partially off
+                      "HLT_Ele8_CaloIdM_TrackIdM_PFJet30","HLT_Ele12_CaloIdM_TrackIdM_PFJet30",                                                                // e + PF jet (for fake rate measurment)
                       "HLT_Ele8_CaloIdM_TrackIdM_IsoVL_PFJet30","HLT_Ele12_CaloIdM_TrackIdM_IsoVL_PFJet30",
-		      
-	 	      "HLT_Mu8_TrkIsoVVL","HLT_Mu17_TrkIsoVVL","HLT_Mu24_TrkIsoVVL","HLT_Mu34_TrkIsoVVL", // FR
-		      
-		      "HLT_Ele18_CaloIdM_TrackIdM_PFJet30",
-		      "HLT_Ele23_CaloIdM_TrackIdM_PFJet30","HLT_Ele33_CaloIdM_TrackIdM_PFJet30",
-		      
-		      "HLT_Mu3_PFJet40",
-		      "HLT_Mu8","HLT_Mu17","HLT_Mu24","HLT_Mu34",
-		      
-		      "HLT_Ele12_CaloIdL_TrackIdL_IsoVL_PFJet30","HLT_Ele18_CaloIdL_TrackIdL_IsoVL_PFJet30",
-		      "HLT_Ele23_CaloIdL_TrackIdL_IsoVL_PFJet30","HLT_Ele33_CaloIdL_TrackIdL_IsoVL_PFJet30",
-		      
-		      "HLT_Ele12_CaloIdL_TrkIdL_IsoVL","HLT_Ele17_CaloIdL_TrackIdL_IsoVL",
-		      "HLT_Ele23_CaloIdL_TrackIdL_IsoVL"
-		     };
+                      "HLT_Mu8_TrkIsoVVL","HLT_Mu17_TrkIsoVVL","HLT_Mu24_TrkIsoVVL","HLT_Mu34_TrkIsoVVL",                                                      // FR
+                      "HLT_Ele18_CaloIdM_TrackIdM_PFJet30",
+                      "HLT_Ele23_CaloIdM_TrackIdM_PFJet30","HLT_Ele33_CaloIdM_TrackIdM_PFJet30",
+                      "HLT_Mu3_PFJet40",
+                      "HLT_Mu8","HLT_Mu17","HLT_Mu24","HLT_Mu34",
+                      "HLT_Ele12_CaloIdL_TrackIdL_IsoVL_PFJet30","HLT_Ele18_CaloIdL_TrackIdL_IsoVL_PFJet30",
+                      "HLT_Ele23_CaloIdL_TrackIdL_IsoVL_PFJet30","HLT_Ele33_CaloIdL_TrackIdL_IsoVL_PFJet30",
+                      "HLT_Ele12_CaloIdL_TrkIdL_IsoVL","HLT_Ele17_CaloIdL_TrackIdL_IsoVL",
+                      "HLT_Ele23_CaloIdL_TrackIdL_IsoVL"};
     filtersToSave  = {"Flag_HBHENoiseFilter", "Flag_HBHENoiseIsoFilter", "Flag_EcalDeadCellTriggerPrimitiveFilter", "Flag_goodVertices", "Flag_eeBadScFilter", "Flag_globalTightHalo2016Filter"};
 }
 
@@ -1174,63 +1168,24 @@ cout<<"Gen matched: "<<_lpdgmc[leptonCounter]<<" "<<_lPtmc[leptonCounter]<<" "<<
 	  HT+= _jetPt[_n_Jets];
         _n_Jets++;
     }
-	
-//if (triggerFlags["HLT_Mu3_PFJet40_v"] )  std::cout<<"++++++++++++++++++++++++++++ true trigger flag: HLT_Mu3_PFJet40_"<<endl;
-//if (triggerFlags["HLT_Mu8_v"] )  std::cout<<"++++++++++++++++++++++++++++ true trigger flag: 2"<<endl;
-//if (triggerFlags["HLT_Mu17_v"] )  std::cout<<"++++++++++++++++++++++++++++ true trigger flag: 3"<<endl;
-//if (triggerFlags["HLT_Ele12_CaloIdL_TrackIdL_IsoVL_PFJet30_v"] )  std::cout<<"++++++++++++++++++++++++++++ true trigger flag: 4"<<endl;
 
-if (!triggerFlags["HLT_TripleMu_12_10_5"] && !triggerFlags["HLT_DiMu9_Ele9_CaloIdL_TrackIdL"] && !triggerFlags["HLT_Mu8_DiEle12_CaloIdL_TrackIdL"] && !triggerFlags["HLT_Ele16_Ele12_Ele8_CaloIdL_TrackIdL"] && 
-!triggerFlags["HLT_TripleMu_5_3_3_DZ_Mass3p8"] && 														!triggerFlags["HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ"] && !triggerFlags["HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL_DZ"] && !triggerFlags["HLT_TkMu17_TrkIsoVVL_TkMu8_TrkIsoVVL_DZ"] && 
-!triggerFlags["HLT_Mu30_TkMu11"] && !triggerFlags["HLT_Mu40_TkMu11"] && 
-!triggerFlags["HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL"] &&    !triggerFlags["HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL"] &&    !triggerFlags["HLT_TkMu17_TrkIsoVVL_TkMu8_TrkIsoVVL"] && 
-!triggerFlags["HLT_Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_DZ"] && 
-!triggerFlags["HLT_Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_DZ"] && !triggerFlags["HLT_Mu23_TrkIsoVVL_Ele8_CaloIdL_TrackIdL_IsoVL_DZ"] && 
-!triggerFlags["HLT_Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL"] && !triggerFlags["HLT_Mu23_TrkIsoVVL_Ele8_CaloIdL_TrackIdL_IsoVL"] && 
-!triggerFlags["HLT_Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL"] && 
-!triggerFlags["HLT_Mu8_TrkIsoVVL_Ele17_CaloIdL_TrackIdL_IsoVL"] && 
-!triggerFlags["HLT_DoubleEle37_Ele27_CaloIdL_GsfTrkIdVL"] && !triggerFlags["HLT_Ele23_Ele12_CaloIdL_TrackIdL_IsoVL_DZ"] && !triggerFlags["HLT_DoubleEle24_22_eta2p1_WPLoose_Gsf"] && 
-!triggerFlags["HLT_DoubleEle33_CaloIdL_GsfTrkIdVL"] && 
-!triggerFlags["HLT_Ele23_Ele12_CaloIdL_TrackIdL_IsoVL"] && 	!triggerFlags["HLT_Ele17_Ele12_CaloIdL_TrackIdL_IsoVL"] && !triggerFlags["HLT_Ele17_Ele12_CaloIdL_TrackIdL_IsoVL_DZ"] && 
-!triggerFlags["HLT_Mu50"] && !triggerFlags["HLT_TkMu50"] && !triggerFlags["HLT_IsoMu27"] && !triggerFlags["HLT_IsoTkMu27"] && 
-!triggerFlags["HLT_IsoMu24"] && !triggerFlags["HLT_IsoTkMu24"] && !triggerFlags["HLT_IsoMu24_eta2p1"] && !triggerFlags["HLT_IsoTkMu24_eta2p1"] && 
-!triggerFlags["HLT_IsoMu22_eta2p1"] && !triggerFlags["HLT_IsoTkMu22_eta2p1"] && 
-!triggerFlags["HLT_IsoTkMu22"] && !triggerFlags["HLT_Mu45_eta2p1"] && 
-!triggerFlags["HLT_Ele32_WPTight_Gsf"] && !triggerFlags["HLT_Ele32_eta2p1_WPTight_Gsf"] && !triggerFlags["HLT_Ele30_WPTight_Gsf"] && !triggerFlags["HLT_Ele30_eta2p1_WPTight_Gsf"] && 
-!triggerFlags["HLT_Ele27_WPTight_Gsf"] && !triggerFlags["HLT_Ele27_eta2p1_WPTight_Gsf"] && !triggerFlags["HLT_Ele27_eta2p1_WPLoose_Gsf"] && !triggerFlags["HLT_Ele25_eta2p1_WPTight_Gsf"] && 
-!triggerFlags["HLT_Ele25_WPTight_Gsf"] && 
-!triggerFlags["HLT_Ele8_CaloIdM_TrackIdM_PFJet30"] && !triggerFlags["HLT_Ele12_CaloIdM_TrackIdM_PFJet30"] && 
-!triggerFlags["HLT_Ele8_CaloIdM_TrackIdM_IsoVL_PFJet30"] && !triggerFlags["HLT_Ele12_CaloIdM_TrackIdM_IsoVL_PFJet30"] && 
-
-!triggerFlags["HLT_Mu8_TrkIsoVVL"] && !triggerFlags["HLT_Mu17_TrkIsoVVL"] && !triggerFlags["HLT_Mu24_TrkIsoVVL"] && !triggerFlags["HLT_Mu34_TrkIsoVVL"] && 
-
-!triggerFlags["HLT_Ele18_CaloIdM_TrackIdM_PFJet30"] && 
-!triggerFlags["HLT_Ele23_CaloIdM_TrackIdM_PFJet30"] && !triggerFlags["HLT_Ele33_CaloIdM_TrackIdM_PFJet30"] && 
-
-!triggerFlags["HLT_Mu3_PFJet40"] && 
-!triggerFlags["HLT_Mu8"] && !triggerFlags["HLT_Mu17"] && !triggerFlags["HLT_Mu24"] && !triggerFlags["HLT_Mu34"] && 
-
-!triggerFlags["HLT_Ele12_CaloIdL_TrackIdL_IsoVL_PFJet30"] && !triggerFlags["HLT_Ele18_CaloIdL_TrackIdL_IsoVL_PFJet30"] && 
-!triggerFlags["HLT_Ele23_CaloIdL_TrackIdL_IsoVL_PFJet30"] && !triggerFlags["HLT_Ele33_CaloIdL_TrackIdL_IsoVL_PFJet30"] && 
-
-!triggerFlags["HLT_Ele12_CaloIdL_TrkIdL_IsoVL"] && !triggerFlags["HLT_Ele17_CaloIdL_TrackIdL_IsoVL"] && 
-!triggerFlags["HLT_Ele23_CaloIdL_TrackIdL_IsoVL"]) return;
-
-
-
-
+    // Check if this event has triggered at least one of our save triggers
+    triggerFound = false;
+    for(trigger : triggersToSave){
+      if(triggerFlags[trigger]) triggerFound = true;
+    }
 
     // Here we make the decision on what to save
     if(treeForFakeRate){
-      //if(_nLeptons < 3) return; // for FR in ttbar sample 
-
+      if(!triggerFound)        return;
       if(_nLeptons != 1)       return;
       if(_n_Jets < 1)          return;				// For fake rate tree: exactly 1 loose lepton + at least 1 jet
       if(_jetPt[0] < 30)       return;				// with deltaR(j, l) > 1 (back-to-back)
       if(_jetDeltaR[0][0] < 1) return;
-    } else if(singleLep){
+    } else if(singleLep){                     // Important: do not require trigger for singleLep trees which we use to measure trigger efficiencies
       if(_nLeptons < 1) return;
     } else {
+      if(!triggerFound) return;
       if(_nLeptons < 3) return;
     }
     outputTree->Fill();
