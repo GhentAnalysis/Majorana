@@ -344,6 +344,8 @@ private:
     int _partonIdMatched[nLeptonsMax];
     bool _sameParton[nLeptonsMax];
     
+
+bool _lCleanCut[nLeptonsMax];
     bool _isloose[nLeptonsMax];
     bool _ismedium[nLeptonsMax];
     bool _istight[nLeptonsMax];

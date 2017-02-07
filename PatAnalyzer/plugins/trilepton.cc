@@ -832,29 +832,28 @@ void trilepton::analyze(const edm::Event& iEvent, const edm::EventSetup& iEventS
      * Leptons
      */
     int leptonCounter = 0;
- 
+//    bool _islooseCut[leptonCounter];
     for(auto muon = muons->begin(); muon != muons->end(); ++muon){
       if(muon->pt() < _minPt0)        continue;
-      if(std::abs(muon->eta()) > 2.5) continue;
-      if(!muon->isLooseMuon())        continue;  // Store only loose muons, see https://twiki.cern.ch/twiki/bin/viewauth/CMS/SWGuideMuonIdRun2
+      if(std::abs(muon->eta()) > 2.4) continue;
+  //    if(!muon->isLooseMuon())        continue;  // Store only loose muons, see https://twiki.cern.ch/twiki/bin/viewauth/CMS/SWGuideMuonIdRun2
       bool goodGlb      = muon->isGlobalMuon() and muon->globalTrack()->normalizedChi2() < 3 and muon->combinedQuality().chi2LocalPosition < 12 and muon->combinedQuality().trkKink < 20;
       bool isMedium     = muon->isLooseMuon() and muon->innerTrack()->validFraction() > 0.8 and muon->segmentCompatibility() >= (goodGlb ? 0.303 : 0.451); // temporary ICHEP recommendation	    
-      if (!isMedium) continue;   
-	      
-      if(muon->innerTrack().isNull()) 		       continue;  // Store only when we have an innertrack
-      if(std::abs(muon->innerTrack()->dxy(PV)) > 0.05) continue;
-      if(std::abs(muon->innerTrack()->dz(PV)) > 0.1  ) continue;
-
-      double relIso = tools::pfRelIso(&*muon,myRhoJECJets);
-      if(relIso > 0.6) continue; // loose selection for FR
+      //if (!isMedium) continue;
+   
+	if(muon->innerTrack().isNull()) continue;	      
 
       if (leptonCounter == 10) continue;  // using arrays, so do not store more than 10 muons, they are sorted in pt anyway
+	 double relIso = tools::pfRelIso(&*muon,myRhoJets);
 
       // might be preferable to change to vectors instead of arrays because we do not know the length
       _flavors[leptonCounter]     = 1;
       _charges[leptonCounter]     = muon->charge();
       _isolation[leptonCounter]   = relIso;
       _isolation_absolute[leptonCounter] = tools::pfAbsIso(&*muon);
+
+
+
       
       _miniisolation[leptonCounter] 	   = tools::getMiniIsolation(pfcands, &*muon, 0.05, 0.2, 10., myRhoJets, false);
       _miniisolationCharged[leptonCounter] = tools::getMiniIsolation(pfcands, &*muon, 0.05, 0.2, 10., myRhoJets, false);
@@ -866,6 +865,15 @@ void trilepton::analyze(const edm::Event& iEvent, const edm::EventSetup& iEventS
       _3dIP[leptonCounter]     = muon->dB(pat::Muon::PV3D);
       _3dIPerr[leptonCounter]  = muon->edB(pat::Muon::PV3D);
       _3dIPsig[leptonCounter]  = fabs(_3dIP[leptonCounter]/_3dIPerr[leptonCounter]);
+
+	        _isloose[leptonCounter] = std::abs(muon->eta()) < 2.4 && muon->pt() > 5 && fabs(_ipPV[leptonCounter]) < 0.05 && fabs(_ipZPV[leptonCounter]) < 0.1 && muon->isPFMuon() && (muon->isTrackerMuon() || muon->isGlobalMuon() ) && _isolation[leptonCounter] < 0.6;
+
+      if(std::abs(muon->innerTrack()->dxy(PV)) > 0.05) continue;
+      if(std::abs(muon->innerTrack()->dz(PV)) > 0.1  ) continue;
+
+      if(relIso > 0.6) continue; // loose selection for FR
+
+
      
       //bool goodGlb      = muon->isGlobalMuon() and muon->globalTrack()->normalizedChi2() < 3 and muon->combinedQuality().chi2LocalPosition < 12 and muon->combinedQuality().trkKink < 20;
       //bool isMedium     = muon->isLooseMuon() and muon->innerTrack()->validFraction() > 0.49 and muon->segmentCompatibility() >= (goodGlb ? 0.303 : 0.451); // temporary ICHEP recommendation
@@ -873,7 +881,7 @@ void trilepton::analyze(const edm::Event& iEvent, const edm::EventSetup& iEventS
  
       _muonSegmentComp[leptonCounter] = muon->segmentCompatibility(); // do we really use this variable in our trees? should be enough to select loose or medium
  
-      _isloose[leptonCounter]  = muon->isLooseMuon();
+      //_isloose[leptonCounter]  = muon->isLooseMuon();
       _ismedium[leptonCounter] = isMedium;
       _istight[leptonCounter]  = muon->isTightMuon(*PVtx);
 
@@ -923,7 +931,8 @@ cout<<"Gen matched: "<<_lpdgmc[leptonCounter]<<" "<<_lPtmc[leptonCounter]<<" "<<
         leptonCounter++;
     }
     _nMu = leptonCounter;
-   
+
+
     for(auto electron = electrons->begin(); electron != electrons->end(); ++electron){
       if (leptonCounter == 10) continue; // This will go terribly wrong when there are about 8-10 muons or more (even though this is an improbable situation)
 
@@ -937,11 +946,25 @@ cout<<"Gen matched: "<<_lpdgmc[leptonCounter]<<" "<<_lPtmc[leptonCounter]<<" "<<
       if(!electron->gsfTrack().isNonnull()) continue;
       //if( TMath::Abs(gsfTrack->dxy(PV)) > 0.05  )  continue;
       //if( TMath::Abs(gsfTrack->dz(PV)) > 0.1  ) continue;
-    
-	    
+	
+	_lCleanCut[leptonCounter] = true;
+                for(int m = 0; m < _nMu; ++m){
+                    if(!_isloose[m]) continue;
+                    TLorentzVector mu, el;
+                    mu.SetPtEtaPhiE(_lPt[m], _lEta[m], _lPhi[m], _lE[m]);
+                    el.SetPtEtaPhiE(electron->pt(), electron->eta(), electron->phi(), electron->energy());
+                    if(el.DeltaR(mu) < 0.05){
+                        _lCleanCut[leptonCounter] = false;
+                        break;
+                    }
+                }    
+	    if(!_lCleanCut[leptonCounter]) continue;
+
+
+
       //if(!tools::isLooseCutBasedElectronWithoutIsolation(&*electron)) continue; //only store those passing the loose cut based id, without isolation requirement
 
-      double relIso = tools::pfRelIso(&*electron, myRhoJECJets);
+      double relIso = tools::pfRelIso(&*electron, myRhoJets);
       	    
       if(relIso > 0.6) continue;
       // There will be a new electron MVA soon
@@ -1090,7 +1113,7 @@ cout<<"Gen matched: "<<_lpdgmc[leptonCounter]<<" "<<_lPtmc[leptonCounter]<<" "<<
         double corr = fMetCorrector->getJetCorrectionRawPt(uncPt, uncEta, myRhoJECJets, SelectedJets[i]->jetArea(),_corrLevel, _runNb);
         //std::cout << "Before correction pt of jet: " << uncPt << " " << uncPt*corr << std::endl;
                                  
-        if (uncPt*corr < 30) continue;
+        if (uncPt*corr < 25) continue;
         //if (uncPt*corr < 20) continue;
                                          
         _jetEta[_n_Jets] = SelectedJets[i]->eta();
@@ -1147,7 +1170,7 @@ cout<<"Gen matched: "<<_lpdgmc[leptonCounter]<<" "<<_lPtmc[leptonCounter]<<" "<<
             _n_bJets++;
         } else _bTagged[_n_Jets] = false;
         
-        if (_jetPt[_n_Jets] > 30)
+        if (_jetPt[_n_Jets] > 25)
 	  HT+= _jetPt[_n_Jets];
         _n_Jets++;
     }
@@ -1156,6 +1179,46 @@ cout<<"Gen matched: "<<_lpdgmc[leptonCounter]<<" "<<_lPtmc[leptonCounter]<<" "<<
 //if (triggerFlags["HLT_Mu8_v"] )  std::cout<<"++++++++++++++++++++++++++++ true trigger flag: 2"<<endl;
 //if (triggerFlags["HLT_Mu17_v"] )  std::cout<<"++++++++++++++++++++++++++++ true trigger flag: 3"<<endl;
 //if (triggerFlags["HLT_Ele12_CaloIdL_TrackIdL_IsoVL_PFJet30_v"] )  std::cout<<"++++++++++++++++++++++++++++ true trigger flag: 4"<<endl;
+
+if (!triggerFlags["HLT_TripleMu_12_10_5"] && !triggerFlags["HLT_DiMu9_Ele9_CaloIdL_TrackIdL"] && !triggerFlags["HLT_Mu8_DiEle12_CaloIdL_TrackIdL"] && !triggerFlags["HLT_Ele16_Ele12_Ele8_CaloIdL_TrackIdL"] && 
+!triggerFlags["HLT_TripleMu_5_3_3_DZ_Mass3p8"] && 														!triggerFlags["HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ"] && !triggerFlags["HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL_DZ"] && !triggerFlags["HLT_TkMu17_TrkIsoVVL_TkMu8_TrkIsoVVL_DZ"] && 
+!triggerFlags["HLT_Mu30_TkMu11"] && !triggerFlags["HLT_Mu40_TkMu11"] && 
+!triggerFlags["HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL"] &&    !triggerFlags["HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL"] &&    !triggerFlags["HLT_TkMu17_TrkIsoVVL_TkMu8_TrkIsoVVL"] && 
+!triggerFlags["HLT_Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_DZ"] && 
+!triggerFlags["HLT_Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_DZ"] && !triggerFlags["HLT_Mu23_TrkIsoVVL_Ele8_CaloIdL_TrackIdL_IsoVL_DZ"] && 
+!triggerFlags["HLT_Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL"] && !triggerFlags["HLT_Mu23_TrkIsoVVL_Ele8_CaloIdL_TrackIdL_IsoVL"] && 
+!triggerFlags["HLT_Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL"] && 
+!triggerFlags["HLT_Mu8_TrkIsoVVL_Ele17_CaloIdL_TrackIdL_IsoVL"] && 
+!triggerFlags["HLT_DoubleEle37_Ele27_CaloIdL_GsfTrkIdVL"] && !triggerFlags["HLT_Ele23_Ele12_CaloIdL_TrackIdL_IsoVL_DZ"] && !triggerFlags["HLT_DoubleEle24_22_eta2p1_WPLoose_Gsf"] && 
+!triggerFlags["HLT_DoubleEle33_CaloIdL_GsfTrkIdVL"] && 
+!triggerFlags["HLT_Ele23_Ele12_CaloIdL_TrackIdL_IsoVL"] && 	!triggerFlags["HLT_Ele17_Ele12_CaloIdL_TrackIdL_IsoVL"] && !triggerFlags["HLT_Ele17_Ele12_CaloIdL_TrackIdL_IsoVL_DZ"] && 
+!triggerFlags["HLT_Mu50"] && !triggerFlags["HLT_TkMu50"] && !triggerFlags["HLT_IsoMu27"] && !triggerFlags["HLT_IsoTkMu27"] && 
+!triggerFlags["HLT_IsoMu24"] && !triggerFlags["HLT_IsoTkMu24"] && !triggerFlags["HLT_IsoMu24_eta2p1"] && !triggerFlags["HLT_IsoTkMu24_eta2p1"] && 
+!triggerFlags["HLT_IsoMu22_eta2p1"] && !triggerFlags["HLT_IsoTkMu22_eta2p1"] && 
+!triggerFlags["HLT_IsoTkMu22"] && !triggerFlags["HLT_Mu45_eta2p1"] && 
+!triggerFlags["HLT_Ele32_WPTight_Gsf"] && !triggerFlags["HLT_Ele32_eta2p1_WPTight_Gsf"] && !triggerFlags["HLT_Ele30_WPTight_Gsf"] && !triggerFlags["HLT_Ele30_eta2p1_WPTight_Gsf"] && 
+!triggerFlags["HLT_Ele27_WPTight_Gsf"] && !triggerFlags["HLT_Ele27_eta2p1_WPTight_Gsf"] && !triggerFlags["HLT_Ele27_eta2p1_WPLoose_Gsf"] && !triggerFlags["HLT_Ele25_eta2p1_WPTight_Gsf"] && 
+!triggerFlags["HLT_Ele25_WPTight_Gsf"] && 
+!triggerFlags["HLT_Ele8_CaloIdM_TrackIdM_PFJet30"] && !triggerFlags["HLT_Ele12_CaloIdM_TrackIdM_PFJet30"] && 
+!triggerFlags["HLT_Ele8_CaloIdM_TrackIdM_IsoVL_PFJet30"] && !triggerFlags["HLT_Ele12_CaloIdM_TrackIdM_IsoVL_PFJet30"] && 
+
+!triggerFlags["HLT_Mu8_TrkIsoVVL"] && !triggerFlags["HLT_Mu17_TrkIsoVVL"] && !triggerFlags["HLT_Mu24_TrkIsoVVL"] && !triggerFlags["HLT_Mu34_TrkIsoVVL"] && 
+
+!triggerFlags["HLT_Ele18_CaloIdM_TrackIdM_PFJet30"] && 
+!triggerFlags["HLT_Ele23_CaloIdM_TrackIdM_PFJet30"] && !triggerFlags["HLT_Ele33_CaloIdM_TrackIdM_PFJet30"] && 
+
+!triggerFlags["HLT_Mu3_PFJet40"] && 
+!triggerFlags["HLT_Mu8"] && !triggerFlags["HLT_Mu17"] && !triggerFlags["HLT_Mu24"] && !triggerFlags["HLT_Mu34"] && 
+
+!triggerFlags["HLT_Ele12_CaloIdL_TrackIdL_IsoVL_PFJet30"] && !triggerFlags["HLT_Ele18_CaloIdL_TrackIdL_IsoVL_PFJet30"] && 
+!triggerFlags["HLT_Ele23_CaloIdL_TrackIdL_IsoVL_PFJet30"] && !triggerFlags["HLT_Ele33_CaloIdL_TrackIdL_IsoVL_PFJet30"] && 
+
+!triggerFlags["HLT_Ele12_CaloIdL_TrkIdL_IsoVL"] && !triggerFlags["HLT_Ele17_CaloIdL_TrackIdL_IsoVL"] && 
+!triggerFlags["HLT_Ele23_CaloIdL_TrackIdL_IsoVL"]) return;
+
+
+
+
 
     // Here we make the decision on what to save
     if(treeForFakeRate){
@@ -1166,7 +1229,7 @@ cout<<"Gen matched: "<<_lpdgmc[leptonCounter]<<" "<<_lPtmc[leptonCounter]<<" "<<
       if(_jetPt[0] < 30)       return;				// with deltaR(j, l) > 1 (back-to-back)
       if(_jetDeltaR[0][0] < 1) return;
     } else if(singleLep){
-      if(_nLeptons < 1) return;
+      if(_nLeptons < 3) return;
     } else {
       if(_nLeptons < 3) return;
     }

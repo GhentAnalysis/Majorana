@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 import os, glob, sys
 
-productionLabel = 'triggerEfficiency_v5'		                      					# Label to keep track of the tuple versio
-outDir          = '/user/' + os.environ['USER'] + '/public/majorana'						# Output directory in case of local submission
+productionLabel = 'last_FR'		                      					# Label to keep track of the tuple versio
+outDir          = '/user/' + os.environ['USER'] + '/public/FR_runD_good'						# Output directory in case of local submission
 datasets        = [dataset.strip() for dataset in open(sys.argv[1])]						# Get list of datasets from file given as first argument
 datasets        = [dataset.split()[0] for dataset in datasets if dataset and not dataset.startswith('#')]	# Clean empty and comment lines
 
@@ -13,7 +13,7 @@ for dataset in datasets:
     singleLep       = False
     dataset         = dataset.split(':')[-1]
   elif dataset.startswith('SINGLELEP:'):
-    outputName      = 'singleLep'
+    outputName      = 'trilepton'
     treeForFakeRate = False
     singleLep       = True
     dataset         = dataset.split(':')[-1]

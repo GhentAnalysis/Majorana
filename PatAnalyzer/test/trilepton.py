@@ -2,12 +2,13 @@ import sys
 import FWCore.ParameterSet.Config as cms
 from RecoTauTag.RecoTau.PFRecoTauQualityCuts_cfi import PFTauQualityCuts
 
-isData          = True
+isData          = False
 treeForFakeRate = False
-singleLep       = False
+singleLep       = True
 #inputFile       = "file:///user/mvit/public/Majorana/MajoranaNeutrino_trilepton_M-10_5f_NLO/Majorana_trilepton_RunIISpring16MiniAODv2_96.root"
-inputFile       = "/pnfs/iihe/cms/ph/sc4/store/mc/RunIISummer16MiniAODv2/WZTo3LNu_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8/MINIAODSIM/PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/120000/14CED05F-DFBB-E611-ACE6-00259029E922.root"
-nEvents         = 10
+inputFile       = "file:///pnfs/iihe/cms/ph/sc4/store/data/Run2016C/DoubleEG/MINIAOD/23Sep2016-v1/100000/00831315-BA89-E611-80F4-0CC47A7C3412.root"
+#inputFile       = "/store/mc/RunIISummer16MiniAODv2/WZTo3LNu_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8/MINIAODSIM/PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/120000/14CED05F-DFBB-E611-ACE6-00259029E922.root"
+nEvents         = -1
 outputFile      = None
 
 def getVal(arg):
@@ -16,13 +17,14 @@ def getVal(arg):
 ## loop over arguments
 for i in range(1,len(sys.argv)):
     print "[arg "+str(i)+"] : ", sys.argv[i]
-    if   "isData"          in sys.argv[i]: isData          = (getVal(sys.argv[i]) == "True")
-    elif "treeForFakeRate" in sys.argv[i]: treeForFakeRate = (getVal(sys.argv[i]) == "True")
-    elif "singleLep"       in sys.argv[i]: singleLep       = (getVal(sys.argv[i]) == "True")
-    elif "output"          in sys.argv[i]: outputFile      = getVal(sys.argv[i])
-    elif "input"           in sys.argv[i]: inputFile       = getVal(sys.argv[i])
-    elif "events"          in sys.argv[i]: nEvents         = int(getVal(sys.argv[i]))
+    singleLep	   = (getVal(sys.argv[i]) == "True")
 
+    #if   "isData"          in sys.argv[i]: isData          = (getVal(sys.argv[i]) == "True")
+    #elif "treeForFakeRate" in sys.argv[i]: treeForFakeRate = (getVal(sys.argv[i]) == "True")
+    #elif "singleLep"       in sys.argv[i]: singleLep       = (getVal(sys.argv[i]) == "True")
+    #elif "output"          in sys.argv[i]: outputFile      = getVal(sys.argv[i])
+    #elif "input"           in sys.argv[i]: inputFile       = getVal(sys.argv[i])
+    #elif "events"          in sys.argv[i]: nEvents         = int(getVal(sys.argv[i]))
 process = cms.Process("trilepton")
 
 # initialize MessageLogger and output report
@@ -36,9 +38,11 @@ process.maxEvents = cms.untracked.PSet(input = cms.untracked.int32(nEvents)) # f
 
 process.load("Configuration.StandardSequences.FrontierConditions_GlobalTag_cff")
 
-if isData: process.GlobalTag.globaltag = '80X_dataRun2_2016SeptRepro_v4'
+if isData: process.GlobalTag.globaltag = '80X_dataRun2_2016SeptRepro_v7'
 #else:      process.GlobalTag.globaltag = '80X_mcRun2_asymptotic_2016_miniAODv2'
-else:	   process.GlobalTag.globaltag = '80X_mcRun2_asymptotic_2016_TrancheIV_v6'
+else:	   process.GlobalTag.globaltag = '80X_mcRun2_asymptotic_2016_TrancheIV_v8'
+#process.GlobalTag.globaltag = '80X_mcRun2_asymptotic_2016_TrancheIV_v8'
+
 
 #process.load("Configuration.StandardSequences.Geometry_cff")
 process.load("Configuration.StandardSequences.GeometryRecoDB_cff")
