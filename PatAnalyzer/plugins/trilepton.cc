@@ -143,9 +143,9 @@ void trilepton::beginJob()
     tools::readEffAreas(edm::FileInPath("Majorana/PatAnalyzer/data/effAreaMuons_cone03_pfNeuHadronsAndPhotons_80X.txt").fullPath(), 13);
     tools::initMultiIsoConstants(); // that's the problem when using namespaces instead of classes, you need to have separate init functions
 
-    if(singleLep)       outputTree = fs->make<TTree>("singleLepTree", "singleLepTree");
-    if(treeForFakeRate) outputTree = fs->make<TTree>("fakeRateTree",  "fakeRateTree");
-    else                outputTree = fs->make<TTree>("trileptonTree","trileptonTree");
+    if(singleLep)            outputTree = fs->make<TTree>("singleLepTree", "singleLepTree");
+    else if(treeForFakeRate) outputTree = fs->make<TTree>("fakeRateTree",  "fakeRateTree");
+    else                     outputTree = fs->make<TTree>("trileptonTree","trileptonTree");
     Nvtx = fs->make<TH1F>("N_{vtx}", "Number of vertices;N_{vtx};events / 1"  ,    40, 0., 40.);
     
     _hCounter = fs->make<TH1D>("hCounter", "Events counter", 5,0,5);
@@ -1229,7 +1229,7 @@ if (!triggerFlags["HLT_TripleMu_12_10_5"] && !triggerFlags["HLT_DiMu9_Ele9_CaloI
       if(_jetPt[0] < 30)       return;				// with deltaR(j, l) > 1 (back-to-back)
       if(_jetDeltaR[0][0] < 1) return;
     } else if(singleLep){
-      if(_nLeptons < 3) return;
+      if(_nLeptons < 1) return;
     } else {
       if(_nLeptons < 3) return;
     }
