@@ -298,7 +298,7 @@ void trilepton::beginJob()
 
     //Gen Level outputTrees////////////////////////////////////////////////////
     if(not isData){
-      outputTree->Branch("_gen_nL",       &_gen_nL,       "_gen_nL/I");	    
+      outputTree->Branch("_gen_nL",       &_gen_nL,       "_gen_nL/I"); 
       outputTree->Branch("_gen_lPt",      &_gen_lPt,      "_gen_lPt[_gen_nL]/D");
       outputTree->Branch("_gen_lE",       &_gen_lE,       "_gen_lE[_gen_nL]/D");
       outputTree->Branch("_gen_lEta",     &_gen_lEta,     "_gen_lEta[_gen_nL]/D");
@@ -1200,58 +1200,50 @@ void trilepton::fillCloseJetVars(const int leptonCounter, Vertex::Point PV) {
     TLorentzVector pJet;
     //std::cout << "Selected Jets Number:\t"<< SelectedJetsAll.size() << std::endl;
     for(unsigned int k = 0 ; k < SelectedJetsAll.size() ;k++ ){
-        double uncorrPt = (SelectedJetsAll[k]->correctedP4("Uncorrected")).Pt();
-	TLorentzVector vect_j;		    
-	vect_j.SetPtEtaPhiE(_lPt[leptonCounter],_lEta[leptonCounter],_lPhi[leptonCounter], _lE[leptonCounter]);
+      double uncorrPt = (SelectedJetsAll[k]->correctedP4("Uncorrected")).Pt();
+      TLorentzVector vect_j;
+      vect_j.SetPtEtaPhiE(_lPt[leptonCounter],_lEta[leptonCounter],_lPhi[leptonCounter], _lE[leptonCounter]);
 
-        double corr = fMetCorrector->getJetCorrectionRawPt( uncorrPt, (SelectedJetsAll[k]->correctedP4("Uncorrected")).Eta(), myRhoJECJets, SelectedJetsAll[k]->jetArea(),"L1FastJet", _runNb);
-        double corr2 = fMetCorrector->getJetCorrectionRawPt( uncorrPt, (SelectedJetsAll[k]->correctedP4("Uncorrected")).Eta(), myRhoJECJets, SelectedJetsAll[k]->jetArea(),_corrLevel, _runNb);
+      double corr = fMetCorrector->getJetCorrectionRawPt( uncorrPt, (SelectedJetsAll[k]->correctedP4("Uncorrected")).Eta(), myRhoJECJets, SelectedJetsAll[k]->jetArea(),"L1FastJet", _runNb);
+      double corr2 = fMetCorrector->getJetCorrectionRawPt( uncorrPt, (SelectedJetsAll[k]->correctedP4("Uncorrected")).Eta(), myRhoJECJets, SelectedJetsAll[k]->jetArea(),_corrLevel, _runNb);
         
-       pJet.SetPtEtaPhiE( corr*uncorrPt, SelectedJetsAll[k]->eta(), SelectedJetsAll[k]->phi(), corr*(SelectedJetsAll[k]->correctedP4("Uncorrected")).E());
-       pJet-=vect_j;
+      pJet.SetPtEtaPhiE( corr*uncorrPt, SelectedJetsAll[k]->eta(), SelectedJetsAll[k]->phi(), corr*(SelectedJetsAll[k]->correctedP4("Uncorrected")).E());
+      pJet-=vect_j;
        
-       pJet*=corr2/corr;
-       pJet+=vect_j;
+      pJet*=corr2/corr;
+      pJet+=vect_j;
 
               
-       double ang = vect_j.DeltaR( pJet );
-       if (ang < _closeJetAngAll[leptonCounter]) {
-           _closeJetAngAll[leptonCounter] = vect_j.DeltaR( pJet );
-           _closeJetPtAll[leptonCounter] = pJet.Pt();
-                                  
-           //_closeJetEtaAll[leptonCounter] = pJet.Eta();
-           //_closeJetPhiAll[leptonCounter] = pJet.Phi();
-           //_closeJetEAll[leptonCounter] = pJet.E();
-           //_closeJetMAll[leptonCounter] = pJet.M();
-           //_closeJetNconstAll[leptonCounter] = SelectedJetsAll[k]->numberOfDaughters();
-           _closeJetCSVAll[leptonCounter] = SelectedJetsAll[k]->bDiscriminator("pfCombinedInclusiveSecondaryVertexV2BJetTags");
-       
-           _ptrel[leptonCounter] = vect_j.Perp(pJet.Vect() - (vect_j.Vect()));
+      double ang = vect_j.DeltaR( pJet );
+      if (ang < _closeJetAngAll[leptonCounter]) {
+        _closeJetAngAll[leptonCounter] = vect_j.DeltaR( pJet );
+        _closeJetPtAll[leptonCounter] = pJet.Pt();
+                                
+      //_closeJetEtaAll[leptonCounter] = pJet.Eta();
+      //_closeJetPhiAll[leptonCounter] = pJet.Phi();
+      //_closeJetEAll[leptonCounter] = pJet.E();
+      //_closeJetMAll[leptonCounter] = pJet.M();
+      //_closeJetNconstAll[leptonCounter] = SelectedJetsAll[k]->numberOfDaughters();
+        _closeJetCSVAll[leptonCounter] = SelectedJetsAll[k]->bDiscriminator("pfCombinedInclusiveSecondaryVertexV2BJetTags");
+    
+        _ptrel[leptonCounter] = vect_j.Perp(pJet.Vect() - (vect_j.Vect()));
 
-           _ptratio[leptonCounter] = (vect_j.Pt())/(_closeJetPtAll[leptonCounter]);
+        _ptratio[leptonCounter] = (vect_j.Pt())/(_closeJetPtAll[leptonCounter]);
 
-           _closeIndex[leptonCounter] = k;
+        _closeIndex[leptonCounter] = k;
 
-           int trackSelectionMult = 0;
-           //cout << "jet closest pt candidate: " << pJet.Pt() << endl;
-           //if(_closeIndex[leptonCounter] != -1){
-           for(int unsigned it=0; it!=SelectedJetsAll[_closeIndex[leptonCounter]]->numberOfDaughters(); ++it) {
-             const pat::PackedCandidate * icand = dynamic_cast<const pat::PackedCandidate *> (SelectedJetsAll[_closeIndex[leptonCounter]]->daughter(it));
-             const reco::Track& trk = icand->pseudoTrack();
-             Double_t deta = trk.eta() - pJet.Eta();
-             Double_t dphi = TVector2::Phi_mpi_pi(trk.phi() - pJet.Phi());
-             bool trackSelection =  (trk.pt() > 1) && trk.charge() != 0 && (TMath::Sqrt( deta*deta+dphi*dphi ) < 0.4) && (icand->fromPV() > 1) && (trk.hitPattern().numberOfValidHits()>=8) && (trk.hitPattern().numberOfValidPixelHits()>=2) && (trk.normalizedChi2()<5) && std::fabs(trk.dxy(PV))<0.2 && std::fabs(trk.dz(PV))<17;
-            if(trackSelection) trackSelectionMult++;
-            /*
-            if(trackSelection)
-                cout << "track pt: " << trk.pt() << endl;
-                */
-           }
-           //cout << "trackMultiplicity: " << trackSelectionMult << endl;
-           //}
+        int trackSelectionMult = 0;
+        for(int unsigned it=0; it!=SelectedJetsAll[_closeIndex[leptonCounter]]->numberOfDaughters(); ++it) {
+          const pat::PackedCandidate * icand = dynamic_cast<const pat::PackedCandidate *> (SelectedJetsAll[_closeIndex[leptonCounter]]->daughter(it));
+          const reco::Track& trk = icand->pseudoTrack();
+          Double_t deta = trk.eta() - pJet.Eta();
+          Double_t dphi = TVector2::Phi_mpi_pi(trk.phi() - pJet.Phi());
+          bool trackSelection =  (trk.pt() > 1) && trk.charge() != 0 && (TMath::Sqrt( deta*deta+dphi*dphi ) < 0.4) && (icand->fromPV() > 1) && (trk.hitPattern().numberOfValidHits()>=8) && (trk.hitPattern().numberOfValidPixelHits()>=2) && (trk.normalizedChi2()<5) && std::fabs(trk.dxy(PV))<0.2 && std::fabs(trk.dz(PV))<17;
+          if(trackSelection) trackSelectionMult++;
+        }
 
-         _trackSelectionMultiplicity[leptonCounter] = trackSelectionMult;
-         }
+      _trackSelectionMultiplicity[leptonCounter] = trackSelectionMult;
+      }
     }
 
     if (_closeJetAngAll[leptonCounter] > 0.4) {
@@ -1276,38 +1268,32 @@ void trilepton::matchCloseJet(const int leptonCounter) {
     const GenParticle* mc3a = 0;
     const GenParticle* mc2a = 0;
 
-    if(SelectedJetsAll.size() != 0)
-    {
+    if(SelectedJetsAll.size() != 0) {
       Gen1.SetPtEtaPhiE(SelectedJetsAll.at(_closeIndex[leptonCounter])->pt(),SelectedJetsAll.at(_closeIndex[leptonCounter])->eta(),SelectedJetsAll.at(_closeIndex[leptonCounter])->phi(),SelectedJetsAll.at(_closeIndex[leptonCounter])->energy());
+      for(GenParticleCollection::const_reverse_iterator p = TheGenParticles->rbegin() ; p != TheGenParticles->rend() ; p++ ) {
+        int id = std::abs(p->pdgId());
     
-
-        for(GenParticleCollection::const_reverse_iterator p = TheGenParticles->rbegin() ; p != TheGenParticles->rend() ; p++ ) {
-            int id = std::abs(p->pdgId());
-        
-            if ((id > 0 && id < 6) || (id == 21) || (id == 22)) {
-             if (p->status() != 2) {
-                if (fabs(p->eta()) <= 10 )
-                    Gen2.SetPtEtaPhiE(p->pt(),p->eta(),p->phi(),p->energy());
-                else continue;
-                //Gen2.SetPtEtaPhiM(p->pt(),0.00001,p->phi(),0);
-                double deltaRcur = Gen1.DeltaR(Gen2);
-                if (deltaRcur < minDeltaR3) {
-                    mc3a = &*p;
-                    minDeltaR3 = deltaRcur;
-                }
-                
-             } else if (p->status() == 2) {
-                if (fabs(p->eta()) <= 10 )
-                    Gen2.SetPtEtaPhiE(p->pt(),p->eta(),p->phi(),p->energy());
-                else continue;
-                //Gen2.SetPtEtaPhiM(p->pt(),0.00001,p->phi(),0);
-                double deltaRcur = Gen1.DeltaR(Gen2);
-                if (deltaRcur < minDeltaR2) {
-                    mc2a = &*p;
-                    minDeltaR2 = deltaRcur;
-                }
-              }
+        if ((id > 0 && id < 6) || (id == 21) || (id == 22)) {
+         if (p->status() != 2) {
+           if (fabs(p->eta()) <= 10 ) Gen2.SetPtEtaPhiE(p->pt(),p->eta(),p->phi(),p->energy());
+           else                       continue;
+         //Gen2.SetPtEtaPhiM(p->pt(),0.00001,p->phi(),0);
+           double deltaRcur = Gen1.DeltaR(Gen2);
+           if (deltaRcur < minDeltaR3) {
+              mc3a = &*p;
+              minDeltaR3 = deltaRcur;
            }
+         } else if (p->status() == 2) {
+            if (fabs(p->eta()) <= 10 ) Gen2.SetPtEtaPhiE(p->pt(),p->eta(),p->phi(),p->energy());
+            else                       continue;
+            //Gen2.SetPtEtaPhiM(p->pt(),0.00001,p->phi(),0);
+            double deltaRcur = Gen1.DeltaR(Gen2);
+            if (deltaRcur < minDeltaR2) {
+              mc2a = &*p;
+              minDeltaR2 = deltaRcur;
+            }
+          }
+        }
       }
     } 
 
@@ -1329,8 +1315,7 @@ void trilepton::matchCloseJet(const int leptonCounter) {
 
 void trilepton::fillIsoMCVars(const int leptonCounter) {
     
-    if( TheGenParticles.isValid() )
-    {
+    if( TheGenParticles.isValid() ) {
         //if (_isolation[0] == 0) {
         //    std::cout<<"==="<<std::endl;
         //}
@@ -1340,7 +1325,7 @@ void trilepton::fillIsoMCVars(const int leptonCounter) {
             //int id = std::abs(p->pdgId());
             if (p->status() == 1) {
                 TLorentzVector pmc; pmc.SetPtEtaPhiM( p->pt(), p->eta(), p->phi(), p->mass() );
-		TLorentzVector pm1; pm1.SetPtEtaPhiE(_lPt[leptonCounter],_lEta[leptonCounter],_lPhi[leptonCounter], _lE[leptonCounter]);
+                TLorentzVector pm1; pm1.SetPtEtaPhiE(_lPt[leptonCounter],_lEta[leptonCounter],_lPhi[leptonCounter], _lE[leptonCounter]);
                 double ang = pm1.DeltaR( pmc );
                 if (ang < 0.3) {
                     _isolationMC[leptonCounter][2]+=p->pt();
@@ -1379,8 +1364,7 @@ void trilepton::fillRegVars(const pat::Jet *jet, double genpt, const pat::Muon* 
     
     const reco::TrackRefVector &tracks =  jet->associatedTracks();
     for (unsigned int k=0; k!= tracks.size(); ++k) {
-        if(tracks[k]->pt() > hJet_ptLeadTrack)
-            hJet_ptLeadTrack = tracks[k]->pt();
+        if(tracks[k]->pt() > hJet_ptLeadTrack) hJet_ptLeadTrack = tracks[k]->pt();
     }
     
     hJet_vtx3dL = 0;
@@ -1436,8 +1420,7 @@ void trilepton::fillRegVars(const pat::Jet *jet, double genpt, const pat::Electr
     
     const reco::TrackRefVector &tracks =  jet->associatedTracks();
     for (unsigned int k=0; k!= tracks.size(); ++k) {
-        if(tracks[k]->pt() > hJet_ptLeadTrack)
-            hJet_ptLeadTrack = tracks[k]->pt();
+        if(tracks[k]->pt() > hJet_ptLeadTrack) hJet_ptLeadTrack = tracks[k]->pt();
     }
     
     hJet_vtx3dL = 0;
