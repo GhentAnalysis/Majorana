@@ -298,35 +298,35 @@ void trilepton::beginJob()
 
     //Gen Level outputTrees////////////////////////////////////////////////////
     if(not isData){
-      outputTree->Branch("_gen_nL", &_gen_nL, "_gen_nL/I");	    
-      outputTree->Branch("_gen_lPt", &_gen_lPt, "_gen_lPt[_gen_nL]/D");
-      outputTree->Branch("_gen_lE", &_gen_lE, "_gen_lE[_gen_nL]/D");
-      outputTree->Branch("_gen_lEta", &_gen_lEta, "_gen_lEta[_gen_nL]/D");
-      outputTree->Branch("_gen_lPhi", &_gen_lPhi, "_gen_lPhi[_gen_nL]/D");
-      outputTree->Branch("_gen_lmompdg", &_gen_lmompdg, "_gen_lmompdg[_gen_nL]/I");
-      outputTree->Branch("_gen_charges",&_gen_charges, "_gen_charges[_gen_nL]/D");
-      outputTree->Branch("_gen_flavors",&_gen_flavors, "_gen_flavors[_gen_nL]/I");
+      outputTree->Branch("_gen_nL",       &_gen_nL,       "_gen_nL/I");	    
+      outputTree->Branch("_gen_lPt",      &_gen_lPt,      "_gen_lPt[_gen_nL]/D");
+      outputTree->Branch("_gen_lE",       &_gen_lE,       "_gen_lE[_gen_nL]/D");
+      outputTree->Branch("_gen_lEta",     &_gen_lEta,     "_gen_lEta[_gen_nL]/D");
+      outputTree->Branch("_gen_lPhi",     &_gen_lPhi,     "_gen_lPhi[_gen_nL]/D");
+      outputTree->Branch("_gen_lmompdg",  &_gen_lmompdg,  "_gen_lmompdg[_gen_nL]/I");
+      outputTree->Branch("_gen_charges",  &_gen_charges,  "_gen_charges[_gen_nL]/D");
+      outputTree->Branch("_gen_flavors",  &_gen_flavors,  "_gen_flavors[_gen_nL]/I");
       //Added neutrinos  ////////////////////////////////////////////////////
-      outputTree->Branch("_gen_nNu", &_gen_nNu, "_gen_nNu/I");
-      outputTree->Branch("_gen_nuPt", &_gen_nuPt, "_gen_nuPt[_gen_nNu]/D");
-      outputTree->Branch("_gen_nuE", &_gen_nuE, "_gen_nuE[_gen_nNu]/D");
-      outputTree->Branch("_gen_nuEta", &_gen_nuEta, "_gen_nuEta[_gen_nNu]/D");
-      outputTree->Branch("_gen_nuPhi", &_gen_nuPhi, "_gen_nuPhi[_gen_nNu]/D");
+      outputTree->Branch("_gen_nNu",      &_gen_nNu,      "_gen_nNu/I");
+      outputTree->Branch("_gen_nuPt",     &_gen_nuPt,     "_gen_nuPt[_gen_nNu]/D");
+      outputTree->Branch("_gen_nuE",      &_gen_nuE,      "_gen_nuE[_gen_nNu]/D");
+      outputTree->Branch("_gen_nuEta",    &_gen_nuEta,    "_gen_nuEta[_gen_nNu]/D");
+      outputTree->Branch("_gen_nuPhi",    &_gen_nuPhi,    "_gen_nuPhi[_gen_nNu]/D");
       outputTree->Branch("_gen_numompdg", &_gen_numompdg, "_gen_numompdg[_gen_nNu]/I");
       //End of neutrino Edit////////////////////////////////////////////////////////
       //Added neutrinos Majorana  ////////////////////////////////////////////////////
-      outputTree->Branch("_gen_nMajo", &_gen_nMajo, "_gen_nMajo/I");
-      outputTree->Branch("_gen_majoPt", &_gen_majoPt, "_gen_majoPt[_gen_nMajo]/D");
-      outputTree->Branch("_gen_majoE", &_gen_majoE, "_gen_majoE[_gen_nMajo]/D");
-      outputTree->Branch("_gen_majoEta", &_gen_majoEta, "_gen_majoEta[_gen_nMajo]/D");
-      outputTree->Branch("_gen_majoPhi", &_gen_majoPhi, "_gen_majoPhi[_gen_nMajo]/D");
+      outputTree->Branch("_gen_nMajo",    &_gen_nMajo,    "_gen_nMajo/I");
+      outputTree->Branch("_gen_majoPt",   &_gen_majoPt,   "_gen_majoPt[_gen_nMajo]/D");
+      outputTree->Branch("_gen_majoE",    &_gen_majoE,    "_gen_majoE[_gen_nMajo]/D");
+      outputTree->Branch("_gen_majoEta",  &_gen_majoEta,  "_gen_majoEta[_gen_nMajo]/D");
+      outputTree->Branch("_gen_majoPhi",  &_gen_majoPhi,  "_gen_majoPhi[_gen_nMajo]/D");
       //Added W  ////////////////////////////////////////////////////
-      outputTree->Branch("_gen_nW", &_gen_nW, "_gen_nW/I");
-      outputTree->Branch("_gen_wPt", &_gen_wPt, "_gen_wPt[_gen_nW]/D");
-      outputTree->Branch("_gen_wE", &_gen_wE, "_gen_wE[_gen_nW]/D");
-      outputTree->Branch("_gen_wEta", &_gen_wEta, "_gen_wEta[_gen_nW]/D");
-      outputTree->Branch("_gen_wPhi", &_gen_wPhi, "_gen_wPhi[_gen_nW]/D");
-      outputTree->Branch("_gen_wmompdg", &_gen_wmompdg, "_gen_wmompdg[_gen_nW]/I");
+      outputTree->Branch("_gen_nW",       &_gen_nW,       "_gen_nW/I");
+      outputTree->Branch("_gen_wPt",      &_gen_wPt,      "_gen_wPt[_gen_nW]/D");
+      outputTree->Branch("_gen_wE",       &_gen_wE,       "_gen_wE[_gen_nW]/D");
+      outputTree->Branch("_gen_wEta",     &_gen_wEta,     "_gen_wEta[_gen_nW]/D");
+      outputTree->Branch("_gen_wPhi",     &_gen_wPhi,     "_gen_wPhi[_gen_nW]/D");
+      outputTree->Branch("_gen_wmompdg",  &_gen_wmompdg,  "_gen_wmompdg[_gen_nW]/I");
 
    }
 
