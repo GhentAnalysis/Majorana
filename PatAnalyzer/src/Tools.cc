@@ -189,27 +189,37 @@ float tools::dEtaInSeed(const pat::Electron* ele){
   else                                                                            return std::numeric_limits<float>::max();
 }
 
-bool tools::passed_loose_MVA_FR(const pat::Electron* iE, double mvaValue){
-    if(iE->pt() > 10 && iE->pt() < 20){
-	if(std::abs(iE->eta()) < 0.8)         return mvaValue > -0.86;
-	else if (std::abs(iE->eta()) < 1.479) return mvaValue > -0.85;
-	else                                  return mvaValue > -0.81;
-    } else if (iE->pt()>=20){
-	if (std::abs(iE->eta()) < 0.8)        return mvaValue > -0.96;
-	else if (std::abs(iE->eta()) < 1.479) return mvaValue > -0.96;
-	else                                  return mvaValue > -0.95;
-    } else return false;
-}
 
 float tools::slidingCut(float pt, float low, float high){
   float slope = (high - low)/10.;
   return std::min(low, std::max(high, low + slope*(pt-15)));
 }
 
-bool tools::passed_loose_MVA_FR_slidingCut(const pat::Electron* iE, double mvaValue){
-    if(std::abs(iE->eta()) < 0.8)         return slidingCut(iE->pt(), -0.86, -0.96);
-    else if (std::abs(iE->eta()) < 1.479) return slidingCut(iE->pt(), -0.85, -0.96);
-    else                                  return slidingCut(iE->pt(), -0.81, -0.95);
+bool tools::passed_loose_MVA_FR_slidingCut(const pat::Electron* iE, double mvaValue, double mvaValueHZZ){
+    if(iE->pt() < 10)                     return passed_MVA_HZZ(iE, mvaValueHZZ);
+    if(std::abs(iE->eta()) < 0.8)         return mvaValue > slidingCut(iE->pt(), -0.86, -0.96);
+    else if (std::abs(iE->eta()) < 1.479) return mvaValue > slidingCut(iE->pt(), -0.85, -0.96);
+    else                                  return mvaValue > slidingCut(iE->pt(), -0.81, -0.95);
+}
+
+bool tools::passed_medium_MVA_FR_slidingCut(const pat::Electron* iE, double mvaValue){
+    if(iE->pt() < 10)                     return false; 
+    if(std::abs(iE->eta()) < 0.8)         return mvaValue > slidingCut(iE->pt(), -0.86, -0.86);
+    else if (std::abs(iE->eta()) < 1.479) return mvaValue > slidingCut(iE->pt(), -0.85, -0.85);
+    else                                  return mvaValue > slidingCut(iE->pt(), -0.81, -0.81);
+}
+
+bool tools::passed_tight_MVA_FR_slidingCut(const pat::Electron* iE, double mvaValue){
+    if(iE->pt() < 10)                     return false; 
+    if(std::abs(iE->eta()) < 0.8)         return mvaValue > slidingCut(iE->pt(), -0.77, -0.52);
+    else if (std::abs(iE->eta()) < 1.479) return mvaValue > slidingCut(iE->pt(), -0.56, -0.11);
+    else                                  return mvaValue > slidingCut(iE->pt(), -0.48, -0.01);
+}
+
+bool tools::passed_MVA_HZZ(const pat::Electron* iE, double mvaValueHZZ){
+    if(std::abs(iE->eta()) < 0.8)         return mvaValueHZZ > -0.3; 
+    else if (std::abs(iE->eta()) < 1.479) return mvaValueHZZ > -0.36;
+    else                                  return mvaValueHZZ > -0.63;
 }
 
 bool tools::isLooseCutBasedElectronWithoutIsolation(const pat::Electron* ele){

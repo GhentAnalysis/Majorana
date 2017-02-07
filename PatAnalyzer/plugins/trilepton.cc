@@ -788,6 +788,7 @@ void trilepton::analyze(const edm::Event& iEvent, const edm::EventSetup& iEventS
       _3dIPerr[leptonCounter]  = muon->edB(pat::Muon::PV3D);
       _3dIPsig[leptonCounter]  = fabs(_3dIP[leptonCounter]/_3dIPerr[leptonCounter]);
 
+      // Important: we are not using POG definitions anymore, NEVER call this a "loose muon" in a presentation
       _isloose[leptonCounter] = std::abs(muon->eta()) < 2.4 && muon->pt() > 5 && fabs(_ipPV[leptonCounter]) < 0.05 && fabs(_ipZPV[leptonCounter]) < 0.1 && muon->isPFMuon() && (muon->isTrackerMuon() || muon->isGlobalMuon() ) && _isolation[leptonCounter] < 0.6;
 
       if(std::abs(muon->innerTrack()->dxy(PV)) > 0.05) continue;
@@ -883,35 +884,10 @@ void trilepton::analyze(const edm::Event& iEvent, const edm::EventSetup& iEventS
       _passedMVA80[leptonCounter]            = (*electronMvaIdMap80)[electronRef];
       _passedMVA90[leptonCounter]            = (*electronMvaIdMap90)[electronRef];
 
-      const double MVA_cuts_pt15[3][3] = {{-0.86, -0.85, -0.81}, {-0.86, -0.85, -0.81}, {0.77, 0.56, 0.48}};
-      const double MVA_cuts_pt25[3][3] = {{-0.96, -0.96, -0.95}, {-0.86, -0.85, -0.81}, {0.52, 0.11, -0.01}};
-      const double MVA_cuts_pt5HZZ[3] = {-0.3, -0.36, -0.63};
+      _passedMVA_SUSY[leptonCounter][0] = tools::passed_loose_MVA_FR_slidingCut( &*electron, _mvaValue[leptonCounter], _mvaValue_HZZ[leptonCounter]);
+      _passedMVA_SUSY[leptonCounter][1] = tools::passed_medium_MVA_FR_slidingCut(&*electron, _mvaValue[leptonCounter]);
+      _passedMVA_SUSY[leptonCounter][2] = tools::passed_tight_MVA_FR_slidingCut( &*electron, _mvaValue[leptonCounter]);
 
-      _mvaValue_HZZ[leptonCounter] = (*electronMvaIdHZZ)[electronRef];    
-      _passedMVA_SUSY[leptonCounter][0] = false;
-      _passedMVA_SUSY[leptonCounter][1] = false;
-      _passedMVA_SUSY[leptonCounter][2] = false;
-
-      int eta = -1;
-      if(TMath::Abs(electron->eta()) < 0.8 ) {
-        eta = 0;
-      } else if(TMath::Abs(electron->eta()) < 1.479 ) {
-        eta = 1;
-      } else{
-        eta = 2;
-      }
-      if(electron->pt() > 10){ 
-        for(unsigned wp = 0; wp < 3; ++wp){
-          _passedMVA_SUSY[leptonCounter][wp] = _mvaValue[leptonCounter] >  std::min( MVA_cuts_pt15[wp][eta], std::max(MVA_cuts_pt25[wp][eta] , MVA_cuts_pt15[wp][eta] + (MVA_cuts_pt25[wp][eta] - MVA_cuts_pt15[wp][eta])*0.1 *(electron->pt()-15) ) );
-        }
-      } else{
-        _passedMVA_SUSY[leptonCounter][0] = _mvaValue_HZZ[leptonCounter]  >  MVA_cuts_pt5HZZ[eta];
-        _passedMVA_SUSY[leptonCounter][1] = false;
-        _passedMVA_SUSY[leptonCounter][2] = false;
-      }
-
-      //bool MVAlooseFR = tools::passed_loose_MVA_FR_slidingCut(&*electron, _mvaValue[leptonCounter]);    
-      //if (!MVAlooseFR) continue;
       //bool crossCheckTight = tools::isTightCutBasedElectronWithoutIsolation(&*electron, false) and tools::pfRelIso(&*electron, myRhoJECJets) < (electron->isEB() ? 0.0588 : 0.0571);
 
       _flavors[leptonCounter]            = 0;
@@ -1030,7 +1006,7 @@ void trilepton::analyze(const edm::Event& iEvent, const edm::EventSetup& iEventS
         }
         _clean[_n_Jets]=0;
         if (clean) _clean[_n_Jets] =1;
-        if (!clean) _clean[_n_Jets] =-1;
+        else       _clean[_n_Jets] =-1;
                 
         for(int j=0; j != _nLeptons; ++j){
           TLorentzVector vect_i;

@@ -98,12 +98,14 @@ namespace tools {
     bool isoTriggerEmulator(const pat::Electron *iE);
     
     float dEtaInSeed(const pat::Electron* ele);
-    bool passed_loose_MVA_FR(const pat::Electron* iE, double mvaValue);
     bool isLooseCutBasedElectronWithoutIsolation(const pat::Electron* ele);
     bool isTightCutBasedElectronWithoutIsolation(const pat::Electron* ele);
 
     float slidingCut(float pt, float low, float high);
-    bool passed_loose_MVA_FR_slidingCut(const pat::Electron* iE, double mvaValue);
+    bool passed_loose_MVA_FR_slidingCut(const pat::Electron* iE, double mvaValue, double mvaValueHZZ);
+    bool passed_medium_MVA_FR_slidingCut(const pat::Electron* iE, double mvaValue);
+    bool passed_tight_MVA_FR_slidingCut(const pat::Electron* iE, double mvaValue);
+    bool passed_MVA_HZZ(const pat::Electron* iE, double mvaValueHZZ);
     
     std::vector<const pat::Jet* > EMJetSelector(const std::vector<pat::Jet>  & thePatJets,
                                               double  value_jet_et,
