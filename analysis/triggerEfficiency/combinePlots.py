@@ -8,9 +8,8 @@ style.setDefault()
 file = ROOT.TFile(os.path.join("triggerEfficiencies.root"))
 file.cd()
  
-samples = ['WZ','MET','JetHT']
+samples = ['WZ','WJets','MET','JetHT']
 for l in ['e','mu']:
-  c1 = ROOT.TCanvas(l, l)
   histos = []
   i = 0
   for sample in samples:
@@ -23,5 +22,5 @@ for l in ['e','mu']:
       histos[-1].style   = style.errorStyle(i)
       histos[-1].xTitle  = 'p_T(l)'
       histos[-1].yTitle  = 'eff'
-  histos[0].SetName('combine/eff_1l_' + l)
-  plot.draw1D(histos)
+  histos[0].SetName('plots/combine/eff_1l_' + l)
+  plot.draw1D(histos, legend=(0.6, 0.15, 0.85, 0.6))
