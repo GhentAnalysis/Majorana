@@ -230,8 +230,6 @@ private:
     double _weight;
     double _LHEweight[111];
     double _LHEweightID[111];
-    double _mgluino;
-    double _mchi0;
     
     int _n_bJetsAll;
     int _n_JetsAll;

@@ -145,160 +145,144 @@ void trilepton::beginJob()
     _hCounter = fs->make<TH1D>("hCounter", "Events counter", 5,0,5);
 
    
-    outputTree->Branch("_eventNb",   &_eventNb,   "_eventNb/l");
-    outputTree->Branch("_runNb",     &_runNb,     "_runNb/l");
-    outputTree->Branch("_lumiBlock", &_lumiBlock, "_lumiBlock/l");
-    
-    outputTree->Branch("_nLeptons", &_nLeptons, "_nLeptons/I");
+    outputTree->Branch("_eventNb",                    &_eventNb,                    "_eventNb/l");
+    outputTree->Branch("_runNb",                      &_runNb,                      "_runNb/l");
+    outputTree->Branch("_lumiBlock",                  &_lumiBlock,                  "_lumiBlock/l");
 
-    outputTree->Branch("_lPt", &_lPt, "_lPt[_nLeptons]/D");
-    outputTree->Branch("_lEta", &_lEta, "_lEta[_nLeptons]/D");
-    outputTree->Branch("_lPhi", &_lPhi, "_lPhi[_nLeptons]/D");
-    outputTree->Branch("_lE", &_lE, "_lE[_nLeptons]/D");
-    
-    outputTree->Branch("_lPtmc", &_lPtmc, "_lPtmc[_nLeptons]/D");
-    outputTree->Branch("_lEtamc", &_lEtamc, "_lEtamc[_nLeptons]/D");
-    outputTree->Branch("_lPhimc", &_lPhimc, "_lPhimc[_nLeptons]/D");
-    outputTree->Branch("_lEmc", &_lEmc, "_lEmc[_nLeptons]/D");
-    outputTree->Branch("_lpdgmc", &_lpdgmc, "_lpdgmc[_nLeptons]/D");
-    outputTree->Branch("_lchargemc", &_lchargemc, "_lchargemc[_nLeptons]/D");
+    outputTree->Branch("_nLeptons",                   &_nLeptons,                   "_nLeptons/I");
+    outputTree->Branch("_lPt",                        &_lPt,                        "_lPt[_nLeptons]/D");
+    outputTree->Branch("_lEta",                       &_lEta,                       "_lEta[_nLeptons]/D");
+    outputTree->Branch("_lPhi",                       &_lPhi,                       "_lPhi[_nLeptons]/D");
+    outputTree->Branch("_lE",                         &_lE,                         "_lE[_nLeptons]/D");
+    outputTree->Branch("_lPtmc",                      &_lPtmc,                      "_lPtmc[_nLeptons]/D");
+    outputTree->Branch("_lEtamc",                     &_lEtamc,                     "_lEtamc[_nLeptons]/D");
+    outputTree->Branch("_lPhimc",                     &_lPhimc,                     "_lPhimc[_nLeptons]/D");
+    outputTree->Branch("_lEmc",                       &_lEmc,                       "_lEmc[_nLeptons]/D");
+    outputTree->Branch("_lpdgmc",                     &_lpdgmc,                     "_lpdgmc[_nLeptons]/D");
+    outputTree->Branch("_lchargemc",                  &_lchargemc,                  "_lchargemc[_nLeptons]/D");
 
-    
-    /*
-    outputTree->Branch("_flag_lepton", &_flag_lepton, "_flag_lepton[6]/O");
-    outputTree->Branch("_dR15", &_dR15 , "_dR15[6]/D");
-    */
-   
-    outputTree->Branch("_nuPtmc", &_nuPtmc, "_nuPtmc[_nLeptons]/D");
-    outputTree->Branch("_nuEtamc", &_nuEtamc, "_nuEtamc[_nLeptons]/D");
-    outputTree->Branch("_nuPhimc", &_nuPhimc, "_nuPhimc[_nLeptons]/D");
-    outputTree->Branch("_nuEmc", &_nuEmc, "_nuEmc[_nLeptons]/D");
+    outputTree->Branch("_nuPtmc",                     &_nuPtmc,                     "_nuPtmc[_nLeptons]/D");
+    outputTree->Branch("_nuEtamc",                    &_nuEtamc,                    "_nuEtamc[_nLeptons]/D");
+    outputTree->Branch("_nuPhimc",                    &_nuPhimc,                    "_nuPhimc[_nLeptons]/D");
+    outputTree->Branch("_nuEmc",                      &_nuEmc,                      "_nuEmc[_nLeptons]/D");
 
-    outputTree->Branch("_mtmc", &_mtmc, "_mtmc[_nLeptons]/D");
-    
-    outputTree->Branch("_nZboson", &_nZboson, "_nZboson/I");
+    outputTree->Branch("_mtmc",                       &_mtmc,                       "_mtmc[_nLeptons]/D");
+
+    outputTree->Branch("_nZboson",                    &_nZboson,                    "_nZboson/I");
+
+    outputTree->Branch("_nEle",                       &_nEle,                       "_nEle/I");
+    outputTree->Branch("_nMu",                        &_nMu,                        "_nMu/I");
+    outputTree->Branch("_nTau",                       &_nTau,                       "_nTau/I");
+
+    outputTree->Branch("_flavors",                    &_flavors,                    "_flavors[_nLeptons]/I");
+    outputTree->Branch("_charges",                    &_charges,                    "_charges[_nLeptons]/D");
+    outputTree->Branch("_isolation",                  &_isolation,                  "_isolation[_nLeptons]/D");
+    outputTree->Branch("_isolation_absolute",         &_isolation_absolute,         "_isolation_absolute[_nLeptons]/D");
+    outputTree->Branch("_miniisolation",              &_miniisolation,              "_miniisolation[_nLeptons]/D");
+    outputTree->Branch("_miniisolationCharged",       &_miniisolationCharged,       "_miniisolationCharged[_nLeptons]/D");
+    outputTree->Branch("_ptrel",                      &_ptrel,                      "_ptrel[_nLeptons]/D");
+    outputTree->Branch("_ptratio",                    &_ptratio,                    "_ptratio[_nLeptons]/D");
+    outputTree->Branch("_muonSegmentComp",            &_muonSegmentComp,            "_muonSegmentComp[_nLeptons]/D");
+
+    outputTree->Branch("_mll",                        &_mll,                        "_mll[3]/D");
+
+    outputTree->Branch("_origin",                     &_origin,                     "_origin[_nLeptons]/I");
+    outputTree->Branch("_originReduced",              &_originReduced,              "_originReduced[_nLeptons]/I");
+
+    outputTree->Branch("_isPromptFinalState",         &_isPromptFinalState,         "_isPromptFinalState[_nLeptons]/O");
+    outputTree->Branch("_fromHardProcessFinalState",  &_fromHardProcessFinalState,  "_fromHardProcessFinalState[_nLeptons]/O");
+
+    outputTree->Branch("_PVchi2",                     &_PVchi2,                     "_PVchi2/D");
+    outputTree->Branch("_PVerr",                      &_PVerr,                      "_PVerr[3]/D");
+    outputTree->Branch("_ipPV",                       &_ipPV,                       "_ipPV[_nLeptons]/D");
+    outputTree->Branch("_ipPVerr",                    &_ipPVerr,                    "_ipPVerr[_nLeptons]/D");
+    outputTree->Branch("_ipZPV",                      &_ipZPV,                      "_ipZPV[_nLeptons]/D");
+    outputTree->Branch("_ipZPVerr",                   &_ipZPVerr,                   "_ipZPVerr[_nLeptons]/D");
+
+    outputTree->Branch("_ipPVmc",                     &_ipPVmc,                     "_ipPVmc[_nLeptons]/D");
+
+    outputTree->Branch("_3dIP",                       &_3dIP,                       "_3dIP[_nLeptons]/D");
+    outputTree->Branch("_3dIPerr",                    &_3dIPerr,                    "_3dIPerr[_nLeptons]/D");
+    outputTree->Branch("_3dIPsig",                    &_3dIPsig,                    "_3dIPsig[_nLeptons]/D");
 
 
-    outputTree->Branch("_nEle", &_nEle, "_nEle/I");
-    outputTree->Branch("_nMu", &_nMu, "_nMu/I");
-    outputTree->Branch("_nTau", &_nTau, "_nTau/I");
+    outputTree->Branch("_mt",                         &_mt,                         "_mt[_nLeptons]/D");
+    outputTree->Branch("_isloose",                    &_isloose,                    "_isloose[_nLeptons]/O");
+    outputTree->Branch("_ismedium",                   &_ismedium,                   "_ismedium[_nLeptons]/O");
+    outputTree->Branch("_istight",                    &_istight,                    "_istight[_nLeptons]/O");
 
-    outputTree->Branch("_flavors", &_flavors, "_flavors[_nLeptons]/I");
-    outputTree->Branch("_charges", &_charges, "_charges[_nLeptons]/D");
-    outputTree->Branch("_isolation", &_isolation, "_isolation[_nLeptons]/D");
-    outputTree->Branch("_isolation_absolute", &_isolation_absolute, "_isolation_absolute[_nLeptons]/D");
-    outputTree->Branch("_miniisolation", &_miniisolation, "_miniisolation[_nLeptons]/D");
-    outputTree->Branch("_miniisolationCharged", &_miniisolationCharged, "_miniisolationCharged[_nLeptons]/D");
-    outputTree->Branch("_ptrel", &_ptrel, "_ptrel[_nLeptons]/D");
-    outputTree->Branch("_ptratio", &_ptratio, "_ptratio[_nLeptons]/D");
-    outputTree->Branch("_muonSegmentComp", &_muonSegmentComp, "_muonSegmentComp[_nLeptons]/D");
+    outputTree->Branch("_trigEmulator",               &_trigEmulator,               "_trigEmulator[_nLeptons]/O");
+    outputTree->Branch("_isotrigEmulator",            &_isotrigEmulator,            "_isotrigEmulator[_nLeptons]/O");
 
-    outputTree->Branch("_mll", &_mll, "_mll[3]/D");
-    //outputTree->Branch("_ossf", &_ossf, "_ossf[3]/O");
-    
-    outputTree->Branch("_origin", &_origin, "_origin[_nLeptons]/I");
-    outputTree->Branch("_originReduced", &_originReduced, "_originReduced[_nLeptons]/I");
+    outputTree->Branch("_closeJetPtAll",              &_closeJetPtAll,              "_closeJetPtAll[_nLeptons]/D");
+    outputTree->Branch("_closeJetAngAll",             &_closeJetAngAll,             "_closeJetAngAll[_nLeptons]/D");
 
-    outputTree->Branch("_isPromptFinalState", &_isPromptFinalState, "_isPromptFinalState[_nLeptons]/O");
-    outputTree->Branch("_fromHardProcessFinalState", &_fromHardProcessFinalState, "_fromHardProcessFinalState[_nLeptons]/O");
-    
-    outputTree->Branch("_PVchi2", &_PVchi2, "_PVchi2/D");
-    outputTree->Branch("_PVerr", &_PVerr, "_PVerr[3]/D");
-    
-    outputTree->Branch("_ipPV", &_ipPV, "_ipPV[_nLeptons]/D");
-    outputTree->Branch("_ipPVerr", &_ipPVerr, "_ipPVerr[_nLeptons]/D");
-    outputTree->Branch("_ipZPV", &_ipZPV, "_ipZPV[_nLeptons]/D");
-    outputTree->Branch("_ipZPVerr", &_ipZPVerr, "_ipZPVerr[_nLeptons]/D");
-    
-    outputTree->Branch("_ipPVmc", &_ipPVmc, "_ipPVmc[_nLeptons]/D");
-    
-    outputTree->Branch("_3dIP", &_3dIP, "_3dIP[_nLeptons]/D");
-    outputTree->Branch("_3dIPerr", &_3dIPerr, "_3dIPerr[_nLeptons]/D");
-    outputTree->Branch("_3dIPsig", &_3dIPsig, "_3dIPsig[_nLeptons]/D");
-    
-    
-    outputTree->Branch("_mt", &_mt, "_mt[_nLeptons]/D");
-    outputTree->Branch("_isloose", &_isloose, "_isloose[_nLeptons]/O");
-    outputTree->Branch("_ismedium", &_ismedium, "_ismedium[_nLeptons]/O");
-    outputTree->Branch("_istight", &_istight, "_istight[_nLeptons]/O");
- 
-    outputTree->Branch("_trigEmulator", &_trigEmulator, "_trigEmulator[_nLeptons]/O");
-    outputTree->Branch("_isotrigEmulator", &_isotrigEmulator, "_isotrigEmulator[_nLeptons]/O");
-    
-    outputTree->Branch("_closeJetPtAll", &_closeJetPtAll, "_closeJetPtAll[_nLeptons]/D");
-    outputTree->Branch("_closeJetAngAll", &_closeJetAngAll, "_closeJetAngAll[_nLeptons]/D");
- 
     outputTree->Branch("_trackSelectionMultiplicity", &_trackSelectionMultiplicity, "_trackSelectionMultiplicity[_nLeptons]/I");
-    outputTree->Branch("_closeJetCSVAll", &_closeJetCSVAll, "_closeJetCSVAll[_nLeptons]/D");
+    outputTree->Branch("_closeJetCSVAll",             &_closeJetCSVAll,             "_closeJetCSVAll[_nLeptons]/D");
 
-    outputTree->Branch("_chargeConst", &_chargeConst, "_chargeConst[_nLeptons]/O");
-    outputTree->Branch("_hitsNumber", &_hitsNumber, "_hitsNumber[_nLeptons]/I");
-    outputTree->Branch("_vtxFitConversion", &_vtxFitConversion, "_vtxFitConversion[_nLeptons]/O");
+    outputTree->Branch("_chargeConst",                &_chargeConst,                "_chargeConst[_nLeptons]/O");
+    outputTree->Branch("_hitsNumber",                 &_hitsNumber,                 "_hitsNumber[_nLeptons]/I");
+    outputTree->Branch("_vtxFitConversion",           &_vtxFitConversion,           "_vtxFitConversion[_nLeptons]/O");
 
-    outputTree->Branch("_mvaValue", &_mvaValue, "_mvaValue[_nLeptons]/D");
-    outputTree->Branch("_mvaValue_HZZ", &_mvaValue_HZZ, "_mvaValue_HZZ[_nLeptons]/D");
+    outputTree->Branch("_mvaValue",                   &_mvaValue,                   "_mvaValue[_nLeptons]/D");
+    outputTree->Branch("_mvaValue_HZZ",               &_mvaValue_HZZ,               "_mvaValue_HZZ[_nLeptons]/D");
 
-    outputTree->Branch("_passedCutBasedIdTight", &_passedCutBasedIdTight, "_passedCutBasedIdTight[_nLeptons]/O");
-    outputTree->Branch("_passedCutBasedIdMedium", &_passedCutBasedIdMedium, "_passedCutBasedIdMedium[_nLeptons]/O");
-    outputTree->Branch("_passedMVA80", &_passedMVA80, "_passedMVA80[_nLeptons]/O");
-    outputTree->Branch("_passedMVA90", &_passedMVA90, "_passedMVA90[_nLeptons]/O");
-    outputTree->Branch("_passedMVA_SUSY", &_passedMVA_SUSY, "_passedMVA_SUSY[_nLeptons][3]/O");	
+    outputTree->Branch("_passedCutBasedIdTight",      &_passedCutBasedIdTight,      "_passedCutBasedIdTight[_nLeptons]/O");
+    outputTree->Branch("_passedCutBasedIdMedium",     &_passedCutBasedIdMedium,     "_passedCutBasedIdMedium[_nLeptons]/O");
+    outputTree->Branch("_passedMVA80",                &_passedMVA80,                "_passedMVA80[_nLeptons]/O");
+    outputTree->Branch("_passedMVA90",                &_passedMVA90,                "_passedMVA90[_nLeptons]/O");
+    outputTree->Branch("_passedMVA_SUSY",             &_passedMVA_SUSY,             "_passedMVA_SUSY[_nLeptons][3]/O"); // I really don't like this SUSY-style of saving things in the tree, but lets keep it for now to not break the current workflow
  
-    outputTree->Branch("_n_PV", &_n_PV, "_n_PV/I");
-    outputTree->Branch("_n_MCTruth_PV", &_n_MCTruth_PV, "_n_MCTruth_PV/D");
-    
-    outputTree->Branch("_met", &_met, "_met/D");
-    outputTree->Branch("_met_phi", &_met_phi, "_met_phi/D");
-    outputTree->Branch("HT", &HT, "HT/D");
-    
-    outputTree->Branch("_genmet", &_genmet, "_genmet/D");
-    outputTree->Branch("_genmet_phi", &_genmet_phi, "_genmet_phi/D");
-    
-    outputTree->Branch("_genqpt", &_genqpt, "_genqpt/D");
-    outputTree->Branch("_genqpt20", &_genqpt20, "_genqpt20/D");
+    outputTree->Branch("_n_PV",                       &_n_PV,                       "_n_PV/I");
+    outputTree->Branch("_n_MCTruth_PV",               &_n_MCTruth_PV,               "_n_MCTruth_PV/D");
+    outputTree->Branch("_met",                        &_met,                        "_met/D");
+    outputTree->Branch("_met_phi",                    &_met_phi,                    "_met_phi/D");
+    outputTree->Branch("HT",                          &HT,                          "HT/D");
+ 
+    outputTree->Branch("_genmet",                     &_genmet,                     "_genmet/D");
+    outputTree->Branch("_genmet_phi",                 &_genmet_phi,                 "_genmet_phi/D");
+    outputTree->Branch("_genqpt",                     &_genqpt,                     "_genqpt/D");
+    outputTree->Branch("_genqpt20",                   &_genqpt20,                   "_genqpt20/D");
 
-    outputTree->Branch("_mompt", &_mompt, "_mompt[_nLeptons]/D");
-    outputTree->Branch("_momphi", &_momphi, "_momphi[_nLeptons]/D");
-    outputTree->Branch("_mometa", &_mometa, "_mometa[_nLeptons]/D");
-    outputTree->Branch("_mompdg", &_mompdg, "_mompdg[_nLeptons]/I");
-    
-    outputTree->Branch("_n_bJets", &_n_bJets, "_n_bJets/I");
-    outputTree->Branch("_n_Jets", &_n_Jets, "_n_Jets/I");
-    outputTree->Branch("_bTagged", &_bTagged, "_bTagged[_n_Jets]/O");
-    outputTree->Branch("_jetEta", &_jetEta, "_jetEta[_n_Jets]/D");
-    outputTree->Branch("_jetPhi", &_jetPhi, "_jetPhi[_n_Jets]/D");
-    outputTree->Branch("_jetPt", &_jetPt, "_jetPt[_n_Jets]/D");
-    outputTree->Branch("_jetFlavour", &_jetFlavour, "_jetFlavour[_n_Jets]/I");
-    outputTree->Branch("_jetE", &_jetE, "_jetE[_n_Jets]/D");
-    outputTree->Branch("_csv", &_csv, "_csv[_n_Jets]/D");
-    outputTree->Branch("_clean", &_clean, "_clean[_n_Jets]/I");
+    outputTree->Branch("_mompt",                      &_mompt,                      "_mompt[_nLeptons]/D");
+    outputTree->Branch("_momphi",                     &_momphi,                     "_momphi[_nLeptons]/D");
+    outputTree->Branch("_mometa",                     &_mometa,                     "_mometa[_nLeptons]/D");
+    outputTree->Branch("_mompdg",                     &_mompdg,                     "_mompdg[_nLeptons]/I");
+
+    outputTree->Branch("_n_bJets",                    &_n_bJets,                    "_n_bJets/I");
+    outputTree->Branch("_n_Jets",                     &_n_Jets,                     "_n_Jets/I");
+    outputTree->Branch("_bTagged",                    &_bTagged,                    "_bTagged[_n_Jets]/O");
+    outputTree->Branch("_jetEta",                     &_jetEta,                     "_jetEta[_n_Jets]/D");
+    outputTree->Branch("_jetPhi",                     &_jetPhi,                     "_jetPhi[_n_Jets]/D");
+    outputTree->Branch("_jetPt",                      &_jetPt,                      "_jetPt[_n_Jets]/D");
+    outputTree->Branch("_jetFlavour",                 &_jetFlavour,                 "_jetFlavour[_n_Jets]/I");
+    outputTree->Branch("_jetE",                       &_jetE,                       "_jetE[_n_Jets]/D");
+    outputTree->Branch("_csv",                        &_csv,                        "_csv[_n_Jets]/D");
+    outputTree->Branch("_clean",                      &_clean,                      "_clean[_n_Jets]/I");
 
     // JEC
-    outputTree->Branch("_jecUnc", &_jecUnc, "_jecUnc[_n_Jets]/D");
-    outputTree->Branch("_jetPtUp", &_jetPtUp, "_jetPtUp[_n_Jets]/D");
-    outputTree->Branch("_jetPtDown", &_jetPtDown, "_jetPtDown[_n_Jets]/D");
+    outputTree->Branch("_jecUnc",                     &_jecUnc,                     "_jecUnc[_n_Jets]/D");
+    outputTree->Branch("_jetPtUp",                    &_jetPtUp,                    "_jetPtUp[_n_Jets]/D");
+    outputTree->Branch("_jetPtDown",                  &_jetPtDown,                  "_jetPtDown[_n_Jets]/D");
 
-    outputTree->Branch("_matchedjetPt", &_matchedjetPt, "_matchedjetPt[_n_Jets]/D");
-    outputTree->Branch("_matchedjetEta", &_matchedjetEta, "_matchedjetEta[_n_Jets]/D");
-    outputTree->Branch("_matchedjetPhi", &_matchedjetPhi, "_matchedjetPhi[_n_Jets]/D");
-    outputTree->Branch("_matchedjetE", &_matchedjetE, "_matchedjetE[_n_Jets]/D");
-    outputTree->Branch("_matchedjetM", &_matchedjetM, "_matchedjetM[_n_Jets]/D");
-    outputTree->Branch("_matchGjet", &_matchGjet, "_matchGjet[_n_Jets]/O");
+    outputTree->Branch("_matchedjetPt",               &_matchedjetPt,               "_matchedjetPt[_n_Jets]/D");
+    outputTree->Branch("_matchedjetEta",              &_matchedjetEta,              "_matchedjetEta[_n_Jets]/D");
+    outputTree->Branch("_matchedjetPhi",              &_matchedjetPhi,              "_matchedjetPhi[_n_Jets]/D");
+    outputTree->Branch("_matchedjetE",                &_matchedjetE,                "_matchedjetE[_n_Jets]/D");
+    outputTree->Branch("_matchedjetM",                &_matchedjetM,                "_matchedjetM[_n_Jets]/D");
+    outputTree->Branch("_matchGjet",                  &_matchGjet,                  "_matchGjet[_n_Jets]/O");
 
     // b-tag SF
-    outputTree->Branch("_btagSF", &_btagSF, "_btagSF[19][_n_Jets]/D");
+    outputTree->Branch("_btagSF",                     &_btagSF,                     "_btagSF[19][_n_Jets]/D");
 
 
     // theoretical
-    outputTree->Branch("_weight", &_weight, "_weight/D");
-    outputTree->Branch("_LHEweight", &_LHEweight, "_LHEweight[111]/D");
-    outputTree->Branch("_LHEweightID", &_LHEweightID, "_LHEweightID[111]/D");
+    outputTree->Branch("_weight",                     &_weight,                     "_weight/D");
+    outputTree->Branch("_LHEweight",                  &_LHEweight,                  "_LHEweight[111]/D");
+    outputTree->Branch("_LHEweightID",                &_LHEweightID,                "_LHEweightID[111]/D");
 
-    outputTree->Branch("_mgluino", &_mgluino, "_mgluino/D");
-    outputTree->Branch("_mchi0", &_mchi0, "_mchi0/D");
-    
-    outputTree->Branch("_nMajorana", &_nMajorana, "_nMajorana/I");
-    outputTree->Branch("_findMatched", &_findMatched, "_findMatched/I");
+    outputTree->Branch("_nMajorana",                  &_nMajorana,                  "_nMajorana/I");
+    outputTree->Branch("_findMatched",                &_findMatched,                "_findMatched/I");
 
     // trigger
     for(TString triggerName : triggersToSave){
@@ -361,7 +345,7 @@ void trilepton::beginJob()
     }
 
     for(TString wp : {"VT","T","M","L","VL","RelIso04","MiniIso04"}){
-      leptonConeCorrectedPt[wp]                  = new std::vector<double>();
+      leptonConeCorrectedPt[wp] = new std::vector<double>();
       outputTree->Branch("leptonConeCorrectedPt" + wp, "vector<double>", leptonConeCorrectedPt[wp]);
     }
         
@@ -373,7 +357,7 @@ void trilepton::beginJob()
 }
 
 void trilepton::endJob() {
-    for(TString wp : {"VT","T","M","L","VL"})			     delete leptonWorkingPoints["multiIsolation" + wp];
+    for(TString wp : {"VT","T","M","L","VL"})                        delete leptonWorkingPoints["multiIsolation" + wp];
     for(TString wp : {"VT","T","M","L","VL","RelIso04","MiniIso04"}) delete leptonConeCorrectedPt[wp];
 
     std::cout<<_nEventsTotal<<std::endl;
