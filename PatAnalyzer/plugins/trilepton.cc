@@ -328,7 +328,7 @@ void trilepton::beginJob()
       outputTree->Branch("_gen_wPhi",     &_gen_wPhi,     "_gen_wPhi[_gen_nW]/D");
       outputTree->Branch("_gen_wmompdg",  &_gen_wmompdg,  "_gen_wmompdg[_gen_nW]/I");
 
-   }
+    }
 
     
     GPM = GenParticleManager();
@@ -387,10 +387,10 @@ void trilepton::getTriggerResults(const edm::Event& iEvent, bool isHLT, edm::EDG
     for (unsigned int i = 0; i < trigResults->size(); ++i){
       std::cout << "  " << triggerNames.triggerName(i) << std::endl;
       for(TString triggerName : toSave){
-	if(TString(triggerNames.triggerName(i)).Contains(triggerName + "_v")){
-	  triggerIndices[triggerName] = i;
-          std::cout << "     --> index: " << i << std::endl;
-	}
+        if(TString(triggerNames.triggerName(i)).Contains(triggerName + "_v")){
+          triggerIndices[triggerName] = i;
+          std::cout << "     --> index: " << i << std::endl; 
+        }
       }
     }
     std::cout << std::endl;
@@ -418,7 +418,7 @@ void trilepton::analyze(const edm::Event& iEvent, const edm::EventSetup& iEventS
     for(TString wp : {"VT","T","M","L","VL","RelIso04","MiniIso04"}) leptonConeCorrectedPt[wp]->clear();
 
     _nZboson = 0;
-	
+
     if(not isData) {
         //******************************************************************************************************************
         // Gen level particles                  ****************************************************************************
@@ -426,18 +426,17 @@ void trilepton::analyze(const edm::Event& iEvent, const edm::EventSetup& iEventS
         //iEvent.getByLabel("packedGenParticles", TheGenParticles);
         iEvent.getByToken(genparticleToken, TheGenParticles);
         std::vector<const GenParticle*> vGenElectrons, vGenMuons, vGenNPElectrons, vGenNPMuons, vGenW, vGenMajorana;
-        if( TheGenParticles.isValid() )
-        {
+        if( TheGenParticles.isValid() ) {
             GPM.SetCollection(TheGenParticles);
             GPM.Classify();
             vGenMuons = GPM.filterByStatus(GPM.getPromptMuons(),1);
             vGenElectrons = GPM.filterByStatus(GPM.getPromptElectrons(),1);
             vGenNPMuons = GPM.filterByStatus(GPM.getNonPromptMuons(),1);
             vGenNPElectrons = GPM.filterByStatus(GPM.getNonPromptElectrons(),1);
-	    vGenMajorana = GPM.filterByStatus(GPM.getMajorana(),1);
+            vGenMajorana = GPM.filterByStatus(GPM.getMajorana(),1);
           //  std::cout<<"********************************************************************"<<std::endl;
           //              std::cout<<"********************************************************************"<<std::endl;
-		
+
             TLorentzVector Gen0;
             Gen0.SetPtEtaPhiE( 0, 0, 0, 0);
             _genqpt = 0;
@@ -452,9 +451,8 @@ void trilepton::analyze(const edm::Event& iEvent, const edm::EventSetup& iEventS
                     cout << id << " " << p->pt() << " " << std::abs(mom->pdgId()) << endl;
                 }
                 
-		if(id == 9900012) _nMajorana++;
-                if(id == 23)
-                    _nZboson++;
+                if(id == 9900012) _nMajorana++;
+                if(id == 23)      _nZboson++;
                 if ( (id == 12 || id == 14 || id == 16 ) && (p->status() == 1) ) {
                     TLorentzVector Gen;
                     Gen.SetPtEtaPhiE( p->pt(), p->eta(), p->phi(), p->energy() );
@@ -468,137 +466,92 @@ void trilepton::analyze(const edm::Event& iEvent, const edm::EventSetup& iEventS
             }
             cout << endl;
             if (Gen0.E()!=0) {
-	      _genmet = Gen0.Pt();
-	      _genmet_phi = Gen0.Phi();
+              _genmet = Gen0.Pt();
+              _genmet_phi = Gen0.Phi();
             } else {
-	      _genmet = 0;
-	      _genmet_phi = 0;
+              _genmet = 0;
+              _genmet_phi = 0;
             }
 
+            for(int i = 0; i <20 ; ++i) _gen_lmompdg[i] = 0;
+            int nL = 0,  nNu = 0, nMajo=0, nw=0;;
 
+            for(GenParticleCollection::const_reverse_iterator p = TheGenParticles->rbegin() ; p != TheGenParticles->rend() ; ++p ){
+              //if(nL > 10 || nPh > 10 || nNu > 10) break;
+              if(p->status() == 0) continue;  //status 0 contains no useful information and should be skipped
+              unsigned id = std::abs(p->pdgId()); 
+              const reco::GenStatusFlags StatusFlags;
+              //MCTruthHelper::fillGenStatusFlags(*p,StatusFlags);
+              //if( id == 11 || id ==13 || id == 15){
+               //if(p->status() == 1 || (id == 15 && p->status() == 2)){        //Tau's always decay! 
+              if(id == 11 || id == 13){
+                if(p->status() == 1){
+                  if (nL > 29) continue;
+                  _gen_lPt[nL] = p->pt();
+                  _gen_lEta[nL] = p->eta();
+                  _gen_lPhi[nL] = p->phi();
+                  _gen_lE[nL] = p->energy();
+                  const GenParticle *mom = GPM.getMother(&*p);        //Use getmother or getmotherparton here?
+                  while( fabs(mom->pdgId()) == id && GPM.getMother(mom) != nullptr) mom = GPM.getMother(mom);
+                  if(mom != nullptr) _gen_lmompdg[nL] = mom->pdgId();
+                  else               _gen_lmompdg[nL] = 0;  //Particles for which mompdg is 0 have no mother.
+                  if(id == 11)       _gen_flavors[nL] = 0;
+                  else if(id ==13)   _gen_flavors[nL] = 1;
+                //else if(id ==15) {_gen_flavors[nL] = 2;}
+                  _gen_charges[nL] = p->charge();
 
-	    for(int i = 0; i <20 ; ++i) _gen_lmompdg[i] = 0;
-	    int nL = 0,  nNu = 0, nMajo=0, nw=0;;
-
-	    for(GenParticleCollection::const_reverse_iterator p = TheGenParticles->rbegin() ; p != TheGenParticles->rend() ; ++p ){
-	      //if(nL > 10 || nPh > 10 || nNu > 10) break;
-	      if(p->status() == 0) continue;								//status 0 contains no useful information and should be skipped
-	      unsigned id = std::abs(p->pdgId());
-	      const reco::GenStatusFlags StatusFlags;
-	      //MCTruthHelper::fillGenStatusFlags(*p,StatusFlags);
-	      //if( id == 11 || id ==13 || id == 15){
-	      //if(p->status() == 1 || (id == 15 && p->status() == 2)){				//Tau's always decay!
-	      if(id == 11 || id == 13){
-		if(p->status() == 1){
-		  if (nL > 29) continue;
-		  _gen_lPt[nL] = p->pt();
-		  _gen_lEta[nL] = p->eta();
-		  _gen_lPhi[nL] = p->phi();
-		  _gen_lE[nL] = p->energy();
-		  const GenParticle *mom = GPM.getMother(&*p);				//Use getmother or getmotherparton here?
-		  while( fabs(mom->pdgId()) == id && GPM.getMother(mom) != nullptr)
-		    mom = GPM.getMother(mom);
-		  if(mom != nullptr){
-		    _gen_lmompdg[nL] = mom->pdgId();
-		  }
-		  else{
-		    _gen_lmompdg[nL] = 0;  //Particles for which mompdg is 0 have no mother.
-		  }
-		  if(id == 11) {_gen_flavors[nL] = 0;}
-		  else if(id ==13){_gen_flavors[nL] = 1;}
-		  //else if(id ==15) {_gen_flavors[nL] = 2;}
-		  _gen_charges[nL] = p->charge();
-
-		  _gen_lPt[nL] = p->pt();
-		  _gen_lEta[nL] = p->eta();
-		  _gen_lPhi[nL] = p->phi();
-		  _gen_lE[nL] = p->energy();
-		  ++nL;
-		}
-	      }	      
-	      else if(id == 12 || id == 14 || id == 16){
-		if(p->status() == 1){
-		  if (nNu > 29) continue;
-		  _gen_nuPt[nNu] = p->pt();
-		  _gen_nuE[nNu] = p->energy();
-		  _gen_nuEta[nNu] = p->eta();
-		  _gen_nuPhi[nNu] = p->phi();
-		  
-		  const GenParticle *mom = GPM.getMother(&*p);				//Use getmother or getmotherparton here?
-		  while( fabs(mom->pdgId()) == id && GPM.getMother(mom) != nullptr)
-		    mom = GPM.getMother(mom);
-		  if(mom != nullptr){
-		    _gen_numompdg[nNu] = mom->pdgId();
-		  }
-		  else{
-		    _gen_numompdg[nNu] = 0;  //Particles for which mompdg is 0 have no mother.
-		  }
-		 
-
-		  
-		  ++nNu;
-		}
-	      }
-	      else if(  id == 24 ){
-		//cout<<"w status:::::::::::::::::::::::::::::::::::::::: "<<p->status()<<endl;
-		if(p->status() == 22 ||p->status() == 52){
-		  if (nw > 29) continue;
-		  _gen_wPt[nw] = p->pt();
-		  _gen_wE[nw] = p->energy();
-		  _gen_wEta[nw] = p->eta();
-		  _gen_wPhi[nw] = p->phi();
-		  if ( p->pt() == 0 &&  p->phi() == 0 && p->eta()== 0 ) continue;
-		  
-		  const GenParticle *mom = GPM.getMother(&*p);				//Use getmother or getmotherparton here?
-		  while( fabs(mom->pdgId()) == id && GPM.getMother(mom) != nullptr)
-		    mom = GPM.getMother(mom);
-		  if(mom != nullptr){
-		    _gen_wmompdg[nw] = mom->pdgId();
-		  }
-		  else{
-		    _gen_wmompdg[nw] = 0;  //Particles for which mompdg is 0 have no mother.
-		  }
-		  
-		  ++nw;
-		}
-		}
-
-
-
-
-	      else if(id == 9900012){
-		//cout<<"N status:::::::::::::::::::::::::::::::::::::::: "<<p->status()<<endl;
-		//if(p->status() == 1){
-		  _gen_majoPt[nMajo] = p->pt();
-		  _gen_majoE[nMajo] = p->energy();
-		  _gen_majoEta[nMajo] = p->eta();
-		  _gen_majoPhi[nMajo] = p->phi();
-		
-		  ++nMajo;
-		  //}
-	      }
-
-	    }
-	    _gen_nL = nL;
-	    _gen_nNu = nNu;
-	    _gen_nMajo = nMajo;
-	    _gen_nW= nw;
-	}
+                  _gen_lPt[nL] = p->pt();
+                  _gen_lEta[nL] = p->eta();
+                  _gen_lPhi[nL] = p->phi();
+                  _gen_lE[nL] = p->energy();
+                  ++nL;
+                }
+              } else if(id == 12 || id == 14 || id == 16){
+                if(p->status() == 1){
+                  if (nNu > 29) continue;
+                  _gen_nuPt[nNu] = p->pt();
+                  _gen_nuE[nNu] = p->energy();
+                  _gen_nuEta[nNu] = p->eta();
+                  _gen_nuPhi[nNu] = p->phi();
+                  
+                  const GenParticle *mom = GPM.getMother(&*p);        //Use getmother or getmotherparton here?
+                  while( fabs(mom->pdgId()) == id && GPM.getMother(mom) != nullptr) mom = GPM.getMother(mom);
+                  if(mom != nullptr) _gen_numompdg[nNu] = mom->pdgId();
+                  else               _gen_numompdg[nNu] = 0;  //Particles for which mompdg is 0 have no mother.
+                  
+                  ++nNu;
+                }
+              } else if(  id == 24 ){
+                if(p->status() == 22 ||p->status() == 52){
+                  if (nw > 29) continue;
+                  _gen_wPt[nw] = p->pt();
+                  _gen_wE[nw] = p->energy();
+                  _gen_wEta[nw] = p->eta();
+                  _gen_wPhi[nw] = p->phi();
+                  if ( p->pt() == 0 &&  p->phi() == 0 && p->eta()== 0 ) continue;
+                  
+                  const GenParticle *mom = GPM.getMother(&*p);         //Use getmother or getmotherparton here?
+                  while( fabs(mom->pdgId()) == id && GPM.getMother(mom) != nullptr) mom = GPM.getMother(mom);
+                  if(mom != nullptr) _gen_wmompdg[nw] = mom->pdgId();
+                  else               _gen_wmompdg[nw] = 0;  //Particles for which mompdg is 0 have no mother.
+                  ++nw;
+                }
+              } else if(id == 9900012){
+                _gen_majoPt[nMajo] = p->pt();
+                _gen_majoE[nMajo] = p->energy();
+                _gen_majoEta[nMajo] = p->eta();
+                _gen_majoPhi[nMajo] = p->phi();
+              
+                ++nMajo;
+              } 
+            }
+            _gen_nL = nL;
+            _gen_nNu = nNu;
+            _gen_nMajo = nMajo;
+            _gen_nW= nw;
+        }
     }
-	/*cout << "~~~~~~~~~~~~~~~~~~~~~~~~~~ ALL GENERATOR LEPTONS ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" << endl;
-    cout << "number of leptons : " << _gen_nL << endl;
-    for(int i = 0; i < _gen_nL; ++i){
-      cout << "+++++++++++++++++++++++++++" << endl;
-      cout << "lepton number : " << i << endl;
-      if(_gen_flavors[i] == 0 && _gen_charges[i] < 0) cout << "flavor :  e-" << endl;
-      else if(_gen_flavors[i] == 0 && _gen_charges[i] > 0) cout << "flavor : e+" << endl;
-      else if(_gen_flavors[i] == 1 && _gen_charges[i] < 0) cout << "flavor : mu-" << endl;
-      else cout << "flavor : mu+" << endl;
-      cout << "+++++++++++++++++++++++++++" << endl;
-      }*/
-	
-	
-	
+
     getTriggerResults(iEvent, true,  triggerResultsHLTToken,  triggersToSave);
     getTriggerResults(iEvent, false, triggerResultsRECOToken, filtersToSave);
     firstEvent_ = false;
@@ -606,20 +559,18 @@ void trilepton::analyze(const edm::Event& iEvent, const edm::EventSetup& iEventS
     realdata_ = iEvent.isRealData();
 
     _weight = 1.;
-	/*
+    // This means we are not getting the weights from NLO samples????? NEED CHECK:
+  /*
     if(not isData) {
         edm::Handle<GenEventInfoProduct> pdfvariables;
         iEvent.getByToken(pdfvariablesToken, pdfvariables);
         _weight = pdfvariables->weight();
-    }
-	*/
+    } 
+  */
     _runNb     = iEvent.id().run();
     _eventNb   = iEvent.id().event();
     _lumiBlock = iEvent.luminosityBlock();
    
-    //std::cout<<"EVENT "<<_runNb << " " << _lumiBlock << " " << _eventNb<<std::endl;
-  
-    
     //============ Total number of events is the sum of the events ============
     //============ in each of these luminosity blocks ============
     _nEventsTotalCounted++;
@@ -639,7 +590,7 @@ void trilepton::analyze(const edm::Event& iEvent, const edm::EventSetup& iEventS
     //iEvent.getByLabel("addPileupInfo", theMCTruthVertices) ;
     //if( ! theVertices.isValid() ) ERR(IT_MCTruthVtx ) ;
     //int nMCTruthvertex = theMCTruthVertices->size();
-		
+
     if (not isData) {
         edm::Handle<vector< PileupSummaryInfo > >  PupInfo;
         iEvent.getByToken(PileUpToken, PupInfo);
@@ -653,7 +604,7 @@ void trilepton::analyze(const edm::Event& iEvent, const edm::EventSetup& iEventS
         }
         //std::cout << std::endl;
     }
-	
+
     //============ Primary vertices ============
     //edm::InputTag IT_goodVtx = edm::InputTag("offlineSlimmedPrimaryVertices");
     edm::Handle<std::vector<Vertex> > theVertices;
@@ -680,6 +631,7 @@ void trilepton::analyze(const edm::Event& iEvent, const edm::EventSetup& iEventS
     edm::Handle<pat::PackedCandidateCollection> pfcands;       iEvent.getByToken(packedPFCandidatesToken, pfcands);
     edm::Handle<std::vector<pat::Muon>> muons;                 iEvent.getByToken(IT_muon, muons);
     edm::Handle<edm::View<pat::Electron>> electrons;           iEvent.getByToken(IT_electron, electrons);
+    edm::Handle<pat::TauCollection> PatTaus;                   iEvent.getByToken(IT_tau, PatTaus);
     edm::Handle<edm::ValueMap<float>> electronMvaIdMap;        iEvent.getByToken(electronMvaIdMapToken, electronMvaIdMap);
     edm::Handle<edm::ValueMap<float>> electronMvaIdHZZ;        iEvent.getByToken(mvaValuesMapToken_HZZ_, electronMvaIdHZZ);
     edm::Handle<edm::ValueMap<bool>> electronMvaIdMap90;       iEvent.getByToken(electronMvaIdMap90Token, electronMvaIdMap90);
@@ -688,15 +640,13 @@ void trilepton::analyze(const edm::Event& iEvent, const edm::EventSetup& iEventS
     edm::Handle<edm::ValueMap<bool>> electronCutBasedIdMapM;   iEvent.getByToken(electronCutBasedIdMapMediumToken, electronCutBasedIdMapM);
     edm::Handle<std::vector<reco::Conversion>> theConversions; iEvent.getByToken(reducedEgammaToken, theConversions);
     edm::Handle<std::vector<pat::Jet>> thePatJets;             iEvent.getByToken(IT_jet , thePatJets );
+    edm::Handle<vector<pat::MET>> ThePFMET;                    iEvent.getByToken(IT_pfmet, ThePFMET);
     edm::Handle<double> rhoJets;                               iEvent.getByToken(fixedGridRhoFastjetCentralNeutralToken , rhoJets);
     edm::Handle<double> rhoJECJets;                            iEvent.getByToken(fixedGridRhoFastjetAllToken , rhoJECJets);//kt6PFJets
 
-    myRhoJets = *rhoJets;
+    myRhoJets    = *rhoJets;
     myRhoJECJets = *rhoJECJets;
 
-
-    edm::Handle<vector<pat::MET>> ThePFMET;
-    iEvent.getByToken(IT_pfmet, ThePFMET);
     const vector<pat::MET> *pfmetcol = ThePFMET.product();
     const pat::MET *pfmet;
     pfmet = &(pfmetcol->front());
@@ -781,13 +731,11 @@ void trilepton::analyze(const edm::Event& iEvent, const edm::EventSetup& iEventS
         photon_, //17
         F_L, //18
         N_U_L_L, // 19
-	W_N_W // 20
+        W_N_W // 20
     };
     
 
     //Taus
-    edm::Handle<pat::TauCollection> PatTaus;
-    iEvent.getByToken( IT_tau, PatTaus );
     std::vector<const pat::Tau* > sTau;
     for (const pat::Tau &tau : *PatTaus) {
         if(tau.pt() < _tauPt) continue;
@@ -810,19 +758,18 @@ void trilepton::analyze(const edm::Event& iEvent, const edm::EventSetup& iEventS
      * Leptons
      */
     int leptonCounter = 0;
-//    bool _islooseCut[leptonCounter];
+//  bool _islooseCut[leptonCounter];
     for(auto muon = muons->begin(); muon != muons->end(); ++muon){
       if(muon->pt() < _minPt0)        continue;
       if(std::abs(muon->eta()) > 2.4) continue;
-  //    if(!muon->isLooseMuon())        continue;  // Store only loose muons, see https://twiki.cern.ch/twiki/bin/viewauth/CMS/SWGuideMuonIdRun2
+//    if(!muon->isLooseMuon())        continue;  // Store only loose muons, see https://twiki.cern.ch/twiki/bin/viewauth/CMS/SWGuideMuonIdRun2
       bool goodGlb      = muon->isGlobalMuon() and muon->globalTrack()->normalizedChi2() < 3 and muon->combinedQuality().chi2LocalPosition < 12 and muon->combinedQuality().trkKink < 20;
-      bool isMedium     = muon->isLooseMuon() and muon->innerTrack()->validFraction() > 0.8 and muon->segmentCompatibility() >= (goodGlb ? 0.303 : 0.451); // temporary ICHEP recommendation	    
+      bool isMedium     = muon->isLooseMuon() and muon->innerTrack()->validFraction() > 0.8 and muon->segmentCompatibility() >= (goodGlb ? 0.303 : 0.451); // temporary ICHEP recommendation    
       //if (!isMedium) continue;
-   
-	if(muon->innerTrack().isNull()) continue;	      
+      if(muon->innerTrack().isNull()) continue;
 
       if (leptonCounter == 10) continue;  // using arrays, so do not store more than 10 muons, they are sorted in pt anyway
-	 double relIso = tools::pfRelIso(&*muon,myRhoJets);
+      double relIso = tools::pfRelIso(&*muon,myRhoJets);
 
       // might be preferable to change to vectors instead of arrays because we do not know the length
       _flavors[leptonCounter]     = 1;
@@ -830,10 +777,7 @@ void trilepton::analyze(const edm::Event& iEvent, const edm::EventSetup& iEventS
       _isolation[leptonCounter]   = relIso;
       _isolation_absolute[leptonCounter] = tools::pfAbsIso(&*muon);
 
-
-
-      
-      _miniisolation[leptonCounter] 	   = tools::getMiniIsolation(pfcands, &*muon, 0.05, 0.2, 10., myRhoJets, false);
+      _miniisolation[leptonCounter]        = tools::getMiniIsolation(pfcands, &*muon, 0.05, 0.2, 10., myRhoJets, false);
       _miniisolationCharged[leptonCounter] = tools::getMiniIsolation(pfcands, &*muon, 0.05, 0.2, 10., myRhoJets, false);
 
       _ipPV[leptonCounter]     = muon->innerTrack()->dxy(PV);
@@ -844,7 +788,7 @@ void trilepton::analyze(const edm::Event& iEvent, const edm::EventSetup& iEventS
       _3dIPerr[leptonCounter]  = muon->edB(pat::Muon::PV3D);
       _3dIPsig[leptonCounter]  = fabs(_3dIP[leptonCounter]/_3dIPerr[leptonCounter]);
 
-	        _isloose[leptonCounter] = std::abs(muon->eta()) < 2.4 && muon->pt() > 5 && fabs(_ipPV[leptonCounter]) < 0.05 && fabs(_ipZPV[leptonCounter]) < 0.1 && muon->isPFMuon() && (muon->isTrackerMuon() || muon->isGlobalMuon() ) && _isolation[leptonCounter] < 0.6;
+      _isloose[leptonCounter] = std::abs(muon->eta()) < 2.4 && muon->pt() > 5 && fabs(_ipPV[leptonCounter]) < 0.05 && fabs(_ipZPV[leptonCounter]) < 0.1 && muon->isPFMuon() && (muon->isTrackerMuon() || muon->isGlobalMuon() ) && _isolation[leptonCounter] < 0.6;
 
       if(std::abs(muon->innerTrack()->dxy(PV)) > 0.05) continue;
       if(std::abs(muon->innerTrack()->dz(PV)) > 0.1  ) continue;
@@ -865,8 +809,7 @@ void trilepton::analyze(const edm::Event& iEvent, const edm::EventSetup& iEventS
 
       //if(!_isloose[leptonCounter]) continue;
       TLorentzVector vect;
-	vect.SetPtEtaPhiE(muon->pt(),muon->eta(),muon->phi(), muon->energy());
-	    
+      vect.SetPtEtaPhiE(muon->pt(),muon->eta(),muon->phi(), muon->energy());
       _mt[leptonCounter] = tools::MT_calc(vect, _met, _met_phi);
 
       // So for some reason, here we are adding again the same stuff to out tree
@@ -883,33 +826,24 @@ void trilepton::analyze(const edm::Event& iEvent, const edm::EventSetup& iEventS
       leptonConeCorrectedPt["MiniIso04"]->push_back(tools::leptonConeCorrectedPt(_lPt[leptonCounter], "MiniIso04", _miniisolation[leptonCounter], 0, 0));
       leptonConeCorrectedPt["RelIso04"]->push_back(tools::leptonConeCorrectedPt(_lPt[leptonCounter], "RelIso04", _isolation[leptonCounter], 0, 0));
 
-      if(not isData){
-	  const GenParticle* mc = GPM.matchedMC(&*muon);
-	  if(mc!=0){
-	      fillMCVars(mc, leptonCounter);
-	      _ipPVmc[leptonCounter] = std::abs(muon->innerTrack()->dxy(PVmc));
-	  } else {
-	      _origin[leptonCounter] = -1;
-	      _originReduced[leptonCounter] = -1;
-	      
-	      _mompt[leptonCounter]  = 0;
-	      _momphi[leptonCounter] = 0;
-	      _mometa[leptonCounter] = 0;
-	      _mompdg[leptonCounter] = 0;
-	  }
+      if(not isData){  
+        const GenParticle* mc = GPM.matchedMC(&*muon);
+        if(mc!=0){
+          fillMCVars(mc, leptonCounter);
+          _ipPVmc[leptonCounter] = std::abs(muon->innerTrack()->dxy(PVmc));
+        } else {
+          _origin[leptonCounter] = -1;
+          _originReduced[leptonCounter] = -1;
+          
+          _mompt[leptonCounter]  = 0;
+          _momphi[leptonCounter] = 0;
+          _mometa[leptonCounter] = 0;
+          _mompdg[leptonCounter] = 0;
         }
-	   /* cout<<"----------------------------  MUON after matching    ---->  "<<endl;
-	    cout<<"origin: "<<_origin[leptonCounter]<<endl;
-	    cout<<"reduced: "<<_originReduced[leptonCounter]<<endl;
-cout<<"RECO: ("<<_charges[leptonCounter]<<","<<_flavors[leptonCounter]<<") "<<_lPt[leptonCounter]<<" "<< _lEta[leptonCounter] <<" "<< _lPhi[leptonCounter] <<" "<<_lE[leptonCounter]  <<" mom info: "<< _mompdg[leptonCounter]<<" "<<_mompt[leptonCounter]<<endl;
-cout<<"Gen matched: "<<_lpdgmc[leptonCounter]<<" "<<_lPtmc[leptonCounter]<<" "<< _lEtamc[leptonCounter] <<" "<< _lPhimc[leptonCounter] <<" "<<_lEmc[leptonCounter]  <<" mom info: "<< _mompdg[leptonCounter]<<" "<<_mompt[leptonCounter]<<endl;
-
-*/
-        
-        leptonCounter++;
+      }
+      leptonCounter++;
     }
     _nMu = leptonCounter;
-
 
     for(auto electron = electrons->begin(); electron != electrons->end(); ++electron){
       if (leptonCounter == 10) continue; // This will go terribly wrong when there are about 8-10 muons or more (even though this is an improbable situation)
@@ -924,26 +858,22 @@ cout<<"Gen matched: "<<_lpdgmc[leptonCounter]<<" "<<_lPtmc[leptonCounter]<<" "<<
       if(!electron->gsfTrack().isNonnull()) continue;
       //if( TMath::Abs(gsfTrack->dxy(PV)) > 0.05  )  continue;
       //if( TMath::Abs(gsfTrack->dz(PV)) > 0.1  ) continue;
-	
-	_lCleanCut[leptonCounter] = true;
-                for(int m = 0; m < _nMu; ++m){
-                    if(!_isloose[m]) continue;
-                    TLorentzVector mu, el;
-                    mu.SetPtEtaPhiE(_lPt[m], _lEta[m], _lPhi[m], _lE[m]);
-                    el.SetPtEtaPhiE(electron->pt(), electron->eta(), electron->phi(), electron->energy());
-                    if(el.DeltaR(mu) < 0.05){
-                        _lCleanCut[leptonCounter] = false;
-                        break;
-                    }
-                }    
-	    if(!_lCleanCut[leptonCounter]) continue;
 
-
+      _lCleanCut[leptonCounter] = true;
+        for(int m = 0; m < _nMu; ++m){
+          if(!_isloose[m]) continue;
+          TLorentzVector mu, el;
+          mu.SetPtEtaPhiE(_lPt[m], _lEta[m], _lPhi[m], _lE[m]);
+          el.SetPtEtaPhiE(electron->pt(), electron->eta(), electron->phi(), electron->energy());
+          if(el.DeltaR(mu) < 0.05){
+            _lCleanCut[leptonCounter] = false;
+            break;
+          }
+        }    
+      if(!_lCleanCut[leptonCounter]) continue;
 
       //if(!tools::isLooseCutBasedElectronWithoutIsolation(&*electron)) continue; //only store those passing the loose cut based id, without isolation requirement
-
       double relIso = tools::pfRelIso(&*electron, myRhoJets);
-      	    
       if(relIso > 0.6) continue;
       // There will be a new electron MVA soon
       edm::RefToBase<pat::Electron> electronRef(edm::Ref<edm::View<pat::Electron>>(electrons, (electron - electrons->begin())));
@@ -952,36 +882,35 @@ cout<<"Gen matched: "<<_lpdgmc[leptonCounter]<<" "<<_lPtmc[leptonCounter]<<" "<<
       _passedCutBasedIdMedium[leptonCounter] = (*electronCutBasedIdMapM)[electronRef];
       _passedMVA80[leptonCounter]            = (*electronMvaIdMap80)[electronRef];
       _passedMVA90[leptonCounter]            = (*electronMvaIdMap90)[electronRef];
-	    
+
       const double MVA_cuts_pt15[3][3] = {{-0.86, -0.85, -0.81}, {-0.86, -0.85, -0.81}, {0.77, 0.56, 0.48}};
       const double MVA_cuts_pt25[3][3] = {{-0.96, -0.96, -0.95}, {-0.86, -0.85, -0.81}, {0.52, 0.11, -0.01}};
-      const double MVA_cuts_pt5HZZ[3] = {-0.3, -0.36, -0.63};	    
-	    
+      const double MVA_cuts_pt5HZZ[3] = {-0.3, -0.36, -0.63};
+
       _mvaValue_HZZ[leptonCounter] = (*electronMvaIdHZZ)[electronRef];    
       _passedMVA_SUSY[leptonCounter][0] = false;
       _passedMVA_SUSY[leptonCounter][1] = false;
       _passedMVA_SUSY[leptonCounter][2] = false;
-	    
-       int eta = -1;
-         if(TMath::Abs(electron->eta()) < 0.8 ) {
-           eta = 0;
-         } else if(TMath::Abs(electron->eta()) < 1.479 ) {
-           eta = 1;
-         } else{
-           eta = 2;
-         }
+
+      int eta = -1;
+      if(TMath::Abs(electron->eta()) < 0.8 ) {
+        eta = 0;
+      } else if(TMath::Abs(electron->eta()) < 1.479 ) {
+        eta = 1;
+      } else{
+        eta = 2;
+      }
       if(electron->pt() > 10){ 
-          for(unsigned wp = 0; wp < 3; ++wp){
-       _passedMVA_SUSY[leptonCounter][wp] = _mvaValue[leptonCounter] >  std::min( MVA_cuts_pt15[wp][eta], std::max(MVA_cuts_pt25[wp][eta] , MVA_cuts_pt15[wp][eta] + (MVA_cuts_pt25[wp][eta] - MVA_cuts_pt15[wp][eta])*0.1 *(electron->pt()-15) ) );
-       }
-     } else{
-     _passedMVA_SUSY[leptonCounter][0] = _mvaValue_HZZ[leptonCounter]  >  MVA_cuts_pt5HZZ[eta];
-     _passedMVA_SUSY[leptonCounter][1] = false;
-     _passedMVA_SUSY[leptonCounter][2] = false;
-     }	    
-	    
-	    
-      //bool MVAlooseFR = tools::passed_loose_MVA_FR_slidingCut(&*electron, _mvaValue[leptonCounter]);	    
+        for(unsigned wp = 0; wp < 3; ++wp){
+          _passedMVA_SUSY[leptonCounter][wp] = _mvaValue[leptonCounter] >  std::min( MVA_cuts_pt15[wp][eta], std::max(MVA_cuts_pt25[wp][eta] , MVA_cuts_pt15[wp][eta] + (MVA_cuts_pt25[wp][eta] - MVA_cuts_pt15[wp][eta])*0.1 *(electron->pt()-15) ) );
+        }
+      } else{
+        _passedMVA_SUSY[leptonCounter][0] = _mvaValue_HZZ[leptonCounter]  >  MVA_cuts_pt5HZZ[eta];
+        _passedMVA_SUSY[leptonCounter][1] = false;
+        _passedMVA_SUSY[leptonCounter][2] = false;
+      }
+
+      //bool MVAlooseFR = tools::passed_loose_MVA_FR_slidingCut(&*electron, _mvaValue[leptonCounter]);    
       //if (!MVAlooseFR) continue;
       //bool crossCheckTight = tools::isTightCutBasedElectronWithoutIsolation(&*electron, false) and tools::pfRelIso(&*electron, myRhoJECJets) < (electron->isEB() ? 0.0588 : 0.0571);
 
@@ -1016,10 +945,8 @@ cout<<"Gen matched: "<<_lpdgmc[leptonCounter]<<" "<<_lPtmc[leptonCounter]<<" "<<
       //if(_isolation[leptonCounter] > 1) continue;
       //if(_3dIPsig[leptonCounter] > 4) continue;
 
-      
- TLorentzVector vect_e;
-	vect_e.SetPtEtaPhiE(electron->pt(),electron->eta(),electron->phi(), electron->energy());
-	      
+      TLorentzVector vect_e;
+      vect_e.SetPtEtaPhiE(electron->pt(),electron->eta(),electron->phi(), electron->energy());
       _mt[leptonCounter] = tools::MT_calc(vect_e, _met, _met_phi);
       
       _lPt[leptonCounter]  = electron->pt();
@@ -1038,51 +965,36 @@ cout<<"Gen matched: "<<_lpdgmc[leptonCounter]<<" "<<_lPtmc[leptonCounter]<<" "<<
       leptonConeCorrectedPt["RelIso04"]->push_back(tools::leptonConeCorrectedPt(_lPt[leptonCounter], "RelIso04", _isolation[leptonCounter], 0, 0));
 
       if (not isData) {
-	_findMatched[leptonCounter]=-1;
-	  const GenParticle* mc = GPM.matchedMC(&*electron);
-	  if ( mc!=0 ) {
-	      fillMCVars(mc, leptonCounter);
-	      //Vertex::Point PVmc = mcMom->vertex();
-	      _ipPVmc[leptonCounter] = std::abs(electron->gsfTrack()->dxy(PVmc));
-	      _findMatched[leptonCounter]=1;
-	  }
-	  else {
-	      _origin[leptonCounter] = -1;
-	      _originReduced[leptonCounter] = -1;
-	      _mompt[leptonCounter] = 0;
-	      _momphi[leptonCounter] = 0;
-	      _mometa[leptonCounter] = 0;
-	      _mompdg[leptonCounter] = 0;
-	      _findMatched[leptonCounter]=0;
-	  }
+        _findMatched[leptonCounter]=-1;
+        const GenParticle* mc = GPM.matchedMC(&*electron);
+        if ( mc!=0 ) {
+          fillMCVars(mc, leptonCounter);
+          //Vertex::Point PVmc = mcMom->vertex();
+          _ipPVmc[leptonCounter] = std::abs(electron->gsfTrack()->dxy(PVmc));
+          _findMatched[leptonCounter]=1;
+        } else {
+          _origin[leptonCounter] = -1;
+          _originReduced[leptonCounter] = -1;
+          _mompt[leptonCounter] = 0;
+          _momphi[leptonCounter] = 0;
+          _mometa[leptonCounter] = 0;
+          _mompdg[leptonCounter] = 0;
+          _findMatched[leptonCounter]=0;
+        }
       }
-     /* cout<<"----------------------------  ELECTRON after matching    ---->  "<<endl;
-	    cout<<"origin: "<<_origin[leptonCounter]<<endl;
-	    cout<<"reduced: "<<_originReduced[leptonCounter]<<endl;
-cout<<"RECO: ("<<_charges[leptonCounter]<<","<<_flavors[leptonCounter]<<") "<<_lPt[leptonCounter]<<" "<< _lEta[leptonCounter] <<" "<< _lPhi[leptonCounter] <<" "<<_lE[leptonCounter]  <<" mom info: "<< _mompdg[leptonCounter]<<" "<<_mompt[leptonCounter]<<endl;
-cout<<"Gen matched: "<<_lpdgmc[leptonCounter]<<" "<<_lPtmc[leptonCounter]<<" "<< _lEtamc[leptonCounter] <<" "<< _lPhimc[leptonCounter] <<" "<<_lEmc[leptonCounter]  <<" mom info: "<< _mompdg[leptonCounter]<<" "<<_mompt[leptonCounter]<<endl;
-*/
       leptonCounter++;
-      
     }
-
     _nEle = leptonCounter-_nMu;
     _nTau = 0;
 
-   
-      
     _nLeptons = leptonCounter;
-   
-    
     _sb = false;
-   
     _n_Jets = 0;
     _n_bJets = 0;
     HT = 0;
 
     std::vector<const pat::Jet*> SelectedJets = tools::JetSelector(*thePatJets, _jetPtCut, _jetEtaCut);
     for(unsigned int i = 0 ; i < SelectedJets.size() ;i++ ){
-        
 
         double uncPt = (SelectedJets[i]->correctedP4("Uncorrected")).Pt();
         double uncEta = (SelectedJets[i]->correctedP4("Uncorrected")).Eta();
@@ -1099,7 +1011,6 @@ cout<<"Gen matched: "<<_lpdgmc[leptonCounter]<<" "<<_lPtmc[leptonCounter]<<" "<<
         _jetPt[_n_Jets] = uncPt*corr;
         _jetE[_n_Jets] = (SelectedJets[i]->correctedP4("Uncorrected")).E()*corr;
 
-
         _jetFlavour[_n_Jets] = SelectedJets[i]->hadronFlavour();
         
         TLorentzVector jt; jt.SetPtEtaPhiE(_jetPt[_n_Jets],_jetEta[_n_Jets],_jetPhi[_n_Jets], _jetE[_n_Jets]);
@@ -1108,54 +1019,49 @@ cout<<"Gen matched: "<<_lpdgmc[leptonCounter]<<" "<<_lPtmc[leptonCounter]<<" "<<
 
         bool clean = true;
         for (int k=0; k!=_nLeptons; ++k) {
-            if (_isloose[k] && _lPt[k] > 10){
-		 TLorentzVector vect_k;
-		    
-	vect_k.SetPtEtaPhiE(_lPt[k],_lEta[k],_lPhi[k], _lE[k]);
-	
-                double dR1 = (vect_k.DeltaR( jt ));
-                //std::cout << "jet cleaning: " << dR1 << " " << ((TLorentzVector *)_leptonP4->At(k))->Pt()  << std::endl;
-                clean = clean && (dR1 > 0.4) ;
-            }
-        }
-	_clean[_n_Jets]=0;
-	if (clean) _clean[_n_Jets] =1;
-	if (!clean) _clean[_n_Jets] =-1;
-        
+          if (_isloose[k] && _lPt[k] > 10){
+            TLorentzVector vect_k;
+            vect_k.SetPtEtaPhiE(_lPt[k],_lEta[k],_lPhi[k], _lE[k]);
 
+            double dR1 = (vect_k.DeltaR( jt ));
+            //std::cout << "jet cleaning: " << dR1 << " " << ((TLorentzVector *)_leptonP4->At(k))->Pt()  << std::endl;
+            clean = clean && (dR1 > 0.4) ;
+          }
+        }
+        _clean[_n_Jets]=0;
+        if (clean) _clean[_n_Jets] =1;
+        if (!clean) _clean[_n_Jets] =-1;
+                
         for(int j=0; j != _nLeptons; ++j){
-		 TLorentzVector vect_i;
-		    
-	vect_i.SetPtEtaPhiE(_lPt[j],_lEta[j],_lPhi[j], _lE[j]);
-            _jetDeltaR[_n_Jets][j] = (vect_i.DeltaR( jt ) );
+          TLorentzVector vect_i;
+          vect_i.SetPtEtaPhiE(_lPt[j],_lEta[j],_lPhi[j], _lE[j]);
+          _jetDeltaR[_n_Jets][j] = (vect_i.DeltaR( jt ) );
         }
 
         _csv[_n_Jets] = SelectedJets[i]->bDiscriminator("pfCombinedInclusiveSecondaryVertexV2BJetTags");
 
         if(!realdata_){
-            jecUnc->setJetEta(SelectedJets[i]->eta());
-            jecUnc->setJetPt(SelectedJets[i]->pt());
-            double unc = jecUnc->getUncertainty(true);
-            _jecUnc[_n_Jets] = unc;
-            //cout << " JEC unc " << unc << endl;
-            _jetPtUp[_n_Jets] = (1+unc)*SelectedJets[i]->pt();
-            _jetPtDown[_n_Jets] = (1-unc)*SelectedJets[i]->pt();
+          jecUnc->setJetEta(SelectedJets[i]->eta());
+          jecUnc->setJetPt(SelectedJets[i]->pt());
+          double unc = jecUnc->getUncertainty(true);
+          _jecUnc[_n_Jets] = unc;
+          //cout << " JEC unc " << unc << endl;
+          _jetPtUp[_n_Jets] = (1+unc)*SelectedJets[i]->pt();
+          _jetPtDown[_n_Jets] = (1-unc)*SelectedJets[i]->pt();
         }
 
-       
         if(_csv[_n_Jets] > 0.460) {
-            _bTagged[_n_Jets] = true;
-            _n_bJets++;
+          _bTagged[_n_Jets] = true;
+          _n_bJets++;
         } else _bTagged[_n_Jets] = false;
         
-        if (_jetPt[_n_Jets] > 25)
-	  HT+= _jetPt[_n_Jets];
+        if (_jetPt[_n_Jets] > 25) HT+= _jetPt[_n_Jets];
         _n_Jets++;
     }
 
     // Check if this event has triggered at least one of our save triggers
-    triggerFound = false;
-    for(trigger : triggersToSave){
+    bool triggerFound = false;
+    for(auto trigger : triggersToSave){
       if(triggerFlags[trigger]) triggerFound = true;
     }
 
@@ -1163,8 +1069,8 @@ cout<<"Gen matched: "<<_lpdgmc[leptonCounter]<<" "<<_lPtmc[leptonCounter]<<" "<<
     if(treeForFakeRate){
       if(!triggerFound)        return;
       if(_nLeptons != 1)       return;
-      if(_n_Jets < 1)          return;				// For fake rate tree: exactly 1 loose lepton + at least 1 jet
-      if(_jetPt[0] < 30)       return;				// with deltaR(j, l) > 1 (back-to-back)
+      if(_n_Jets < 1)          return;        // For fake rate tree: exactly 1 loose lepton + at least 1 jet
+      if(_jetPt[0] < 30)       return;        // with deltaR(j, l) > 1 (back-to-back)
       if(_jetDeltaR[0][0] < 1) return;
     } else if(singleLep){                     // Important: do not require trigger for singleLep trees which we use to measure trigger efficiencies
       if(_nLeptons < 1) return;
@@ -1492,7 +1398,7 @@ void trilepton::fillRegVars(const pat::Jet *jet, double genpt, const pat::Muon* 
                 Measurement1D distance1 = scdVtx->flightDistance(0, true);
                 hJet_vtx3dL = distance1.value();
                 hJet_vtx3deL = distance1.error();
-                
+
                 math::XYZTLorentzVectorD p4vtx = sv1.p4();
                 hJet_vtxMass = p4vtx.M();
                 hJet_vtxPt = p4vtx.Pt();
@@ -1549,7 +1455,7 @@ void trilepton::fillRegVars(const pat::Jet *jet, double genpt, const pat::Electr
                 Measurement1D distance1 = scdVtx->flightDistance(0, true);
                 hJet_vtx3dL = distance1.value();
                 hJet_vtx3deL = distance1.error();
-                
+
                 math::XYZTLorentzVectorD p4vtx = sv1.p4();
                 hJet_vtxMass = p4vtx.M();
                 hJet_vtxPt = p4vtx.Pt();
