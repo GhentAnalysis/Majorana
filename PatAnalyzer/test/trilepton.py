@@ -38,7 +38,7 @@ process.load("Configuration.StandardSequences.FrontierConditions_GlobalTag_cff")
 
 if isData: process.GlobalTag.globaltag = '80X_dataRun2_2016SeptRepro_v7'
 #else:      process.GlobalTag.globaltag = '80X_mcRun2_asymptotic_2016_miniAODv2'
-else:	   process.GlobalTag.globaltag = '80X_mcRun2_asymptotic_2016_TrancheIV_v8'
+else:           process.GlobalTag.globaltag = '80X_mcRun2_asymptotic_2016_TrancheIV_v8'
 #process.GlobalTag.globaltag = '80X_mcRun2_asymptotic_2016_TrancheIV_v8'
 
 
@@ -55,7 +55,7 @@ from PhysicsTools.SelectorUtils.tools.vid_id_tools import *
 switchOnVIDElectronIdProducer(process, DataFormat.MiniAOD)
 my_id_modules = ['RecoEgamma.ElectronIdentification.Identification.mvaElectronID_Spring16_GeneralPurpose_V1_cff',
                  'RecoEgamma.ElectronIdentification.Identification.cutBasedElectronID_Summer16_80X_V1_cff',
-		 'RecoEgamma.ElectronIdentification.Identification.mvaElectronID_Spring16_HZZ_V1_cff']
+                 'RecoEgamma.ElectronIdentification.Identification.mvaElectronID_Spring16_HZZ_V1_cff']
 for idmod in my_id_modules:
     setupAllVIDIdsInModule(process,idmod,setupVIDElectronSelection)
 
@@ -70,35 +70,35 @@ process.TFileService = cms.Service("TFileService", fileName = cms.string(outputF
 process.trileptonProducer = cms.EDAnalyzer("trilepton",
                                           #METFilter                              = cms.InputTag("TriggerResults::PAT"),
                                            qualityCuts                            = PFTauQualityCuts,
-					   isData                                 = cms.untracked.bool(isData),
-					   SampleName                             = cms.untracked.string("default"),
-					   electronMvaIdMap                       = cms.InputTag("electronMVAValueMapProducer:ElectronMVAEstimatorRun2Spring16GeneralPurposeV1Values"),
-					   mvaValuesMap_HZZ                       = cms.InputTag("electronMVAValueMapProducer:ElectronMVAEstimatorRun2Spring16HZZV1Values"),
-	 	                           electronMvaId90Map 			  = cms.InputTag("egmGsfElectronIDs:mvaEleID-Spring16-GeneralPurpose-V1-wp90"),
-					   electronMvaId80Map 			  = cms.InputTag("egmGsfElectronIDs:mvaEleID-Spring16-GeneralPurpose-V1-wp80"),
-					   electronCutBasedIdTightMap             = cms.InputTag("egmGsfElectronIDs:cutBasedElectronID-Summer16-80X-V1-tight"),
-					   electronCutBasedIdMediumMap            = cms.InputTag("egmGsfElectronIDs:cutBasedElectronID-Summer16-80X-V1-medium"),
-					   genPartsLabel                          = cms.InputTag("prunedGenParticles"),
-					   pdfvariablesLabel                      = cms.InputTag("generator"),
-					   BeamSpotLabel                          = cms.InputTag("offlineBeamSpot"),
-					   slimmedAddPileupInfoLabel              = cms.InputTag("slimmedAddPileupInfo"),
-					   goodOfflinePrimaryVerticesLabel        = cms.InputTag("goodOfflinePrimaryVertices"),
-					   packedPFCandidatesLabel                = cms.InputTag("packedPFCandidates"),
-					   MuonLabel                              = cms.InputTag("slimmedMuons"),
-					   ElectronLabel                          = cms.InputTag("slimmedElectrons"),
-					   JetLabel                               = cms.InputTag("slimmedJets"),
-					   METLabel                               = cms.InputTag("slimmedMETs"),
-					   reducedEgammaLabel                     = cms.InputTag("reducedEgamma:reducedConversions"),
-					   TauLabel                               = cms.InputTag("slimmedTaus"),
-					   fixedGridRhoFastjetCentralNeutralLabel = cms.InputTag("fixedGridRhoFastjetCentralNeutral"),
-					   fixedGridRhoFastjetAllLabel            = cms.InputTag("fixedGridRhoFastjetAll"),
-					   prescales                              = cms.InputTag("patTrigger"),
+                                           isData                                 = cms.untracked.bool(isData),
+                                           SampleName                             = cms.untracked.string("default"),
+                                           electronMvaIdMap                       = cms.InputTag("electronMVAValueMapProducer:ElectronMVAEstimatorRun2Spring16GeneralPurposeV1Values"),
+                                           mvaValuesMap_HZZ                       = cms.InputTag("electronMVAValueMapProducer:ElectronMVAEstimatorRun2Spring16HZZV1Values"),
+                                           electronMvaId90Map                     = cms.InputTag("egmGsfElectronIDs:mvaEleID-Spring16-GeneralPurpose-V1-wp90"),
+                                           electronMvaId80Map                     = cms.InputTag("egmGsfElectronIDs:mvaEleID-Spring16-GeneralPurpose-V1-wp80"),
+                                           electronCutBasedIdTightMap             = cms.InputTag("egmGsfElectronIDs:cutBasedElectronID-Summer16-80X-V1-tight"),
+                                           electronCutBasedIdMediumMap            = cms.InputTag("egmGsfElectronIDs:cutBasedElectronID-Summer16-80X-V1-medium"),
+                                           genPartsLabel                          = cms.InputTag("prunedGenParticles"),
+                                           pdfvariablesLabel                      = cms.InputTag("generator"),
+                                           BeamSpotLabel                          = cms.InputTag("offlineBeamSpot"),
+                                           slimmedAddPileupInfoLabel              = cms.InputTag("slimmedAddPileupInfo"),
+                                           goodOfflinePrimaryVerticesLabel        = cms.InputTag("goodOfflinePrimaryVertices"),
+                                           packedPFCandidatesLabel                = cms.InputTag("packedPFCandidates"),
+                                           MuonLabel                              = cms.InputTag("slimmedMuons"),
+                                           ElectronLabel                          = cms.InputTag("slimmedElectrons"),
+                                           JetLabel                               = cms.InputTag("slimmedJets"),
+                                           METLabel                               = cms.InputTag("slimmedMETs"),
+                                           reducedEgammaLabel                     = cms.InputTag("reducedEgamma:reducedConversions"),
+                                           TauLabel                               = cms.InputTag("slimmedTaus"),
+                                           fixedGridRhoFastjetCentralNeutralLabel = cms.InputTag("fixedGridRhoFastjetCentralNeutral"),
+                                           fixedGridRhoFastjetAllLabel            = cms.InputTag("fixedGridRhoFastjetAll"),
+                                           prescales                              = cms.InputTag("patTrigger"),
                                            triggerResultsHLT                      = cms.InputTag("TriggerResults","","HLT"), # reHLT samples have their triggers stored in HLT2
                                            triggerResultsRECO                     = cms.InputTag("TriggerResults::RECO"),
-					   exernalLHEPLabel                       = cms.InputTag("externalLHEProducer"),
+                                           exernalLHEPLabel                       = cms.InputTag("externalLHEProducer"),
                                            treeForFakeRate                        = cms.untracked.bool(treeForFakeRate),
                                            singleLep                              = cms.untracked.bool(singleLep),
-					   )
+                                           )
 
 process.goodOfflinePrimaryVertices = cms.EDFilter("PrimaryVertexObjectFilter",
                                                   src          = cms.InputTag('offlineSlimmedPrimaryVertices'),
@@ -113,5 +113,5 @@ if isData:
    process.source.lumisToProcess = LumiList.LumiList(filename = 'JSON/Cert_271036-284044_13TeV_23Sep2016ReReco_Collisions16_JSON.txt').getVLuminosityBlockRange()
 
 process.p = cms.Path(process.goodOfflinePrimaryVertices
-		    *process.egmGsfElectronIDSequence
-		    *process.trileptonProducer)
+                    *process.egmGsfElectronIDSequence
+                    *process.trileptonProducer)
