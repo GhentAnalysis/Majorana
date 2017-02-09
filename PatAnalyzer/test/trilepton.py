@@ -3,8 +3,8 @@ import FWCore.ParameterSet.Config as cms
 from RecoTauTag.RecoTau.PFRecoTauQualityCuts_cfi import PFTauQualityCuts
 
 isData          = False
-treeForFakeRate = False
-singleLep       = True
+treeForFakeRate = True
+singleLep       = False
 #inputFile       = "file:///user/mvit/public/Majorana/MajoranaNeutrino_trilepton_M-10_5f_NLO/Majorana_trilepton_RunIISpring16MiniAODv2_96.root"
 inputFile       = "file:///pnfs/iihe/cms/ph/sc4/store/data/Run2016C/DoubleEG/MINIAOD/23Sep2016-v1/100000/00831315-BA89-E611-80F4-0CC47A7C3412.root"
 #inputFile       = "/store/mc/RunIISummer16MiniAODv2/WZTo3LNu_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8/MINIAODSIM/PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/120000/14CED05F-DFBB-E611-ACE6-00259029E922.root"
@@ -17,14 +17,12 @@ def getVal(arg):
 ## loop over arguments
 for i in range(1,len(sys.argv)):
     print "[arg "+str(i)+"] : ", sys.argv[i]
-    singleLep	   = (getVal(sys.argv[i]) == "True")
-
-    #if   "isData"          in sys.argv[i]: isData          = (getVal(sys.argv[i]) == "True")
-    #elif "treeForFakeRate" in sys.argv[i]: treeForFakeRate = (getVal(sys.argv[i]) == "True")
-    #elif "singleLep"       in sys.argv[i]: singleLep       = (getVal(sys.argv[i]) == "True")
-    #elif "output"          in sys.argv[i]: outputFile      = getVal(sys.argv[i])
-    #elif "input"           in sys.argv[i]: inputFile       = getVal(sys.argv[i])
-    #elif "events"          in sys.argv[i]: nEvents         = int(getVal(sys.argv[i]))
+    if   "isData"          in sys.argv[i]: isData          = (getVal(sys.argv[i]) == "True")
+    elif "treeForFakeRate" in sys.argv[i]: treeForFakeRate = (getVal(sys.argv[i]) == "True")
+    elif "singleLep"       in sys.argv[i]: singleLep       = (getVal(sys.argv[i]) == "True")
+    elif "output"          in sys.argv[i]: outputFile      = getVal(sys.argv[i])
+    elif "input"           in sys.argv[i]: inputFile       = getVal(sys.argv[i])
+    elif "events"          in sys.argv[i]: nEvents         = int(getVal(sys.argv[i]))
 process = cms.Process("trilepton")
 
 # initialize MessageLogger and output report
@@ -64,7 +62,7 @@ for idmod in my_id_modules:
 
 if not outputFile:
   if treeForFakeRate: outputFile = 'fakeRate.root'
-  if singleLep:       outputFile = 'singleLep.root'
+  elif singleLep:     outputFile = 'singleLep.root'
   else:               outputFile = 'trilepton.root'
 process.TFileService = cms.Service("TFileService", fileName = cms.string(outputFile))
 
