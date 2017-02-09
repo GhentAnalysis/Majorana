@@ -5,7 +5,7 @@ productionLabel = 'last_FR'                                                     
 outDir          = '/user/' + os.environ['USER'] + '/public/FR_runD_good'                                  # Output directory in case of local submission
 datasets        = [dataset.strip() for dataset in open(sys.argv[1])]                                      # Get list of datasets from file given as first argument
 datasets        = [dataset.split()[0] for dataset in datasets if dataset and not dataset.startswith('#')] # Clean empty and comment lines
-groupFiles      = 3                                                                                       # Group files together when running locally
+groupFiles      = 5                                                                                       # Group files together when running locally
 
 
 for dataset in datasets:
@@ -48,7 +48,7 @@ for dataset in datasets:
         except: pass
       
       print 'Submitting ' + inputFile + ' to cream02:'
-      args  = 'dir=' + dir + ',inputFile=' + inputFile + ',outputFile=' + outputFile + ',events=-1'
+      args  = 'dir=' + dir + ',inputFile=\"' + inputFile + '\",outputFile=' + outputFile + ',events=-1'
       args += ',isData='          + ('True' if 'Run2016' in dataset else 'False')
       args += ',treeForFakeRate=' + ('True' if treeForFakeRate      else 'False')
       args += ',singleLep='       + ('True' if singleLep            else 'False')
