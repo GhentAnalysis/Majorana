@@ -284,7 +284,8 @@ void trilepton::beginJob()
     outputTree->Branch("_nMajorana",                  &_nMajorana,                  "_nMajorana/I");
     outputTree->Branch("_findMatched",                &_findMatched,                "_findMatched/I");
         outputTree->Branch("_originPhot",                &_originPhot,                "_originPhot/I");
-
+        outputTree->Branch("_originDetailed",                &_originDetailed,                "_originDetailed/I");
+_originDetailed
   
 
     // trigger
@@ -436,7 +437,6 @@ void trilepton::analyze(const edm::Event& iEvent, const edm::EventSetup& iEventS
             vGenElectrons = GPM.filterByStatus(GPM.getPromptElectrons(),1);
             vGenNPMuons = GPM.filterByStatus(GPM.getNonPromptMuons(),1);
             vGenNPElectrons = GPM.filterByStatus(GPM.getNonPromptElectrons(),1);
-            vGenMajorana = GPM.filterByStatus(GPM.getMajorana(),1);
           //  std::cout<<"********************************************************************"<<std::endl;
           //              std::cout<<"********************************************************************"<<std::endl;
 
