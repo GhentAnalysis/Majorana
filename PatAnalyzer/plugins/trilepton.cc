@@ -942,17 +942,24 @@ void trilepton::analyze(const edm::Event& iEvent, const edm::EventSetup& iEventS
 
       if (not isData) {
         _findMatched[leptonCounter]=-1;
-        const GenParticle* mc = GPM.matchedMC(&*electron);
+        const GenParticle* mc = GPM.matchedMC(&*electron,11);
+        _originPhot[leptonCounter] = -2;
         if ( mc!=0 ) {
           fillMCVars(mc, leptonCounter);
-          //Vertex::Point PVmc = mcMom->vertex();
+            if (mc->pdgId() != 22) //not a photon => should be a fake, and GenParticleManager does the job
+              _origin[leptonCounter] = GPM.originReduced(_originDetailed[leptonCounter]);
+            else {
+              _originPhot[leptonCounter] = photonOrigin(mc); //is from conversion, so I store info on where a photon come from (fragmentation, FSR etc)
+            }       
+            //Vertex::Point PVmc = mcMom->vertex();
           _ipPVmc[leptonCounter] = std::abs(electron->gsfTrack()->dxy(PVmc));
           _findMatched[leptonCounter]=1;
         } else {
-          _origin[leptonCounter] = -1;
           _originReduced[leptonCounter] = -1;
-          _mompt[leptonCounter] = 0;
-          _momphi[leptonCounter] = 0;
+          _originDetailed[leptonCounter] = -1;
+          _origin[leptonCounter] = 4;
+         _mompt[leptonCounter] = 0;
+         _momphi[leptonCounter] = 0;
           _mometa[leptonCounter] = 0;
           _mompdg[leptonCounter] = 0;
           _findMatched[leptonCounter]=0;
@@ -1068,10 +1075,18 @@ void trilepton::fillMCVars(const GenParticle* mc, const int leptonCounter) {
     GPM.printInheritance(mc);
     //std::cout << "pdg of tau truth: " << mc->pdgId() << std::endl;
     
-    _origin[leptonCounter] = GPM.origin(mc);
+  
+    _originDetailed[leptonCounter] = GPM.origin(mc);
+    _origin[leptonCounter] = GPM.originReduced(_originDetailed[leptonCounter]);
     _originReduced[leptonCounter] = GPM.originReduced(_origin[leptonCounter]);
     _isPromptFinalState[leptonCounter] = mc->isPromptFinalState();
     _fromHardProcessFinalState[leptonCounter] = mc->fromHardProcessFinalState();
+  
+  if (_isPromptFinalState[leptonCounter] || _fromHardProcessFinalState[leptonCounter]) {
+        _origin[leptonCounter] = 0;
+    }
+
+    
 
     //std::cout << "Origin of tau: " << _originReduced[leptonCounter] << std::endl;
 
@@ -1120,13 +1135,6 @@ void trilepton::fillMCVars(const GenParticle* mc, const int leptonCounter) {
                 _isolationMC[leptonCounter][0]+=dauts.at(counterD)->pt();
                 if ((fabs(dauts.at(counterD)->pdgId())!= 12) && (fabs(dauts.at(counterD)->pdgId())!= 14) && (fabs(dauts.at(counterD)->pdgId())!= 16)) {
                     _isolationMC[leptonCounter][1]+=dauts.at(counterD)->pt();
-                    /*if (_isolation == 0) {
-                     TLorentzVector dauV;
-                     dauV.SetPtEtaPhiE(dauts.at(counterD)->pt(), dauts.at(counterD)->eta(), dauts.at(counterD)->phi(), dauts.at(counterD)->energy());
-                     double deltaR1 = ((TLorentzVector *)_leptonP4->At(leptonCounter))->DeltaR(dauV);
-                     std::cout<<counterD<<" "<<dauts.at(counterD)->pdgId()<<" "<<dauts.at(counterD)->pt()<<
-                     " "<<dauts.at(counterD)->eta()<<" "<<dauts.at(counterD)->phi()<<" "<<dauts.at(counterD)->energy()<<" in "<<deltaR1<<std::endl;
-                     }*/
                 } else {
                     TLorentzVector Gen;
                     Gen.SetPtEtaPhiE( dauts.at(counterD)->pt(), dauts.at(counterD)->eta(), dauts.at(counterD)->phi(), dauts.at(counterD)->energy() );
@@ -1164,6 +1172,46 @@ void trilepton::fillMCVars(const GenParticle* mc, const int leptonCounter) {
     
     //GPM.printInheritance(&(*mc));
 }
+
+
+int trilepton::photonOrigin(const GenParticle* photon) {
+    //implementation of a flag for the photon truth matching:
+    //https://hypernews.cern.ch/HyperNews/CMS/get/susy-interpretations/192.html
+    //-1: not a photon
+    //0: direct prompt photons (prompt and delta R > 0.4)
+    //1: fragmentation photons (prompt and delta R < 0.4)
+    //2: non-prompt photons
+
+    
+    if (photon->pdgId() != 22) return -1;
+    if (!photon->isPromptFinalState()) return 2;
+    if (photon->pt() < 10) return 1;
+
+    
+    TLorentzVector photonP4; photonP4.SetPtEtaPhiE(photon->pt(),photon->eta(),photon->phi(),photon->energy());
+    TLorentzVector partonP4;
+    bool smallDR = false;
+    for( unsigned p=0; p<TheGenParticles->size(); ++p ){
+        if ((*TheGenParticles)[p].status() != 23) continue;
+        if (!((*TheGenParticles)[p].pdgId() == 21 || (fabs((*TheGenParticles)[p].pdgId()) > 0 && fabs((*TheGenParticles)[p].pdgId()) <7))) continue;
+        partonP4.SetPtEtaPhiE((*TheGenParticles)[p].pt(),(*TheGenParticles)[p].eta(),(*TheGenParticles)[p].phi(),(*TheGenParticles)[p].energy());
+        double deltaR = photonP4.DeltaR(partonP4);
+        smallDR |= (deltaR < 0.05);
+    }
+    if (smallDR) return 1;
+    else return 0;
+}
+
+
+
+
+
+
+
+
+
+
+
 void trilepton::fillCloseJetVars(const int leptonCounter, Vertex::Point PV) {
 
     _closeJetPtAll[leptonCounter] = 0;
