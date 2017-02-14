@@ -285,7 +285,7 @@ void trilepton::beginJob()
     outputTree->Branch("_findMatched",                &_findMatched,                "_findMatched/I");
         outputTree->Branch("_originPhot",                &_originPhot,                "_originPhot/I");
         outputTree->Branch("_originDetailed",                &_originDetailed,                "_originDetailed/I");
-_originDetailed
+
   
 
     // trigger
