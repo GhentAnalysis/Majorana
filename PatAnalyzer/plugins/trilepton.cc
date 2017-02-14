@@ -188,6 +188,8 @@ void trilepton::beginJob()
 
     outputTree->Branch("_origin",                     &_origin,                     "_origin[_nLeptons]/I");
     outputTree->Branch("_originReduced",              &_originReduced,              "_originReduced[_nLeptons]/I");
+    outputTree->Branch("_originPhot",                &_originPhot,                "_originPhot[_nLeptons]/I");
+    outputTree->Branch("_originDetailed",                &_originDetailed,                "_originDetailed[_nLeptons]/I");
 
     outputTree->Branch("_isPromptFinalState",         &_isPromptFinalState,         "_isPromptFinalState[_nLeptons]/O");
     outputTree->Branch("_fromHardProcessFinalState",  &_fromHardProcessFinalState,  "_fromHardProcessFinalState[_nLeptons]/O");
@@ -283,8 +285,7 @@ void trilepton::beginJob()
 
     outputTree->Branch("_nMajorana",                  &_nMajorana,                  "_nMajorana/I");
     outputTree->Branch("_findMatched",                &_findMatched,                "_findMatched/I");
-        outputTree->Branch("_originPhot",                &_originPhot,                "_originPhot/I");
-        outputTree->Branch("_originDetailed",                &_originDetailed,                "_originDetailed/I");
+        
 
   
 
