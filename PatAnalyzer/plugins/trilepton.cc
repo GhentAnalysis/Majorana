@@ -283,6 +283,9 @@ void trilepton::beginJob()
 
     outputTree->Branch("_nMajorana",                  &_nMajorana,                  "_nMajorana/I");
     outputTree->Branch("_findMatched",                &_findMatched,                "_findMatched/I");
+        outputTree->Branch("_originPhot",                &_originPhot,                "_originPhot/I");
+
+  
 
     // trigger
     for(TString triggerName : triggersToSave){
