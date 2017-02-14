@@ -103,7 +103,7 @@ def run(inputTree, triggers, dir, nLepton, binEta=False):
       elif nLepton == 1:              yTitle = "lepton p_{T} [Gev]"
       else:                           yTitle = ("sub" if nLepton==3 else "") + "leading lepton p_{T} [Gev]"
 
-      title = ";".join([name, xTitle, yTitle])
+      title = ";".join([name, xTitle, yTitle] if yTitle else [name, xTitle])
 
       defaultBinning = numpy.array([5.+i*5. for i in range(20)])
       if   nLepton==1 and not binEta: eff[ptThreshold][channel] = ROOT.TEfficiency(name, title, 38, 5, 100)
