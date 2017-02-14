@@ -1,5 +1,7 @@
 #include "Majorana/PatAnalyzer/interface/GenParticleManager.h"
 
+
+using namespace std;
 const GenParticle* GenParticleManager::getMother(const GenParticle *p)
 {
     
@@ -90,28 +92,28 @@ bool GenParticleManager::isPrompt( const GenParticle* p)
     }
     
     switch(id) {
-    case 22:
-    case 23:
-    case 24:
-    case 25:
-    case 1000022:
-    case 1000023:
-    case 1000024:
-    case 1000025:
-    case 1000035:
-    case 1000039:
-    case 1000011:
-    case 1000012:
-    case 1000014:
-    case 1000015:
-    case 1000016:
-    case 2000011:
-    case 2000013:
-    case 2000015:
-    case 9900012:
-      return true;
-    default:
-      return false;
+        case 22:
+        case 23:
+        case 24:
+        case 25:
+        case 1000022:
+        case 1000023:
+        case 1000024:
+        case 1000025:
+        case 1000035:
+        case 1000039:
+        case 1000011:
+        case 1000012:
+        case 1000014:
+        case 1000015:
+        case 1000016:
+        case 2000011:
+        case 2000013:
+        case 2000015:
+        case 9900012:
+            return true;
+        default:
+            return false;
     }
 }
 
@@ -122,55 +124,50 @@ void GenParticleManager::Classify()
     for(GenParticleCollection::const_reverse_iterator p = _Collection->rbegin() ; p != _Collection->rend() ; p++ )
     {
         int id = TMath::Abs(p->pdgId());
-	// cout << id << "   momentum:  "<< p-> pt()<<endl;
+        //cout << id << endl;
         //continue;
-	
-	if (id == 9900012)
-	  {
-	    vMajorana.push_back(&*p);
-	  }
         
-	else if( id == 11 )
-	  {
+        if( id == 11 )
+        {
             if( isPrompt(&*p) )
-	      vPromptElectrons.push_back(&*p);
+                vPromptElectrons.push_back(&*p);
             else
-	      vNonPromptElectrons.push_back(&*p);
-	  }
+                vNonPromptElectrons.push_back(&*p);
+        }
         else if ( id == 13 )
-	  {
+        {
             if( isPrompt(&*p) )
-	      vPromptMuons.push_back(&*p);
+                vPromptMuons.push_back(&*p);
             else
-	      vNonPromptMuons.push_back(&*p);
-	  }
+                vNonPromptMuons.push_back(&*p);
+        }
         else if ( id == 15 )
-	  {
+        {
             if( isPrompt(&*p) )
-	      vPromptTaus.push_back(&*p);
+                vPromptTaus.push_back(&*p);
             else
-	      vNonPromptTaus.push_back(&*p);
-	  }
+                vNonPromptTaus.push_back(&*p);
+        }
         else if ( id == 23 )
-	  {
+        {
             vZBosons.push_back(&*p);
-	  }
+        }
         else if( id == 24 )
-	  {
+        {
             vWBosons.push_back(&*p);
-	  }
+        }
         else if ( id == 22 && p->mass() > 1.0)
-	  {
+        {
             vOffShellPhotons.push_back(&*p);
-	  }
+        }
         else if ( id == 25 )
-	  {
+        {
             vHiggsBosons.push_back(&*p);
-	  }
+        }
         else if ( id == 12 || id == 14 || id == 16 )
-	  {
+        {
             vInvisible.push_back(&*p);
-	  }
+        }
     }
 }
 
@@ -190,7 +187,6 @@ void GenParticleManager::Reset()
     vOffShellPhotons.clear();
     vCharginos.clear();
     vNeutralinos.clear();
-    vMajorana.clear();
 }
 
 
@@ -284,16 +280,13 @@ std::vector<const GenParticle*> GenParticleManager::getAllMothers(const GenParti
             counter++;
         } else mom = NULL;
     }
-
-    /*
-    std::cout<<"Full size "<<moms.size()<<std::endl;
-    std::cout<<"************"<<std::endl;
+    //std::cout<<"Full size "<<moms.size()<<std::endl;
+    /*std::cout<<"************"<<std::endl;
     for (unsigned int i = 0; i!=moms.size(); ++i) {
         std::cout<<moms[i]->pdgId()<<" "<<std::endl;
     }
     std::cout<<"************"<<std::endl;
     */
-    
     return moms;
 }
 
@@ -317,9 +310,7 @@ enum decay {
     pi_0, //16
     photon_, //17
     F_L, //18
-    N_U_L_L, // 19
-    W_N_W // 20
-  
+    N_U_L_L // 19
 };
 
 bool GenParticleManager::fromTop(const GenParticle* p ) {
@@ -362,16 +353,6 @@ int GenParticleManager::origin(const GenParticle *p)
     if( !p ) return N_U_L_L ;
     
     std::vector<const GenParticle*> moms = getAllMothers(p);
-    if( comesFromBoson(moms) )
-      {
-	if( comesFromMajorana(moms) )
-	  {
-	    if( comesFromBoson(moms) )
-	      {
-		return W_N_W; //W --> N --> Z/W -->lepton
-	      }
-	  }
-      }
     
     if( comesFromBoson(moms) )
     {
@@ -471,15 +452,6 @@ bool GenParticleManager::comesFromTau(std::vector<const GenParticle*>& m)
     for(uint i = 0 ; i < m.size(); i++ ) 
     {
         if( TMath::Abs(m[i]->pdgId()) == 15 ) return true;
-    }
-    return false;
-}
-
-bool GenParticleManager::comesFromMajorana(std::vector<const GenParticle*>& m)
-{
-    for(uint i = 0 ; i < m.size(); i++ ) 
-    {
-        if( TMath::Abs(m[i]->pdgId()) == 9900012 ) return true;
     }
     return false;
 }
@@ -613,17 +585,12 @@ const GenParticle* GenParticleManager::matchedMC(const pat::Muon *pReco) {
     const GenParticle* mom = 0;
     TLorentzVector Gen1, Gen2;
     if (!pReco) return 0;
-	
     Gen1.SetPtEtaPhiE(pReco->pt(),pReco->eta(),pReco->phi(),pReco->energy());
-    double deltaRreco = 0.1;
+    double deltaRreco = 9999.;
     for(GenParticleCollection::const_reverse_iterator p = _Collection->rbegin() ; p != _Collection->rend() ; p++ ) {
         if (p->status()!=1) continue;
-	   if (TMath::Abs(p->pdgId() ) !=13 ) continue; 
-	   // if (TMath::Abs(p->pt() - pReco->pt()) > 5) continue;
         Gen2.SetPtEtaPhiE(p->pt(),p->eta(),p->phi(),p->energy());
         double deltaRcur = Gen1.DeltaR(Gen2);
-	    	cout<<deltaRcur<<"  ///////////////////////////muon: with pt: "<<pReco->pt()<<"  "<<p->charge()<<" "<<pReco->charge()<<" "<<p->pdgId()<<"  vs  "<<pReco->pdgId()<<endl;
-
         if (deltaRcur < deltaRreco) {
             mom = &*p;
             deltaRreco = deltaRcur;
@@ -631,47 +598,77 @@ const GenParticle* GenParticleManager::matchedMC(const pat::Muon *pReco) {
     }
     return mom;
 }
-
 const GenParticle* GenParticleManager::matchedMC(const pat::Electron *pReco) {
     const GenParticle* mom = 0;
     if (!pReco) return 0;
     TLorentzVector Gen1, Gen2;
     Gen1.SetPtEtaPhiE(pReco->pt(),pReco->eta(),pReco->phi(),pReco->energy());
-    double deltaRreco = 0.1;
+    double deltaRreco = 9999.;
     for(GenParticleCollection::const_reverse_iterator p = _Collection->rbegin() ; p != _Collection->rend() ; p++ ) {
         if (p->status()!=1) continue;
-        if (fabs(p->pdgId())!=11) continue;
         Gen2.SetPtEtaPhiE(p->pt(),p->eta(),p->phi(),p->energy());
         double deltaRcur = Gen1.DeltaR(Gen2);
-	    	    	cout<<deltaRcur<<"  ///////////////////////////electron: with pt: "<<pReco->pt()<<"  "<<p->charge()<<" "<<pReco->charge()<<" "<<p->pdgId()<<"  vs  "<<pReco->pdgId()<<endl;
-
-        //if (deltaRcur < deltaRreco && fabs(pReco->pt() - p->pt())/p->pt() < 0.2) {
         if (deltaRcur < deltaRreco) {
             mom = &*p;
             deltaRreco = deltaRcur;
         }
-    	
+    
     }
     return mom;
 }
 
-const GenParticle* GenParticleManager::matchedMC(const edm::Ptr<reco::GsfElectron> pReco) {
+const GenParticle* GenParticleManager::matchedMC(const pat::Electron *pReco, const int pdgID) {
     const GenParticle* mom = 0;
     if (!pReco) return 0;
     TLorentzVector Gen1, Gen2;
     Gen1.SetPtEtaPhiE(pReco->pt(),pReco->eta(),pReco->phi(),pReco->energy());
-    double deltaRreco = 0.1;
+    double deltaRreco = 9999.;
     for(GenParticleCollection::const_reverse_iterator p = _Collection->rbegin() ; p != _Collection->rend() ; p++ ) {
-        if (p->status()!=1) continue;
-        if (fabs(p->pdgId())!=11) continue;
+        if (p->status()!=1 || fabs(p->pdgId())!=pdgID) continue;
         Gen2.SetPtEtaPhiE(p->pt(),p->eta(),p->phi(),p->energy());
         double deltaRcur = Gen1.DeltaR(Gen2);
-        //if (deltaRcur < deltaRreco && fabs(pReco->pt() - p->pt())/p->pt() < 0.2) {
+        //double deltaPt = fabs(p->pt() - pReco->pt())/p->pt();
         if (deltaRcur < deltaRreco) {
             mom = &*p;
             deltaRreco = deltaRcur;
         }
-    	
     }
-    return mom;
+    if (deltaRreco < 0.2) {
+        /*if (pReco->charge()!=mom->charge()) {
+            std::cout<<"try "<<mom->pdgId()<<" "<<deltaRreco<<" "<<fabs(mom->pt() - pReco->pt())/mom->pt()<<std::endl;
+            for(GenParticleCollection::const_reverse_iterator p = _Collection->rbegin() ; p != _Collection->rend() ; p++ ) {
+                if (p->status()!=1 || fabs(p->pdgId())!=pdgID) continue;
+                Gen2.SetPtEtaPhiE(p->pt(),p->eta(),p->phi(),p->energy());
+                double deltaRcur = Gen1.DeltaR(Gen2);
+
+            }
+            
+        }*/
+        //std::cout<<pReco->pt()<<" "<<p->pt()<<" "<<deltaRcur<<"; "<<pReco->charge()<<" "<<p->charge()<<std::endl;
+        return mom;
+    }
+    else return 0;
 }
+const GenParticle* GenParticleManager::matchedMC(const pat::Muon *pReco, const int pdgID) {
+    const GenParticle* mom = 0;
+    TLorentzVector Gen1, Gen2;
+    if (!pReco) return 0;
+    Gen1.SetPtEtaPhiE(pReco->pt(),pReco->eta(),pReco->phi(),pReco->energy());
+    double deltaRreco = 9999.;
+    for(GenParticleCollection::const_reverse_iterator p = _Collection->rbegin() ; p != _Collection->rend() ; p++ ) {
+        if (p->status()!=1 || fabs(p->pdgId())!=pdgID) continue;
+        Gen2.SetPtEtaPhiE(p->pt(),p->eta(),p->phi(),p->energy());
+        double deltaRcur = Gen1.DeltaR(Gen2);
+        //double deltaPt = fabs(p->pt() - pReco->pt())/p->pt();
+        if (deltaRcur < deltaRreco) {
+            mom = &*p;
+            deltaRreco = deltaRcur;
+        }
+    }
+    if (deltaRreco < 0.2)
+        return mom;
+    else return 0;
+
+}
+
+

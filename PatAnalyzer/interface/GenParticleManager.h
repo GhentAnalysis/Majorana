@@ -36,7 +36,6 @@ public:
     std::vector<const GenParticle*>& getOffShellPhotons(){return vOffShellPhotons;}
     std::vector<const GenParticle*>& getCharginios(){return vCharginos;}
     std::vector<const GenParticle*>& getNeutralinos(){return vNeutralinos;}
-    std::vector<const GenParticle*>& getMajorana(){return vMajorana;}
     
     std::vector<const GenParticle*> getAllMothers(const GenParticle* p);
     
@@ -52,8 +51,10 @@ public:
     
     const GenParticle* matchedMC(const pat::Muon *pReco);
     const GenParticle* matchedMC(const pat::Electron *pReco);
-    const GenParticle* matchedMC(const edm::Ptr<reco::GsfElectron> pReco);
     
+    const GenParticle* matchedMC(const pat::Electron *pReco, const int pdgID);
+    const GenParticle* matchedMC(const pat::Muon *pReco, const int pdgID);
+
     //int origin(const pat::Muon *p );
     //int origin(const pat::Electron *p );
     
@@ -66,7 +67,6 @@ public:
     bool comesFromTau(std::vector<const GenParticle*>& );
     bool comesFromPi0(std::vector<const GenParticle*>& );
     bool comesFromUDS(std::vector<const GenParticle*>& );
-    bool comesFromMajorana(std::vector<const GenParticle*>& );
     
     bool SameMother(const  GenParticle* p,  const GenParticle* part);
     
@@ -91,9 +91,6 @@ protected:
     
     //stable invisible
     std::vector<const GenParticle*> vInvisible;
-
-    //Majorana Neutrino
-    std::vector<const GenParticle*> vMajorana;
 };
 
 
