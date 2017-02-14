@@ -131,6 +131,9 @@ private:
     void fillIsoMCVars(const int leptonCounter);
     void getTriggerResults(const edm::Event& iEvent, bool isHLT, edm::EDGetTokenT<edm::TriggerResults> token, std::vector<TString> toSave);
 
+    int photonOrigin(const GenParticle* photon);
+    
+    
     std::vector<const pat::Jet* > SelectedJetsAll;
     //edm::Handle<GenParticleCollection> TheGenParticles;
     edm::Handle<std::vector<reco::GenParticle>> TheGenParticles;
