@@ -1054,10 +1054,12 @@ void trilepton::analyze(const edm::Event& iEvent, const edm::EventSetup& iEventS
     // Here we make the decision on what to save
     if(treeForFakeRate){
       if(!triggerFound)        return;
-      if(_nLeptons != 1)       return;
-      if(_n_Jets < 1)          return;        // For fake rate tree: exactly 1 loose lepton + at least 1 jet
-      if(_jetPt[0] < 30)       return;        // with deltaR(j, l) > 1 (back-to-back)
-      if(_jetDeltaR[0][0] < 1) return;
+      //if(_nLeptons != 1)       return;
+      //if(_n_Jets < 1)          return;        // For fake rate tree: exactly 1 loose lepton + at least 1 jet
+      //if(_jetPt[0] < 30)       return;        // with deltaR(j, l) > 1 (back-to-back)
+      //if(_jetDeltaR[0][0] < 1) return;
+      if(_nLeptons < 3) return; // fake ttbar
+
     } else if(singleLep){                     // Important: do not require trigger for singleLep trees which we use to measure trigger efficiencies
       if(_nLeptons < 1) return;
     } else {
@@ -1081,7 +1083,7 @@ void trilepton::fillMCVars(const GenParticle* mc, const int leptonCounter) {
   
     _originDetailed[leptonCounter] = GPM.origin(mc);
     _origin[leptonCounter] = GPM.originReduced(_originDetailed[leptonCounter]);
-    _originReduced[leptonCounter] = GPM.originReduced(_origin[leptonCounter]);
+    _originReduced[leptonCounter] = GPM.originReduced(_originDetailed[leptonCounter]);
     _isPromptFinalState[leptonCounter] = mc->isPromptFinalState();
     _fromHardProcessFinalState[leptonCounter] = mc->fromHardProcessFinalState();
   
