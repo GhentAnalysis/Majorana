@@ -51,11 +51,9 @@ public:
     
     const GenParticle* matchedMC(const pat::Muon *pReco);
     const GenParticle* matchedMC(const pat::Electron *pReco);
-    const GenParticle* matchedMC(const pat::Tau *pReco);
     
     const GenParticle* matchedMC(const pat::Electron *pReco, const int pdgID);
     const GenParticle* matchedMC(const pat::Muon *pReco, const int pdgID);
-    const GenParticle* matchedMC(const pat::Tau *pReco, const int pdgID);
 
     //int origin(const pat::Muon *p );
     //int origin(const pat::Electron *p );
