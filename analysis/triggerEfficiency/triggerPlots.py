@@ -1,6 +1,6 @@
 #! /usr/bin/env python
 
-import ROOT
+import ROOT,numpy
 from collections import defaultdict
 import os
 import Majorana.tools.samples      as samples
@@ -9,7 +9,7 @@ import Majorana.analysis.selectors as selectors
 
 
 triggerSamples      = ['WZ','WJets','MET','JetHT']
-triggerCombinations = ['1l','2l','3l','2l1l','3l2l1l','1l1l']
+triggerCombinations = ['1l','1l_eta','2l','3l','2l1l','3l2l1l','1l1l']
 
 import argparse
 argParser = argparse.ArgumentParser(description = "Argument parser")
@@ -75,10 +75,10 @@ def passTriggers(tree, triggerList):
   return False
 
 
-def run(inputTree, triggers, dir, nLepton):
+def run(inputTree, triggers, dir, nLepton, binEta=False):
   try: os.makedirs(dir)
   except: pass
-  hists = {}
+  eff = {}
 
   if nLepton ==1: style.setDefault()
   else:           style.setDefault2D()
@@ -89,14 +89,26 @@ def run(inputTree, triggers, dir, nLepton):
 
   ptThresholds = ['10to15','15to20','20to30','30to40','40to50','50to70','70to100'] if nLepton == 3 else [None]
   for ptThreshold in ptThresholds:
-    hists[ptThreshold] = {}
-    for triggerApplied in [True, False]:
-      hists[ptThreshold][triggerApplied] = {}
-      for channel in channels:
-	if nLepton==3: name = channel + "_pt" + str(ptThreshold) + ("" if triggerApplied else "_noTrig")
-	else:          name = channel + ("" if triggerApplied else "_noTrig")
-	if nLepton==1: hists[ptThreshold][triggerApplied][channel] = ROOT.TH1D(name, name, 38, 5, 100)
-  else:          hists[ptThreshold][triggerApplied][channel] = ROOT.TH2D(name, name, 19, 5, 100, 19, 5, 100)
+    eff[ptThreshold] = {}
+    for channel in channels:
+      if nLepton==3:              name = channel + "_pt" + str(ptThreshold)
+      elif nLepton==1 and binEta: name = channel + "_etaBinned"
+      else:                       name = channel
+
+      if nLepton == 1 and not binEta: xTitle = "lepton p_{T} [Gev]"
+      elif nLepton == 1:              xTitle = "lepton #eta"
+      else:                           xTitle = "trailing lepton p_{T} [Gev]"
+
+      if nLepton == 1 and not binEta: yTitle = None
+      elif nLepton == 1:              yTitle = "lepton p_{T} [Gev]"
+      else:                           yTitle = ("sub" if nLepton==3 else "") + "leading lepton p_{T} [Gev]"
+
+      title = ";".join([name, xTitle, yTitle])
+
+      defaultBinning = numpy.array([5.+i*5. for i in range(20)])
+      if   nLepton==1 and not binEta: eff[ptThreshold][channel] = ROOT.TEfficiency(name, title, 38, 5, 100)
+      elif nLepton==1:                eff[ptThreshold][channel] = ROOT.TEfficiency(name, title, 5, numpy.array([0, 0.8, 1.442, 1.556, 2, 2.5]), 19, defaultBinning)
+      else:                           eff[ptThreshold][channel] = ROOT.TEfficiency(name, title, 19, defaultBinning, 19, defaultBinning)
 
   def getPtThreshold(pt):
     for ptThreshold in ptThresholds:
@@ -114,11 +126,12 @@ def run(inputTree, triggers, dir, nLepton):
     if not all(selectors.leptonSelector(inputTree, i) for i in range(nLepton)): continue
  
     # flavor of muon is 1, flavor of electron is 0 
-    ptAndFlavour = [(inputTree._lPt[i], inputTree._flavors[i]) for i in range(nLepton)]
+    ptAndFlavour = [(inputTree._lPt[i], inputTree._flavors[i], inputTree._lEta[i]) for i in range(nLepton)]
     def getSortKey(item): return item[0]
     ptAndFlavour.sort(reverse=True, key=getSortKey)
     pt      = [i[0] for i in ptAndFlavour]
     flavour = [i[1] for i in ptAndFlavour]
+    eta     = [i[2] for i in ptAndFlavour]
 
     nMuon   = sum(i for i in flavour)
     channel = "".join(["mu" if i==1 else "e" for i in flavour])
@@ -126,44 +139,27 @@ def run(inputTree, triggers, dir, nLepton):
     if nLepton == 3: ptThreshold = getPtThreshold(pt[0])
     else:            ptThreshold = None
 
-    def fill(*args):
-      hists[ptThreshold][False][channel].Fill(*args)
-      if passTriggers(inputTree, triggers[nMuon]):
-	      hists[ptThreshold][True][channel].Fill(*args)
-
-    if   nLepton == 3: fill(pt[2], pt[1])
-    elif nLepton == 2: fill(pt[1], pt[0])
-    elif nLepton == 1: fill(pt[0])
+    if   nLepton == 3:            eff[ptThreshold][channel].Fill(passTriggers(inputTree, triggers[nMuon]), pt[2], pt[1])
+    elif nLepton == 2:            eff[ptThreshold][channel].Fill(passTriggers(inputTree, triggers[nMuon]), pt[1], pt[0])
+    elif nLepton == 1 and binEta: eff[ptThreshold][channel].Fill(passTriggers(inputTree, triggers[nMuon]), abs(eta[0]), pt[0])
+    elif nLepton == 1:            eff[ptThreshold][channel].Fill(passTriggers(inputTree, triggers[nMuon]), pt[0])
 
   for ptThreshold in ptThresholds:
     for channel in channels:
-      hists[ptThreshold][False][channel].Sumw2()
-      hists[ptThreshold][True][channel].Sumw2()
-      eff = hists[ptThreshold][True][channel].Clone()
-      eff.Divide(hists[ptThreshold][False][channel])
- 
-      c = ROOT.TCanvas(eff.GetName(), eff.GetName())
+      c = ROOT.TCanvas(eff[ptThreshold][channel].GetName(), eff[ptThreshold][channel].GetName())
       c.cd()
 
-      if nLepton == 1:
-        eff.GetXaxis().SetTitle("lepton p_{T} [Gev]")
-        eff.GetYaxis().SetRangeUser(0, 1)
-      else:
-        eff.GetZaxis().SetRangeUser(0, 1)
-        eff.GetXaxis().SetTitle("trailing lepton p_{T} [Gev]")
-        eff.GetYaxis().SetTitle(("sub" if nLepton==3 else "") + "leading lepton p_{T} [Gev]")
+      if ptThreshold: eff[ptThreshold][channel].SetTitle(channel + " channel, leading lepton " + ptThreshold.split('to')[0] + ' GeV < p_{T} < ' + ptThreshold.split('to')[1] + ' GeV')
+      else:           eff[ptThreshold][channel].SetTitle(channel + " channel")
 
-      if ptThreshold: eff.SetTitle(channel + " channel, leading lepton " + ptThreshold.split('to')[0] + ' GeV < p_{T} < ' + ptThreshold.split('to')[1] + ' GeV')
-      else:           eff.SetTitle(channel + " channel")
-
-      if nLepton==1: eff.Draw("E")
-      else:          eff.Draw("COLZ TEXT")
+      if nLepton==1 and not binEta: eff[ptThreshold][channel].Draw("AP")
+      else:                         eff[ptThreshold][channel].Draw("COLZ TEXT")
 
       c.RedrawAxis()
-      c.Print(os.path.join(dir, eff.GetName() + '.pdf'))
-      c.Print(os.path.join(dir, eff.GetName() + '.png'))
+      c.Print(os.path.join(dir, eff[ptThreshold][channel].GetName() + '.pdf'))
+      c.Print(os.path.join(dir, eff[ptThreshold][channel].GetName() + '.png'))
       file = ROOT.TFile(os.path.join("triggerEfficiencies.root"),"UPDATE")
-      eff.Write(dir + '_' + eff.GetName(), ROOT.TObject.kOverwrite)
+      eff[ptThreshold][channel].Write(dir + '_' + eff[ptThreshold][channel].GetName(), ROOT.TObject.kOverwrite)
       file.Close()
 
   return True
@@ -182,10 +178,11 @@ if not args.sample:
       launch('./triggerPlots.py --sample=' + pd + ' --type=' + type + ' --isChild', 'log/' + pd + '_' + type + '.log')
 elif args.isChild:
   pd = args.sample
-  chain = samples.getTree(pd, treeType='singleLep', productionLabel='triggerEfficiency_v6', shortDebug=False)
+  chain = samples.getTree(pd, treeType='singleLep', productionLabel='triggerEfficiency_v7', shortDebug=False)
 
   plotDir = 'plots/'
   if args.type == '1l':       run(chain, triggers_1l,     plotDir + pd + '/1l', 1)
+  elif args.type == '1l_eta': run(chain, triggers_1l,     plotDir + pd + '/1l_eta', 1, binEta=True)
   elif args.type == '3l':     run(chain, triggers_3l,     plotDir + pd + '/3l', 3)
   elif args.type == '2l':     run(chain, triggers_2l,     plotDir + pd + '/2l', 2)
   elif args.type == '1l1l':   run(chain, triggers_1l1l,   plotDir + pd + '/1l1l', 2)
