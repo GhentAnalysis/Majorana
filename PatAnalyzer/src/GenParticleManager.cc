@@ -671,44 +671,4 @@ const GenParticle* GenParticleManager::matchedMC(const pat::Muon *pReco, const i
 
 }
 
-const GenParticle* GenParticleManager::matchedMC(const pat::Tau *pReco, const int pdgID) {
-    const GenParticle* mom = 0;
-    TLorentzVector Gen1, Gen2;
-    if (!pReco) return 0;
-    Gen1.SetPtEtaPhiE(pReco->pt(),pReco->eta(),pReco->phi(),pReco->energy());
-    double deltaRreco = 9999.;
-    for(GenParticleCollection::const_reverse_iterator p = _Collection->rbegin() ; p != _Collection->rend() ; p++ ) {
-        if (fabs(p->pdgId())!=pdgID || (fabs(p->eta()) > 10)) continue;
-        Gen2.SetPtEtaPhiE(p->pt(),p->eta(),p->phi(),p->energy());
-        double deltaRcur = Gen1.DeltaR(Gen2);
-        //double deltaPt = fabs(p->pt() - pReco->pt())/p->pt();
-        if (deltaRcur < deltaRreco) {
-            mom = &*p;
-            deltaRreco = deltaRcur;
-        }
-    }
-    if (deltaRreco < 0.3)
-        return mom;
-    else return 0;
-}
-
-const GenParticle* GenParticleManager::matchedMC(const pat::Tau *pReco) {
-    const GenParticle* mom = 0;
-    TLorentzVector Gen1, Gen2;
-    if (!pReco) return 0;
-    Gen1.SetPtEtaPhiE(pReco->pt(),pReco->eta(),pReco->phi(),pReco->energy());
-    double deltaRreco = 9999.;
-    for(GenParticleCollection::const_reverse_iterator p = _Collection->rbegin() ; p != _Collection->rend() ; p++ ) {
-        if (fabs(p->eta()) > 10) continue;
-        if (fabs(pReco->pt() - p->pt())/pReco->pt() > 0.9) continue;
-        Gen2.SetPtEtaPhiE(p->pt(),p->eta(),p->phi(),p->energy());
-        double deltaRcur = Gen1.DeltaR(Gen2);
-        //double deltaPt = fabs(p->pt() - pReco->pt())/p->pt();
-        if (deltaRcur < deltaRreco) {
-            mom = &*p;
-            deltaRreco = deltaRcur;
-        }
-    }
-    return mom;
-}
 
