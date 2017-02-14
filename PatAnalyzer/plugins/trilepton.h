@@ -304,6 +304,7 @@ private:
     int _origin[nLeptonsMax];
     int _originReduced[nLeptonsMax];
     int _originPhot[nLeptonsMax];
+    int _originDetailed[nLeptonsMax];
     bool _isPromptFinalState[nLeptonsMax];
     bool _fromHardProcessFinalState[nLeptonsMax];
 
