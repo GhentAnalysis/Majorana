@@ -954,7 +954,10 @@ void trilepton::analyze(const edm::Event& iEvent, const edm::EventSetup& iEventS
               _origin[leptonCounter] = GPM.originReduced(_originDetailed[leptonCounter]);
             else {
               _originPhot[leptonCounter] = photonOrigin(mc); //is from conversion, so I store info on where a photon come from (fragmentation, FSR etc)
-            }       
+              GPM.printInheritance(&(*mc));
+
+            } 
+          
             //Vertex::Point PVmc = mcMom->vertex();
           _ipPVmc[leptonCounter] = std::abs(electron->gsfTrack()->dxy(PVmc));
           _findMatched[leptonCounter]=1;
@@ -969,6 +972,11 @@ void trilepton::analyze(const edm::Event& iEvent, const edm::EventSetup& iEventS
           _findMatched[leptonCounter]=0;
         }
       }
+      
+      
+
+      
+      
       leptonCounter++;
     }
     _nEle = leptonCounter-_nMu;
@@ -1078,7 +1086,7 @@ void trilepton::fillMCVars(const GenParticle* mc, const int leptonCounter) {
     _lEtamc[leptonCounter] = mc->eta();
     _lpdgmc[leptonCounter] = mc->pdgId();
     _lchargemc[leptonCounter] = mc->charge();
-    GPM.printInheritance(mc);
+    //GPM.printInheritance(mc);
     //std::cout << "pdg of tau truth: " << mc->pdgId() << std::endl;
     
   
@@ -1176,7 +1184,6 @@ void trilepton::fillMCVars(const GenParticle* mc, const int leptonCounter) {
         _mompdg[leptonCounter] = 0;
     }
     
-    //GPM.printInheritance(&(*mc));
 }
 
 
