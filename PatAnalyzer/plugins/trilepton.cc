@@ -950,38 +950,35 @@ void trilepton::analyze(const edm::Event& iEvent, const edm::EventSetup& iEventS
         _originPhot[leptonCounter] = -2;
         if ( mc!=0 ) {
           fillMCVars(mc, leptonCounter);
-          cout<<mc->pdgId()<<endl;
-            if (mc->pdgId() != 22) {//not a photon => should be a fake, and GenParticleManager does the job
-              _origin[leptonCounter] = GPM.originReduced(_originDetailed[leptonCounter]);
-              //std::cout<<" != 22    "<< _origin[leptonCounter]<<   std::endl;
-
-              //GPM.printInheritance(&(*mc));
-            }
-            else {
-              _originPhot[leptonCounter] = photonOrigin(mc); //is from conversion, so I store info on where a photon come from (fragmentation, FSR etc)
-                            std::cout<<"------------>     == 22    "<<_originPhot[leptonCounter]<<std::endl;
-
-              GPM.printInheritance(&(*mc));
-              
-
-            } 
-          
-            //Vertex::Point PVmc = mcMom->vertex();
-          _ipPVmc[leptonCounter] = std::abs(electron->gsfTrack()->dxy(PVmc));
-          _findMatched[leptonCounter]=1;
-        } else {
-          _originReduced[leptonCounter] = -1;
-          _originDetailed[leptonCounter] = -1;
-          _origin[leptonCounter] = 4;
-         _mompt[leptonCounter] = 0;
-         _momphi[leptonCounter] = 0;
-          _mometa[leptonCounter] = 0;
-          _mompdg[leptonCounter] = 0;
-          _findMatched[leptonCounter]=0;
+        }
+        else {
+          mc = GPM.matchedMC(&*electron);
+                if ( mc!=0 ) {
+                    fillMCVars(mc, leptonCounter);
+                    if (mc->pdgId() != 22) //not a photon => should be a fake, and GenParticleManager does the job
+                        _origin[leptonCounter] = GPM.originReduced(_originDetailed[leptonCounter]);
+                    else {
+                        _originPhot[leptonCounter] = photonOrigin(mc); //is from conversion, so I store info on where a photon come from (fragmentation, FSR etc)
+                        GPM.printInheritance(&(*mc));
+                      cout<<_originPhot[leptonCounter]<<endl;
+                    }
+                 
+          //_ipPVmc[leptonCounter] = std::abs(electron->gsfTrack()->dxy(PVmc));
+          //_findMatched[leptonCounter]=1;
+                } else {
+                  _originReduced[leptonCounter] = -1;
+                  _originDetailed[leptonCounter] = -1;
+                  _origin[leptonCounter] = 4;
+                  _mompt[leptonCounter] = 0;
+                 _momphi[leptonCounter] = 0;
+                  _mometa[leptonCounter] = 0;
+                 _mompdg[leptonCounter] = 0;
+                 _findMatched[leptonCounter]=0;
+        }
+      
+      
         }
       }
-      
-      
 
       
       
