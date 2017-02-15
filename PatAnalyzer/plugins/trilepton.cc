@@ -188,6 +188,8 @@ void trilepton::beginJob()
 
     outputTree->Branch("_origin",                     &_origin,                     "_origin[_nLeptons]/I");
     outputTree->Branch("_originReduced",              &_originReduced,              "_originReduced[_nLeptons]/I");
+    outputTree->Branch("_originPhot",                &_originPhot,                "_originPhot[_nLeptons]/I");
+    outputTree->Branch("_originDetailed",                &_originDetailed,                "_originDetailed[_nLeptons]/I");
 
     outputTree->Branch("_isPromptFinalState",         &_isPromptFinalState,         "_isPromptFinalState[_nLeptons]/O");
     outputTree->Branch("_fromHardProcessFinalState",  &_fromHardProcessFinalState,  "_fromHardProcessFinalState[_nLeptons]/O");
@@ -283,8 +285,7 @@ void trilepton::beginJob()
 
     outputTree->Branch("_nMajorana",                  &_nMajorana,                  "_nMajorana/I");
     outputTree->Branch("_findMatched",                &_findMatched,                "_findMatched/I");
-        outputTree->Branch("_originPhot",                &_originPhot,                "_originPhot/I");
-        outputTree->Branch("_originDetailed",                &_originDetailed,                "_originDetailed/I");
+        
 
   
 
@@ -444,14 +445,14 @@ void trilepton::analyze(const edm::Event& iEvent, const edm::EventSetup& iEventS
             Gen0.SetPtEtaPhiE( 0, 0, 0, 0);
             _genqpt = 0;
             _genqpt20 = 0;
-            cout << "Particle ids in the event" << endl;
+            //cout << "Particle ids in the event" << endl;
             for(GenParticleCollection::const_reverse_iterator p = TheGenParticles->rbegin() ; p != TheGenParticles->rend() ; p++ )
             {
                 int id = std::abs(p->pdgId());
                 
                 if(p->status() == 1){
                     const GenParticle *mom = GPM.getMother(&*p);
-                    cout << id << " " << p->pt() << " " << std::abs(mom->pdgId()) << endl;
+                    //cout << id << " " << p->pt() << " " << std::abs(mom->pdgId()) << endl;
                 }
                 
                 if(id == 9900012) _nMajorana++;
@@ -949,11 +950,22 @@ void trilepton::analyze(const edm::Event& iEvent, const edm::EventSetup& iEventS
         _originPhot[leptonCounter] = -2;
         if ( mc!=0 ) {
           fillMCVars(mc, leptonCounter);
-            if (mc->pdgId() != 22) //not a photon => should be a fake, and GenParticleManager does the job
+          cout<<mc->pdgId()<<endl;
+            if (mc->pdgId() != 22) {//not a photon => should be a fake, and GenParticleManager does the job
               _origin[leptonCounter] = GPM.originReduced(_originDetailed[leptonCounter]);
+              //std::cout<<" != 22    "<< _origin[leptonCounter]<<   std::endl;
+
+              //GPM.printInheritance(&(*mc));
+            }
             else {
               _originPhot[leptonCounter] = photonOrigin(mc); //is from conversion, so I store info on where a photon come from (fragmentation, FSR etc)
-            }       
+                            std::cout<<"------------>     == 22    "<<_originPhot[leptonCounter]<<std::endl;
+
+              GPM.printInheritance(&(*mc));
+              
+
+            } 
+          
             //Vertex::Point PVmc = mcMom->vertex();
           _ipPVmc[leptonCounter] = std::abs(electron->gsfTrack()->dxy(PVmc));
           _findMatched[leptonCounter]=1;
@@ -968,6 +980,11 @@ void trilepton::analyze(const edm::Event& iEvent, const edm::EventSetup& iEventS
           _findMatched[leptonCounter]=0;
         }
       }
+      
+      
+
+      
+      
       leptonCounter++;
     }
     _nEle = leptonCounter-_nMu;
@@ -1077,7 +1094,7 @@ void trilepton::fillMCVars(const GenParticle* mc, const int leptonCounter) {
     _lEtamc[leptonCounter] = mc->eta();
     _lpdgmc[leptonCounter] = mc->pdgId();
     _lchargemc[leptonCounter] = mc->charge();
-    GPM.printInheritance(mc);
+    //GPM.printInheritance(mc);
     //std::cout << "pdg of tau truth: " << mc->pdgId() << std::endl;
     
   
@@ -1175,7 +1192,6 @@ void trilepton::fillMCVars(const GenParticle* mc, const int leptonCounter) {
         _mompdg[leptonCounter] = 0;
     }
     
-    //GPM.printInheritance(&(*mc));
 }
 
 
