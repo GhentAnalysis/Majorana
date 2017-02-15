@@ -954,7 +954,7 @@ void trilepton::analyze(const edm::Event& iEvent, const edm::EventSetup& iEventS
               _origin[leptonCounter] = GPM.originReduced(_originDetailed[leptonCounter]);
               //std::cout<<" != 22    "<< _origin[leptonCounter]<<   std::endl;
 
-              GPM.printInheritance(&(*mc));
+              //GPM.printInheritance(&(*mc));
             }
             else {
               _originPhot[leptonCounter] = photonOrigin(mc); //is from conversion, so I store info on where a photon come from (fragmentation, FSR etc)
