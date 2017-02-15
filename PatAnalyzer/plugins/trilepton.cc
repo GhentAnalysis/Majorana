@@ -445,14 +445,14 @@ void trilepton::analyze(const edm::Event& iEvent, const edm::EventSetup& iEventS
             Gen0.SetPtEtaPhiE( 0, 0, 0, 0);
             _genqpt = 0;
             _genqpt20 = 0;
-            cout << "Particle ids in the event" << endl;
+            //cout << "Particle ids in the event" << endl;
             for(GenParticleCollection::const_reverse_iterator p = TheGenParticles->rbegin() ; p != TheGenParticles->rend() ; p++ )
             {
                 int id = std::abs(p->pdgId());
                 
                 if(p->status() == 1){
                     const GenParticle *mom = GPM.getMother(&*p);
-                    cout << id << " " << p->pt() << " " << std::abs(mom->pdgId()) << endl;
+                    //cout << id << " " << p->pt() << " " << std::abs(mom->pdgId()) << endl;
                 }
                 
                 if(id == 9900012) _nMajorana++;
@@ -952,7 +952,9 @@ void trilepton::analyze(const edm::Event& iEvent, const edm::EventSetup& iEventS
           fillMCVars(mc, leptonCounter);
             if (mc->pdgId() != 22) //not a photon => should be a fake, and GenParticleManager does the job
               _origin[leptonCounter] = GPM.originReduced(_originDetailed[leptonCounter]);
+            cout<<"mc->pdgId() != 22"<<endl;
             else {
+              cout<<"------------>    mc->pdgId() == 22"<<endl;
               _originPhot[leptonCounter] = photonOrigin(mc); //is from conversion, so I store info on where a photon come from (fragmentation, FSR etc)
               GPM.printInheritance(&(*mc));
 
