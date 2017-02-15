@@ -952,7 +952,7 @@ void trilepton::analyze(const edm::Event& iEvent, const edm::EventSetup& iEventS
           fillMCVars(mc, leptonCounter);
         }
         else {
-          mc = GPM.matchedMC(&*iE);
+          mc = GPM.matchedMC(&*electron);
                 if ( mc!=0 ) {
                     fillMCVars(mc, leptonCounter);
                     if (mc->pdgId() != 22) //not a photon => should be a fake, and GenParticleManager does the job
