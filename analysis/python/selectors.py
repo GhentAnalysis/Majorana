@@ -12,6 +12,8 @@ def matchedGenParticle(tree, index):
 # Current 'tight' selections
 def electronSelector(tree, index, ipCuts=True):
   if tree._isolation[index] > 0.1:          return False
+  if not tree._trigEmulator[index]:         return False
+  if not tree._isotrigEmulator[index]:      return False
   if not tree._passedMVA_SUSY[index*3]:     return False   # yes, times three, this is a result of the horrible SUSY-style coding we currently have in our trilepton.cc because someone says speed is more important than quality
   if ipCuts and tree._3dIPsig[index] > 4:   return False
   if ipCuts and tree._ipPV[index] > 0.05:   return False
