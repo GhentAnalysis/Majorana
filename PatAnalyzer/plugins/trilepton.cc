@@ -960,6 +960,7 @@ void trilepton::analyze(const edm::Event& iEvent, const edm::EventSetup& iEventS
                     else {
                         _originPhot[leptonCounter] = photonOrigin(mc); //is from conversion, so I store info on where a photon come from (fragmentation, FSR etc)
                         GPM.printInheritance(&(*mc));
+                      cout<<_originPhot[leptonCounter]<<endl;
                     }
                  
           //_ipPVmc[leptonCounter] = std::abs(electron->gsfTrack()->dxy(PVmc));
