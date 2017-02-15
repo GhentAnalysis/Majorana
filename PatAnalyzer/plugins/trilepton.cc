@@ -952,14 +952,16 @@ void trilepton::analyze(const edm::Event& iEvent, const edm::EventSetup& iEventS
           fillMCVars(mc, leptonCounter);
             if (mc->pdgId() != 22) {//not a photon => should be a fake, and GenParticleManager does the job
               _origin[leptonCounter] = GPM.originReduced(_originDetailed[leptonCounter]);
-              std::cout<<" != 22    "<< _origin[leptonCounter]<<   std::endl;
+              //std::cout<<" != 22    "<< _origin[leptonCounter]<<   std::endl;
 
               GPM.printInheritance(&(*mc));
             }
             else {
-              std::cout<<"------------>     == 22"<<std::endl;
               _originPhot[leptonCounter] = photonOrigin(mc); //is from conversion, so I store info on where a photon come from (fragmentation, FSR etc)
+                            std::cout<<"------------>     == 22    "<<_originPhot[leptonCounter]<<std::endl;
+
               GPM.printInheritance(&(*mc));
+              
 
             } 
           
