@@ -794,9 +794,9 @@ void trilepton::analyze(const edm::Event& iEvent, const edm::EventSetup& iEventS
 
       // Important: we are not using POG definitions anymore, NEVER call this a "loose muon" in a presentation
       _isloose[leptonCounter] = std::abs(muon->eta()) < 2.4 && muon->pt() > 5 && fabs(_ipPV[leptonCounter]) < 0.05 && fabs(_ipZPV[leptonCounter]) < 0.1 && muon->isPFMuon() && (muon->isTrackerMuon() || muon->isGlobalMuon() ) && _isolation[leptonCounter] < 0.6;
-
-      if(std::abs(muon->innerTrack()->dxy(PV)) > 0.05) continue;
-      if(std::abs(muon->innerTrack()->dz(PV)) > 0.1  ) continue;
+  
+      //if(std::abs(muon->innerTrack()->dxy(PV)) > 0.05) continue;
+      //if(std::abs(muon->innerTrack()->dz(PV)) > 0.1  ) continue;
 
       if(relIso > 0.6) continue; // loose selection for FR
 
@@ -902,8 +902,8 @@ void trilepton::analyze(const edm::Event& iEvent, const edm::EventSetup& iEventS
       _ipPV[leptonCounter]  = electron->gsfTrack()->dxy(PV);
       _ipZPV[leptonCounter] = electron->gsfTrack()->dz(PV);
 
-      if(std::abs(_ipPV[leptonCounter]) > 0.05) continue;
-      if(std::abs(_ipZPV[leptonCounter]) > 0.1) continue;
+     // if(std::abs(_ipPV[leptonCounter]) > 0.05) continue;
+     // if(std::abs(_ipZPV[leptonCounter]) > 0.1) continue;
       
       _miniisolation[leptonCounter]        = tools::getMiniIsolation(pfcands, &*electron, 0.05, 0.2, 10., myRhoJets, false);
       _miniisolationCharged[leptonCounter] = tools::getMiniIsolation(pfcands, &*electron, 0.05, 0.2, 10., myRhoJets, false);
@@ -1068,11 +1068,11 @@ void trilepton::analyze(const edm::Event& iEvent, const edm::EventSetup& iEventS
     // Here we make the decision on what to save
     if(treeForFakeRate){
       if(!triggerFound)        return;
-      //if(_nLeptons != 1)       return;
-      //if(_n_Jets < 1)          return;        // For fake rate tree: exactly 1 loose lepton + at least 1 jet
-      //if(_jetPt[0] < 30)       return;        // with deltaR(j, l) > 1 (back-to-back)
-      //if(_jetDeltaR[0][0] < 1) return;
-      if(_nLeptons < 3) return; // fake ttbar
+      if(_nLeptons != 1)       return;
+      if(_n_Jets < 1)          return;        // For fake rate tree: exactly 1 loose lepton + at least 1 jet
+      if(_jetPt[0] < 30)       return;        // with deltaR(j, l) > 1 (back-to-back)
+      if(_jetDeltaR[0][0] < 1) return;
+      //if(_nLeptons < 3) return; // fake ttbar
 
     } else if(singleLep){                     // Important: do not require trigger for singleLep trees which we use to measure trigger efficiencies
       if(_nLeptons < 1) return;
