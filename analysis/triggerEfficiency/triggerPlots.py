@@ -8,7 +8,8 @@ import Majorana.tools.style        as style
 import Majorana.analysis.selectors as selectors
 
 
-triggerSamples      = ['WZ','WJets','MET','JetHT']
+#triggerSamples      = ['WZ','WJets','MET','JetHT','JetHT-met30']
+triggerSamples      = ['JetHT-mt50']
 triggerCombinations = ['1l','1l_eta','2l','3l','2l1l','3l2l1l','1l1l']
 
 import argparse
@@ -114,13 +115,16 @@ def run(inputTree, triggers, dir, nLepton, binEta=False):
     for ptThreshold in ptThresholds:
       ptMin = int(ptThreshold.split('to')[0])
       ptMax = int(ptThreshold.split('to')[1])
-      if pt > ptMin or pt < ptMax: return ptThreshold
+      if pt > ptMin and pt < ptMax: return ptThreshold
 
   # loop over events
   print inputTree.GetEntries()
   for i in range(inputTree.GetEntries()):
     inputTree.GetEntry(i)
     if i%100000==0: print i, '/', inputTree.GetEntries()
+
+    if dir.count('met30') and inputTree._met < 30: continue
+    if dir.count('mt50') and inputTree._mt < 50: continue
 
     if inputTree._nLeptons != nLepton: continue
     if not all(selectors.leptonSelector(inputTree, i) for i in range(nLepton)): continue
@@ -178,7 +182,7 @@ if not args.sample:
       launch('./triggerPlots.py --sample=' + pd + ' --type=' + type + ' --isChild', 'log/' + pd + '_' + type + '.log')
 elif args.isChild:
   pd = args.sample
-  chain = samples.getTree(pd, treeType='singleLep', productionLabel='triggerEfficiency_v7', shortDebug=False)
+  chain = samples.getTree(pd.split('-')[0], treeType='singleLep', productionLabel='triggerEfficiency_v7', shortDebug=False)
 
   plotDir = 'plots/'
   if args.type == '1l':       run(chain, triggers_1l,     plotDir + pd + '/1l', 1)
